@@ -26,3 +26,27 @@ $routes->get('/customer/order/create/(:num)', 'CustomerController::createOrder/$
 $routes->post('/customer/order/store', 'CustomerController::storeOrder');
 $routes->get('/customer/monitor', 'CustomerController::monitorOrder');
 $routes->post('/customer/review/store', 'CustomerController::storeReview');
+
+// Rute untuk fitur-fitur Outlet
+// Rute untuk manajemen banyak outlet
+$routes->get('/outlet/my-outlets', 'OutletController::listMyOutlets');
+$routes->get('/outlet/create', 'OutletController::createOutletForm');
+$routes->get('/outlet/edit/(:num)', 'OutletController::editOutletForm/$1');
+$routes->post('/outlet/store-update', 'OutletController::storeOrUpdateOutlet');
+
+// Rute lainnya tetap sama
+$routes->get('/outlet/orders', 'OutletController::listOrders');
+$routes->post('/outlet/orders/update/(:num)', 'OutletController::updateOrderStatus/$1');
+$routes->get('/outlet/reviews', 'OutletController::listReviews');
+// ... (rute untuk services)
+// Rute untuk Kelola Layanan oleh Outlet
+$routes->get('/outlet/services', 'OutletController::listServices');
+$routes->get('/outlet/services/create', 'OutletController::createService');
+$routes->get('/outlet/services/edit/(:num)', 'OutletController::editService/$1');
+$routes->post('/outlet/services/store', 'OutletController::storeService');
+$routes->get('/outlet/services/delete/(:num)', 'OutletController::deleteService/$1');
+
+
+// Rute untuk fitur Admin
+$routes->get('/admin/verify', 'AdminController::listPendingOutlets');
+$routes->get('/admin/verify/action/(:num)/(:segment)', 'AdminController::verifyOutlet/$1/$2');
