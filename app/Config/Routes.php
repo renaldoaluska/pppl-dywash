@@ -8,11 +8,10 @@ use CodeIgniter\Router\RouteCollection;
 //$routes->get('/', 'Home::index');
 
 // ... (kode route lainnya)
-
 $routes->get('/', 'AuthController::login');
-$routes->match(['post'], 'auth/login', 'AuthController::login');
-$routes->get('logout', 'AuthController::logout');
+$routes->get('/auth/login', 'AuthController::login');
+$routes->post('/auth/login', 'AuthController::login');
+$routes->get('/logout', 'AuthController::logout');
 
-$routes->get('dashboard/admin', 'DashboardController::admin');
-$routes->get('dashboard/outlet', 'DashboardController::outlet');
-$routes->get('dashboard/customer', 'DashboardController::customer');
+// Rute ini sekarang menangani semua jenis dashboard
+$routes->get('/dashboard', 'AuthController::dashboard');
