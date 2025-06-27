@@ -54,7 +54,7 @@
         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg mb-3 transition">Masuk</button>
       </form>
       <div class="text-center text-sm mb-3">
-        Belum anggota? <a href="#" class="text-blue-600 font-medium hover:underline">Daftar sekarang</a>
+        Belum anggota? <a href="/auth/register" class="text-blue-600 font-medium hover:underline">Daftar sekarang</a>
       </div>
       <div class="flex items-center my-4">
         <div class="flex-grow border-t border-gray-200"></div>

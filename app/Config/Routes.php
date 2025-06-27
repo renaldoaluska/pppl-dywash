@@ -15,3 +15,7 @@ $routes->get('/logout', 'AuthController::logout');
 
 // Rute ini sekarang menangani semua jenis dashboard
 $routes->get('/dashboard', 'AuthController::dashboard');
+
+// Rute untuk register
+$routes->get('/auth/register', 'AuthController::register');
+$routes->post('/auth/register', 'AuthController::register');

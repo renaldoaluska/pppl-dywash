@@ -83,7 +83,44 @@ class AuthController extends BaseController
                 return redirect()->to('/logout');
         }
     }
+    /**
+     * Menampilkan dan memproses halaman register.
+     */
+    public function register()
+    {
+        // Jika sudah login, arahkan ke dashboard
+        if (session()->get('isLoggedIn')) {
+            return redirect()->to('/dashboard');
+        }
 
+        $error = null;
+
+        if ($this->request->getMethod() === 'POST') {
+            $name     = $this->request->getPost('name');
+            $email    = $this->request->getPost('email');
+            $password = $this->request->getPost('password');
+            $role     = $this->request->getPost('role', FILTER_SANITIZE_STRING);
+
+            $userModel = new UserModel();
+
+            // Cek apakah email sudah terdaftar
+            if ($userModel->where('email', $email)->first()) {
+                $error = 'Email sudah terdaftar!';
+            } else {
+                // Simpan user baru (password masih plain text, sebaiknya gunakan hash di produksi)
+                $userModel->save([
+                    'name'     => $name,
+                    'email'    => $email,
+                    'password' => $password,
+                    'role'     => $role ?? 'cust'
+                ]);
+                // Redirect ke login setelah register berhasil
+                return redirect()->to('/auth/login');
+            }
+        }
+
+        return view('auth/register', ['error' => $error]);
+    }
     /**
      * Menghapus sesi dan mengarahkan ke halaman login.
      */
