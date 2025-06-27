@@ -15,7 +15,8 @@
     <hr>
     
     <a href="/admin/verify">Verifikasi Pendaftaran Outlet</a><br>
-    
+    <a href="/admin/payments/verify">Verifikasi Pembayaran Customer</a><br>
+
     <br>
     <a href="/logout">Logout</a>
 </body>

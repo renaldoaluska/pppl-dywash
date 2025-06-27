@@ -50,3 +50,11 @@ $routes->get('/outlet/services/delete/(:num)', 'OutletController::deleteService/
 // Rute untuk fitur Admin
 $routes->get('/admin/verify', 'AdminController::listPendingOutlets');
 $routes->get('/admin/verify/action/(:num)/(:segment)', 'AdminController::verifyOutlet/$1/$2');
+
+// Rute untuk alur pembayaran customer
+$routes->get('/customer/payment/(:num)', 'CustomerController::paymentForm/$1');
+$routes->post('/customer/payment/process', 'CustomerController::processPayment');
+
+// Rute untuk verifikasi pembayaran oleh admin
+$routes->get('/admin/payments/verify', 'AdminController::listPendingPayments');
+$routes->get('/admin/payments/verify/action/(:num)', 'AdminController::verifyPayment/$1');

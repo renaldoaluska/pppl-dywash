@@ -7,6 +7,7 @@ use App\Models\OrderModel;
 use App\Models\OrderItemModel;
 use App\Models\ServiceModel;
 use App\Models\ReviewModel;
+use App\Models\PaymentModel;
 
 class CustomerController extends BaseController
 {
@@ -78,12 +79,7 @@ class CustomerController extends BaseController
                 $service = $serviceModel->find($service_id);
                 $subtotal = $service['price'] * $quantity;
                 $totalAmount += $subtotal;
-
-                $orderItemsData[] = [
-                    'service_id' => $service_id,
-                    'quantity'   => $quantity,
-                    'subtotal'   => $subtotal,
-                ];
+                $orderItemsData[] = ['service_id' => $service_id, 'quantity' => $quantity, 'subtotal' => $subtotal];
             }
         }
         
@@ -91,7 +87,8 @@ class CustomerController extends BaseController
             'customer_id'    => session()->get('user_id'),
             'outlet_id'      => $outlet_id,
             'total_amount'   => $totalAmount,
-            'status'         => 'diterima',
+            // STATUS AWAL BARU
+            // 'status'         => 'pending', 
             'customer_notes' => $customer_notes,
         ];
         $order_id = $orderModel->insert($orderData);
@@ -101,7 +98,59 @@ class CustomerController extends BaseController
         }
         $orderItemModel->insertBatch($orderItemsData);
 
-        return redirect()->to('/customer/monitor')->with('success', 'Pesanan berhasil dibuat!');
+        // Arahkan ke halaman pembayaran, bukan riwayat
+        return redirect()->to('/customer/payment/' . $order_id)->with('success', 'Pesanan dibuat. Silakan lakukan pembayaran.');
+    }
+
+        /**
+     * FUNGSI BARU: Menampilkan form pembayaran untuk sebuah pesanan.
+     * @param int $order_id
+     */
+    public function paymentForm($order_id)
+    {
+        $orderModel = new OrderModel();
+        $data['order'] = $orderModel->find($order_id);
+
+        // Validasi: pastikan order ini milik customer yang login
+        if (!$data['order'] || $data['order']['customer_id'] != session()->get('user_id')) {
+            return redirect()->to('/customer/monitor')->with('error', 'Pesanan tidak ditemukan.');
+        }
+        
+        return view('customer/payment_form', $data);
+    }
+
+    /**
+     * FUNGSI BARU: Memproses pembayaran yang dipilih oleh customer.
+     */
+    public function processPayment()
+    {
+        $paymentModel = new PaymentModel();
+        $orderModel = new OrderModel();
+
+        $order_id = $this->request->getPost('order_id');
+        $amount = $this->request->getPost('amount');
+        $payment_method = $this->request->getPost('payment_method');
+
+        $paymentData = [
+            'order_id'       => $order_id,
+            'amount'         => $amount,
+            'payment_method' => $payment_method,
+            'payment_date'   => date('Y-m-d H:i:s'),
+        ];
+        
+        // Logika berdasarkan metode pembayaran
+        if ($payment_method === 'cod') {
+            $paymentData['status'] = 'lunas';
+            // Langsung ubah status pesanan menjadi 'diterima'
+            $orderModel->update($order_id, ['status' => 'diterima']);
+        } else { // Untuk 'transfer' dan 'ewallet'
+            $paymentData['status'] = 'pending';
+            // Status pesanan tetap 'menunggu_pembayaran' sampai admin verifikasi
+        }
+
+        $paymentModel->save($paymentData);
+
+        return redirect()->to('/customer/monitor')->with('success', 'Proses pembayaran Anda telah dicatat. Terima kasih.');
     }
 
     /**
