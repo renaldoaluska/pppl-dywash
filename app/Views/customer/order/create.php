@@ -3,6 +3,7 @@
 <html lang="id">
 <head>
     <?= $this->include('layout/isian') ?>
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Buat Pesanan Baru</title>
      <style>
         body { font-family: sans-serif; }
@@ -12,6 +13,7 @@
     </style>
 </head>
 <body>
+<?= $this->include('layout/top_nav') ?>
 <div class="container">
     <h1>Pesan di Outlet: <?= esc($outlet['name']) ?></h1>
     <p><a href="../">Kembali ke daftar outlet</a></p>
@@ -47,5 +49,5 @@
         <button type="submit" class="button">Buat Pesanan</button>
     </form>
 </div>
-</body>
-</html>
+<?= $this->include('layout/bottom_nav') ?>
+<?= $this->include('layout/footer') ?>

@@ -6,7 +6,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Riwayat Pesanan</title>
     <style>
-        body { font-family: sans-serif; }
         .order-card { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
         .status { font-weight: bold; padding: 5px; border-radius: 5px; color: white; }
         .status-diterima { background-color: #007bff; }
@@ -19,6 +18,7 @@
     </style>
 </head>
 <body>
+<?= $this->include('layout/top_nav') ?>
     <h1>Riwayat Pesanan Saya</h1>
     <p><a href="../">Kembali ke Home</a></p>
     <hr>

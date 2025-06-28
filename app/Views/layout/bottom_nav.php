@@ -1,5 +1,7 @@
-<nav class="fixed bottom-0 inset-x-0 bg-white shadow-t z-10">
-    <div class="flex justify-around h-16">
+<nav class="fixed bottom-0 inset-x-0 bg-white z-10 h-16">
+<div class="absolute bottom-full w-full h-3 bg-gradient-to-t from-black/5 to-transparent pointer-events-none"></div>
+
+    <div class="flex justify-around h-full">
         <a href="<?= site_url('/') ?>" class="flex flex-col items-center justify-center w-full text-gray-500 hover:text-blue-600 transition-colors">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             <span class="text-xs">Eksplor</span>
@@ -20,6 +22,8 @@
             <span class="text-xs">Profil</span>
         </a>
     </div>
+
+        </div>
 </nav>
 
 <div class="pb-16"></div>

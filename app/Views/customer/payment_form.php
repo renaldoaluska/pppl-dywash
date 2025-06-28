@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
+    <?= $this->include('layout/isian') ?>
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Pembayaran Pesanan</title>
     <style>
         body { font-family: sans-serif; background-color: #f4f4f9; }
@@ -13,6 +14,7 @@
     </style>
 </head>
 <body>
+<?= $this->include('layout/top_nav') ?>
 <div class="container">
     <h1>Konfirmasi Pembayaran</h1>
     

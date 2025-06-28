@@ -1,4 +1,5 @@
 <?= $this->include('layout/header') ?>
+<?= $this->include('layout/top_nav') ?>
 <main class="p-4">
 
     <section class="mb-8">

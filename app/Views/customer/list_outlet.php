@@ -5,7 +5,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Cari Outlet Laundry</title>
     <style>
-        body { font-family: sans-serif; background-color: #f4f4f9; color: #333; }
         .container { max-width: 800px; margin: 20px auto; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         h1, h2 { color: #0056b3; }
         a { text-decoration: none; color: #007bff; }
@@ -19,7 +18,7 @@
     </style>
 </head>
 <body>
-
+<?= $this->include('layout/top_nav') ?>
     <div class="container">
         <h1>Cari Outlet Laundry</h1>
         <p><a href="/dashboard">Kembali ke Dashboard</a> | <a href="/logout">Logout</a></p>

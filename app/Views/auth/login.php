@@ -3,11 +3,7 @@
     <!-- Logo/Ilustrasi -->
     <div class="flex flex-col items-center bg-blue-50 py-10">
       <div class="bg-white rounded-lg w-20 h-20 flex items-center justify-center shadow">
-        <!-- Placeholder logo -->
-        <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 48 48">
-          <rect width="36" height="28" x="6" y="10" rx="4" fill="#f3f4f6"/>
-          <path d="M6 34l8-10 7 9 7-11 8 12" stroke="#d1d5db" stroke-width="2" fill="none"/>
-        </svg>
+        <img src="<?= base_url('assets/img/icon.png') ?>" alt="Ilustrasi Login" class="w-16 h-16 object-contain">
       </div>
     </div>
     <!-- Login Form -->
