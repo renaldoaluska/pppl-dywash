@@ -1,9 +1,14 @@
 <?php // app/Views/outlet/list_orders.php ?>
 
-<?= $this->include('Views/layout/header') ?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <title>Order List - Dywash Laundry</title>
+    <?= $this->include('layout/isian') ?>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
 
 <!-- KONTEN UTAMA HALAMAN MULAI DI SINI -->
-
 <!-- BAGIAN 1: PESANAN AKTIF -->
 <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
     <h2 class="text-xl font-bold text-slate-700 mb-5">Pesanan Aktif</h2>
@@ -122,4 +127,4 @@
 
 <!-- KONTEN UTAMA HALAMAN SELESAI -->
 
-<?= $this->include('Views/layout/footer') ?>
+<?= $this->include('layout/footer') ?>
