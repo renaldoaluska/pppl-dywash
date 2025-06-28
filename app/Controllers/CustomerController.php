@@ -157,18 +157,37 @@ class CustomerController extends BaseController
      * Fitur: Monitor Pesanan
      * Menampilkan halaman riwayat pesanan.
      */
-    public function monitorOrder()
-    {
-        $orderModel = new OrderModel();
-        
-        $data['orders'] = $orderModel
-            ->where('customer_id', session()->get('user_id'))
-            ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-            ->select('orders.*, outlets.name as outlet_name')
-            ->findAll();
+public function monitorOrder()
+{
+    $orderModel = new OrderModel();
 
-        return view('customer/order/history', $data);
+    $filter_status = $this->request->getGet('status');
+    $sort = $this->request->getGet('sort');
+
+    $query = $orderModel
+        ->where('orders.customer_id', session()->get('user_id'))
+        ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+        ->join('reviews', 'reviews.order_id = orders.order_id', 'left')
+        ->select('orders.*, outlets.name as outlet_name, reviews.rating as review_rating, reviews.comment as review_comment');
+
+    if ($filter_status) {
+        $query->where('orders.status', $filter_status);
     }
+
+    if ($sort == 'oldest') {
+        $query->orderBy('orders.order_date', 'ASC');
+    } else { // default: newest
+        $query->orderBy('orders.order_date', 'DESC');
+    }
+
+    $data['orders'] = $query->findAll();
+    $data['filter_status'] = $filter_status;
+    $data['sort'] = $sort;
+
+    return view('customer/order/history', $data);
+}
+
+
 
     /**
      * Fitur: Memberikan Review
