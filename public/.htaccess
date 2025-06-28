@@ -1,4 +1,4 @@
-# Disable directory browsing
+# Disable directory Browse
 Options -Indexes
 
 # ----------------------------------------------------------------------
@@ -16,32 +16,37 @@ Options -Indexes
 	# http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritebase
 	# RewriteBase /
 
-	# Redirect Trailing Slashes...
-	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteCond %{REQUEST_URI} (.+)/$
-	RewriteRule ^ %1 [L,R=301]
-
-	# Rewrite "www.example.com -> example.com"
-	RewriteCond %{HTTPS} !=on
-	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-	RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
-
-	# Checks to see if the user is attempting to access a valid file,
-	# such as an image or css document, if this isn't true it sends the
-	# request to the front controller, index.php
+	# Ini adalah aturan utama untuk CodeIgniter 4 di folder public.
+	# Ini akan mengarahkan semua permintaan yang BUKAN file atau direktori yang ada
+	# ke index.php sebagai front controller, untuk membersihkan URL.
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteRule ^([\s\S]*)$ index.php/$1 [L,NC,QSA]
+	RewriteRule ^(.*)$ index.php/$1 [L,NC,QSA] # Perhatikan bahwa ini adalah aturan standar CI4 untuk public/
+
+	# Redirect Trailing Slashes...
+	# Aturan ini biasanya tidak diperlukan jika sudah dihandle oleh aplikasi atau proxy.
+	# RewriteCond %{REQUEST_FILENAME} !-d
+	# RewriteCond %{REQUEST_URI} (.+)/$
+	# RewriteRule ^ %1 [L,R=301]
+
+	# Rewrite "www.example.com -> example.com"
+	# Koyeb biasanya menangani HTTPS dan redirect domain di tingkat load balancer.
+	# Jika Anda sudah mengatur APP_BASEURL ke https://{{ KOYEB_PUBLIC_DOMAIN }}/, ini tidak diperlukan.
+	# RewriteCond %{HTTPS} !=on
+	# RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+	# RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
 
 	# Ensure Authorization header is passed along
-	RewriteCond %{HTTP:Authorization} .
-	RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+	# Aturan ini mungkin tidak diperlukan jika php spark serve sudah menangani header.
+	# RewriteCond %{HTTP:Authorization} .
+	# RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 </IfModule>
 
 <IfModule !mod_rewrite.c>
 	# If we don't have mod_rewrite installed, all 404's
 	# can be sent to index.php, and everything works as normal.
-	ErrorDocument 404 index.php
+	# ErrorDocument ini biasanya hanya relevan jika Apache adalah server utama.
+	ErrorDocument 404 /index.php
 </IfModule>
 
 # Disable server signature start
