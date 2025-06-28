@@ -13,6 +13,6 @@
     }
   ],
   "env": {
-    "APP_ENV": "production" // Opsional: Untuk mengatur environment aplikasi internal Vercel. CI_ENVIRONMENT diatur terpisah.
+    "APP_ENV": "production"
   }
 }
