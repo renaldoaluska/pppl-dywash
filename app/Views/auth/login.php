@@ -1,16 +1,11 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Dywash</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-blue-50 flex flex-col" style="height: calc(var(--vh, 1vh) * 100);">
 
-  <div class="flex-grow flex flex-col items-center justify-center p-4">
-    <div class="bg-white rounded-lg w-20 h-20 flex items-center justify-center shadow-md">
-      <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 48 48"><rect width="36" height="28" x="6" y="10" rx="4" fill="#f3f4f6"/><path d="M6 34l8-10 7 9 7-11 8 12" stroke="#d1d5db" stroke-width="2" fill="none"/></svg>
+<?= $this->include('layout/header') ?>
+  <div class="flex-1 flex flex-col justify-center">
+    <!-- Logo/Ilustrasi -->
+    <div class="flex flex-col items-center bg-blue-50 py-10">
+      <div class="bg-white rounded-lg w-20 h-20 flex items-center justify-center shadow">
+        <img src="<?= base_url('assets/img/icon.png') ?>" alt="Ilustrasi Login" class="w-16 h-16 object-contain">
+      </div>
     </div>
   </div>
 
@@ -81,7 +76,6 @@
         </div>
     </div>
   </div>
-
   <script>
     // == FUNGSI POP-UP YANG BISA DIPAKAI ULANG ==
     function showPopup(popupId) {
@@ -160,5 +154,4 @@
     });
   </script>
 
-</body>
-</html>
+<?= $this->include('layout/footer') ?>

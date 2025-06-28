@@ -1,76 +1,241 @@
+<?php
+// Definisikan warna status untuk konsistensi
+$statusColors = [
+    'diterima' => 'bg-blue-100 text-blue-800',
+    'diproses' => 'bg-yellow-100 text-yellow-800',
+    'selesai'  => 'bg-green-100 text-green-800',
+    'diulas'   => 'bg-gray-200 text-gray-800',
+    'ditolak'  => 'bg-red-100 text-red-800'
+];
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Daftar Pesanan Masuk</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Pesanan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background-color: #f8f9fa; }
-        .container { max-width: 1000px; margin: 20px auto; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; border: 1px solid #dee2e6; text-align: left; vertical-align: middle; }
-        th { background-color: #e9ecef; }
-        .status-diterima { background-color: #cfe2ff; }
-        .status-diproses { background-color: #fff3cd; }
-        .status-selesai { background-color: #d1e7dd; }
-        .status-diulas { background-color: #e2e3e5; }
-        .status-ditolak { background-color: #f8d7da; }
-        select, button { padding: 8px; border-radius: 5px; border: 1px solid #ccc; }
-        button { cursor: pointer; background-color: #007bff; color: white; border: none; }
-        button:hover { background-color: #0056b3; }
-        .update-form { display: flex; gap: 5px; }
+        body { font-family: 'Poppins', sans-serif; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Daftar Pesanan Masuk</h1>
-        <p><a href="/dashboard">Kembali ke Dashboard</a> | <a href="/logout">Logout</a></p>
-        <hr>
-        
-        <table>
-            <thead>
+<body class="bg-slate-100">
+
+<<<<<<< HEAD
+    <div class="container max-w-7xl mx-auto my-8 px-4">
+        <header class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">Manajemen Pesanan</h1>
+                <p class="mt-1 text-slate-500">Kelola pesanan aktif dan lihat riwayat.</p>
+            </div>
+        <a href="/dashboard" class="w-full sm:w-auto text-center text-white bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-200">
+            Kembali ke Dashboard
+        </a>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
+            <h2 class="text-xl font-bold text-slate-700 mb-5">Pesanan Aktif</h2>
+
+            <div class="hidden md:block">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-slate-500 uppercase bg-slate-50">
+                        <tr>
+                            <th class="p-4">Detail Customer</th>
+                            <th class="p-4">Outlet</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <?php if (!empty($pending_orders)): ?>
+                            <?php foreach ($pending_orders as $order): ?>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-4">
+                                        <p class="font-bold text-slate-800">#<?= $order['order_id'] ?> - <?= esc($order['customer_name']) ?></p>
+                                        <p class="text-xs text-slate-500"><?= date('d M Y, H:i', strtotime($order['order_date'])) ?></p>
+                                    </td>
+                                    <td class="p-4 text-slate-600"><?= esc($order['outlet_name']) ?></td>
+                                    <td class="p-4">
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full <?= $statusColors[esc($order['status'])] ?? 'bg-gray-100' ?> capitalize"><?= esc($order['status']) ?></span>
+                                    </td>
+                                    <td class="p-4">
+                                        <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="flex items-center gap-2">
+                                            <?= csrf_field() ?>
+                                            <select name="status" class="w-36 border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2">
+                                                <option value="diproses" <?= $order['status'] == 'diproses' ? 'selected' : '' ?>>Diproses</option>
+                                                <option value="selesai" <?= $order['status'] == 'selesai' ? 'selected' : '' ?>>Selesai</option>
+                                                <option value="ditolak" <?= $order['status'] == 'ditolak' ? 'selected' : '' ?>>Tolak</option>
+                                            </select>
+                                            <button type="button" class="update-btn px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Update</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr><td colspan="4" class="text-center p-10 text-slate-500">Tidak ada pesanan aktif.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="block md:hidden space-y-4">
+=======
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <title>Order List - Dywash Laundry</title>
+    <?= $this->include('layout/isian') ?>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<!-- KONTEN UTAMA HALAMAN MULAI DI SINI -->
+<!-- BAGIAN 1: PESANAN AKTIF -->
+<div class="bg-white rounded-xl shadow-lg p-6 mt-6">
+    <h2 class="text-xl font-bold text-slate-700 mb-5">Pesanan Aktif</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+            <thead class="text-xs text-slate-500 uppercase bg-slate-50">
                 <tr>
-                    <th>ID Pesanan</th>
-                    <th>Nama Outlet</th>
-                    <th>Nama Customer</th>
-                    <th>Tanggal</th>
-                    <th>Status</th>
-                    <th>Update Status</th>
+                    <th scope="col" class="p-4">ID Pesanan</th>
+                    <th scope="col" class="p-4">Outlet</th>
+                    <th scope="col" class="p-4">Customer</th>
+                    <th scope="col" class="p-4">Tanggal</th>
+                    <th scope="col" class="p-4">Status</th>
+                    <th scope="col" class="p-4">Tindakan</th>
                 </tr>
             </thead>
             <tbody>
-                <?php if (!empty($orders)): ?>
-                    <?php foreach ($orders as $order): ?>
-                        <tr class="status-<?= esc($order['status']) ?>">
-                            <td>#<?= $order['order_id'] ?></td>
-                            <td><?= esc($order['outlet_name']) ?></td>
-                            <td><?= esc($order['customer_name']) ?></td>
-                            <td><?= date('d M Y', strtotime($order['order_date'])) ?></td>
-                            <td><strong><?= ucfirst(esc($order['status'])) ?></strong></td>
-                            <td>
-                                <?php // Form hanya ditampilkan jika statusnya belum final (bukan diulas atau ditolak) ?>
-                                <?php if (!in_array($order['status'], ['diulas', 'ditolak'])): ?>
-                                <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="update-form">
+>>>>>>> 17e48ce59d5b4548fe33235ce60f0c53d61fb919
+                <?php if (!empty($pending_orders)): ?>
+                    <?php foreach ($pending_orders as $order): ?>
+                        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <p class="font-bold text-slate-800">#<?= $order['order_id'] ?> - <?= esc($order['customer_name']) ?></p>
+                                    <p class="text-sm text-slate-500"><?= esc($order['outlet_name']) ?></p>
+                                </div>
+                                <span class="flex-shrink-0 px-3 py-1 text-xs font-semibold rounded-full <?= $statusColors[esc($order['status'])] ?? 'bg-gray-100' ?> capitalize"><?= esc($order['status']) ?></span>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-4">Tgl: <?= date('d M Y, H:i', strtotime($order['order_date'])) ?></p>
+                            <div class="bg-slate-50 p-3 rounded-lg mt-2">
+                                <p class="text-xs text-slate-500 mb-2 font-semibold">Update Status:</p>
+                                <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="flex items-center gap-2">
                                     <?= csrf_field() ?>
-                                    <select name="status">
+                                    <select name="status" class="w-full p-2 text-sm border-gray-300 rounded-lg bg-white focus:ring-blue-500 focus:border-blue-500">
                                         <option value="diproses" <?= $order['status'] == 'diproses' ? 'selected' : '' ?>>Diproses</option>
                                         <option value="selesai" <?= $order['status'] == 'selesai' ? 'selected' : '' ?>>Selesai</option>
                                         <option value="ditolak" <?= $order['status'] == 'ditolak' ? 'selected' : '' ?>>Tolak</option>
                                     </select>
-                                    <button type="submit">Update</button>
+                                    <button type="button" class="update-btn px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Update</button>
                                 </form>
-                                <?php else: ?>
-                                    -
-                                <?php endif; ?>
-                            </td>
-                        </tr>
+                            </div>
+                        </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <tr>
-                        <td colspan="6" style="text-align: center;">Belum ada pesanan yang masuk di outlet terverifikasi Anda.</td>
-                    </tr>
+                    <p class="bg-white rounded-lg p-10 text-center text-slate-500 shadow-sm">Tidak ada pesanan aktif.</p>
                 <?php endif; ?>
-            </tbody>
-        </table>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-lg p-6 mt-8">
+            <h2 class="text-xl font-bold text-slate-700 mb-5">Riwayat Pesanan</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm" style="min-width: 640px;">
+                    <thead class="text-xs text-slate-500 uppercase bg-slate-50">
+                        <tr>
+                            <th class="p-4">ID</th>
+                            <th class="p-4">Customer</th>
+                            <th class="p-4">Outlet</th>
+                            <th class="p-4">Tanggal</th>
+                            <th class="p-4">Status Final</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <?php if (!empty($history_orders)): ?>
+                            <?php foreach ($history_orders as $order): ?>
+                                <tr>
+                                    <td class="p-4 font-bold text-slate-700">#<?= $order['order_id'] ?></td>
+                                    <td class="p-4 text-slate-600"><?= esc($order['customer_name']) ?></td>
+                                    <td class="p-4 text-slate-600"><?= esc($order['outlet_name']) ?></td>
+                                    <td class="p-4 text-slate-600"><?= date('d M Y', strtotime($order['order_date'])) ?></td>
+                                    <td class="p-4">
+                                        <span class="px-3 py-1 text-xs font-semibold rounded-full <?= $statusColors[esc($order['status'])] ?? 'bg-gray-100' ?> capitalize"><?= esc($order['status']) ?></span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr><td colspan="5" class="text-center p-10 text-slate-500">Belum ada riwayat pesanan.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
+
+    <div id="confirmationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
+            <p class="text-lg font-medium text-slate-800 mb-6">Apakah Anda yakin ingin mengupdate status pesanan ini?</p>
+            <div class="flex justify-center gap-4">
+                <button id="confirmBtnTidak" class="px-6 py-2 font-semibold text-white bg-gray-500 rounded-lg hover:bg-gray-600">Tidak</button>
+                <button id="confirmBtnYa" class="px-6 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">Ya, Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('confirmationModal');
+            if (modal) {
+                const confirmBtnYa = document.getElementById('confirmBtnYa');
+                const confirmBtnTidak = document.getElementById('confirmBtnTidak');
+                const updateButtons = document.querySelectorAll('.update-btn');
+                let formToSubmit = null;
+
+<<<<<<< HEAD
+                updateButtons.forEach(button => {
+                    button.addEventListener('click', function(event) {
+                        formToSubmit = event.target.closest('form');
+                        // Cara yang benar untuk menampilkan modal di Tailwind
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                    });
+                });
+
+                function hideModal() {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    formToSubmit = null;
+                }
+
+                // Cek jika tombol 'Ya' ada sebelum menambahkan listener
+                if (confirmBtnYa) {
+                    confirmBtnYa.addEventListener('click', () => { 
+                        if (formToSubmit) {
+                            formToSubmit.submit();
+                        }
+                    });
+                }
+                
+                // Cek jika tombol 'Tidak' ada sebelum menambahkan listener
+                if (confirmBtnTidak) {
+                    confirmBtnTidak.addEventListener('click', hideModal);
+                }
+
+                // Listener untuk menutup modal jika klik di luar area
+                modal.addEventListener('click', (event) => { 
+                    if (event.target === modal) {
+                        hideModal();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
+=======
+<?= $this->include('layout/footer') ?>
+>>>>>>> 17e48ce59d5b4548fe33235ce60f0c53d61fb919

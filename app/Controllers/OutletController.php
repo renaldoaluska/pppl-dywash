@@ -95,30 +95,46 @@ class OutletController extends BaseController
 
     // --- FUNGSI KELOLA PESANAN (DIPERBARUI) ---
     public function listOrders()
-    {
+     {
         $orderModel = new OrderModel();
         $outletModel = new OutletModel();
         
+        // Ambil semua outlet terverifikasi milik owner
         $outlets = $outletModel->where(['owner_id' => session()->get('user_id'), 'status' => 'verified'])->findAll();
 
         if (empty($outlets)) {
+            // Jika tidak punya outlet terverifikasi, tidak bisa melihat pesanan
             return redirect()->to('/dashboard')->with('error', 'Anda tidak memiliki outlet terverifikasi untuk melihat pesanan.');
         }
 
+        // Kumpulkan semua ID outlet untuk query
         $outletIds = array_column($outlets, 'outlet_id');
         
-        // Ambil pesanan dari SEMUA outlet yang dimiliki
-        $data['orders'] = $orderModel
-            // PERBAIKAN: Sebutkan nama tabel secara eksplisit untuk menghindari ambiguitas
+        // REVISI DIMULAI DI SINI: Kita akan membuat 2 query terpisah
+
+        // Grup 1: Pesanan yang perlu ditangani (statusnya BUKAN selesai, diulas, atau ditolak)
+        $data['pending_orders'] = $orderModel
             ->whereIn('orders.outlet_id', $outletIds)
+            ->whereNotIn('orders.status', ['selesai', 'diulas', 'ditolak']) // Status yang dianggap aktif
             ->join('users', 'users.user_id = orders.customer_id')
             ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
             ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+            ->orderBy('orders.order_date', 'ASC') // Pesanan terlama di atas
             ->findAll();
         
+        // Grup 2: Riwayat pesanan (statusnya selesai, diulas, atau ditolak)
+        $data['history_orders'] = $orderModel
+            ->whereIn('orders.outlet_id', $outletIds)
+            ->whereIn('orders.status', ['selesai', 'diulas', 'ditolak']) // Status yang dianggap riwayat
+            ->join('users', 'users.user_id = orders.customer_id')
+            ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+            ->orderBy('orders.order_date', 'DESC') // Riwayat terbaru di atas
+            ->findAll();
+        
+        // Kirim dua variabel data ('pending_orders' dan 'history_orders') ke view
         return view('outlet/list_orders', $data);
     }
-    
     /**
      * Fitur: Update Status Pesanan (Langkah 2) - DIPERBARUI
      * Memproses perubahan status pesanan dengan validasi kepemilikan.
