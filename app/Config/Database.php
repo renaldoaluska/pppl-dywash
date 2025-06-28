@@ -212,7 +212,7 @@ class Database extends Config
                 'charset'      => env('database.default.charset', 'UTF8'), // UTF8 for Postgre!
                 'DBCollat'     => '', // Postgre does not use DBCollat
                 'swapPre'      => '',
-                'encrypt'      => false,
+                'encrypt'  => ['sslmode' => 'require'], // PENTING UNTUK SSL
                 'compress'     => false,
                 'strictOn'     => false,
                 'failover'     => [],
