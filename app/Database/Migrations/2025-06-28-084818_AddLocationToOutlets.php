@@ -10,12 +10,12 @@ class AddLocationToOutlets extends Migration
     {
         $fields = [
             'latitude' => [
-                'type' => 'DOUBLE',
+                'type' => ' Double PRECISION',
                 'null' => true,
                 'after' => 'address',
             ],
             'longitude' => [
-                'type' => 'DOUBLE',
+                'type' => ' Double PRECISION',
                 'null' => true,
                 'after' => 'latitude',
             ],
