@@ -10,12 +10,12 @@ class AddLocationToUsers extends Migration
     {
         $fields = [
             'latitude' => [
-                'type' => 'DOUBLE',
+                'type' => 'Double PRECISION',
                 'null' => true,
                 'after' => 'role',
             ],
             'longitude' => [
-                'type' => 'DOUBLE',
+                'type' => 'Double PRECISION',
                 'null' => true,
                 'after' => 'latitude',
             ],
