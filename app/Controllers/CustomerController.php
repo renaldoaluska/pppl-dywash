@@ -210,8 +210,8 @@ class CustomerController extends BaseController
     }
 
     /**
-     * Fitur: Monitor Pesanan
-     * Menampilkan halaman riwayat pesanan.
+     * Fitur: Cek Profil
+     * Menampilkan halaman profil.
      */
     public function cekProfil()
     {

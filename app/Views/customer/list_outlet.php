@@ -52,5 +52,3 @@
 
 <?= $this->include('layout/bottom_nav') ?>
 <?= $this->include('layout/footer') ?>
-</body>
-</html>
