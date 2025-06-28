@@ -2,17 +2,17 @@
   "version": 2,
   "builds": [
     {
-      "src": "Dockerfile",       // Mengacu pada Dockerfile yang baru Anda buat
-      "use": "@vercel/docker"    // Menggunakan builder Docker Vercel
+      "src": "Dockerfile",    
+      "use": "@vercel/docker"    
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/app/public/index.php" // Mengarahkan semua request ke index.php di dalam container Docker Anda
+      "dest": "/app/public/index.php"
     }
   ],
   "env": {
-    "APP_ENV": "production" // Atau "development" untuk debugging, sesuai kebutuhan Anda
+    "APP_ENV": "production" 
   }
 }
