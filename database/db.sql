@@ -1,5 +1,6 @@
 -- ====================================================================
 -- SKRIP LENGKAP: RESET DATABASE & ISI DATA DUMMY
+-- Versi Modifikasi dengan Latitude & Longitude
 -- Cukup jalankan seluruh file ini dari atas ke bawah.
 -- ====================================================================
 
@@ -41,6 +42,8 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role user_role NOT NULL,
+    latitude DOUBLE PRECISION, -- Penambahan kolom latitude
+    longitude DOUBLE PRECISION, -- Penambahan kolom longitude
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -51,6 +54,8 @@ CREATE TABLE outlets (
     owner_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     address TEXT NOT NULL,
+    latitude DOUBLE PRECISION, -- Penambahan kolom latitude
+    longitude DOUBLE PRECISION, -- Penambahan kolom longitude
     contact_phone VARCHAR(20),
     operating_hours VARCHAR(255),
     status outlet_status DEFAULT 'pending',
@@ -126,20 +131,22 @@ CREATE TABLE reviews (
 -- ====================================================================
 
 -- Tabel Users
-INSERT INTO users (name, email, password, role) VALUES
-('Admin Dywash', 'admin@dywash.com', 'password123', 'admin'),
-('Budi Laundry', 'budi.laundry@mail.com', 'password123', 'outlet'),
-('Siti Laundry', 'siti.laundry@mail.com', 'password123', 'outlet'),
-('Andi Pratama', 'andi@mail.com', 'password123', 'cust'),
-('Citra Lestari', 'citra@mail.com', 'password123', 'cust'),
-('Dewi Anggraini', 'dewi@mail.com', 'password123', 'cust');
+-- Data koordinat untuk customer ditambahkan, untuk admin/outlet dikosongkan (NULL)
+INSERT INTO users (name, email, password, role, latitude, longitude) VALUES
+('Admin Dywash', 'admin@dywash.com', 'password123', 'admin', NULL, NULL),
+('Budi Laundry', 'budi.laundry@mail.com', 'password123', 'outlet', NULL, NULL),
+('Siti Laundry', 'siti.laundry@mail.com', 'password123', 'outlet', NULL, NULL),
+('Andi Pratama', 'andi@mail.com', 'password123', 'cust', -7.2893, 112.7222),
+('Citra Lestari', 'citra@mail.com', 'password123', 'cust', -7.2915, 112.7305),
+('Dewi Anggraini', 'dewi@mail.com', 'password123', 'cust', -7.2881, 112.7259);
 
 
 -- Tabel Outlets
-INSERT INTO outlets (owner_id, name, address, contact_phone, operating_hours, status) VALUES
-(2, 'KlinKlin Laundry', 'Jl. Mawar No. 10, Surabaya', '081234567890', 'Senin - Sabtu, 08:00 - 20:00', 'verified'),
-(3, 'BersihWangi Laundry', 'Jl. Melati No. 25, Surabaya', '081223344556', 'Setiap Hari, 07:00 - 21:00', 'verified'),
-(2, 'Cemerlang Laundry', 'Jl. Anggrek No. 5, Surabaya', '081987654321', 'Senin - Jumat, 09:00 - 17:00', 'pending');
+-- Data koordinat untuk setiap outlet ditambahkan
+INSERT INTO outlets (owner_id, name, address, latitude, longitude, contact_phone, operating_hours, status) VALUES
+(2, 'KlinKlin Laundry', 'Jl. Mawar No. 10, Surabaya', -7.2905, 112.7248, '081234567890', 'Senin - Sabtu, 08:00 - 20:00', 'verified'),
+(3, 'BersihWangi Laundry', 'Jl. Melati No. 25, Surabaya', -7.2879, 112.7291, '081223344556', 'Setiap Hari, 07:00 - 21:00', 'verified'),
+(2, 'Cemerlang Laundry', 'Jl. Anggrek No. 5, Surabaya', -7.2922, 112.7211, '081987654321', 'Senin - Jumat, 09:00 - 17:00', 'pending');
 
 
 -- Tabel Services
