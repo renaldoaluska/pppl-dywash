@@ -196,11 +196,16 @@ class Database extends Config
             // Default connection, now set in constructor!
             $this->default = [
                 'DSN'          => '',
-                'hostname'     => env('database.default.hostname', 'localhost'),
-                'username'     => env('database.default.username', ''),
-                'password'     => env('database.default.password', ''),
-                'database'     => env('database.default.database', ''),
-                'DBDriver'     => env('database.default.DBDriver', 'Postgre'),
+                'hostname' => env('DB_HOSTNAME'), // Ambil dari env variable DB_HOSTNAME
+                'username' => env('DB_USERNAME'), // Ambil dari env variable DB_USERNAME
+                'password' => env('DB_PASSWORD'), // Ambil dari env variable DB_PASSWORD
+                'database' => env('DB_DATABASE'), // Ambil dari env variable DB_DATABASE
+                'DBDriver' => env('DB_DRIVER', 'Postgre'), // Ambil dari env variable DB_DRIVER, default Postgre
+                //'hostname'     => env('database.default.hostname', 'localhost'),
+                //'username'     => env('database.default.username', ''),
+                //'password'     => env('database.default.password', ''),
+                //'database'     => env('database.default.database', ''),
+                //'DBDriver'     => env('database.default.DBDriver', 'Postgre'),
                 'DBPrefix'     => '',
                 'pConnect'     => false,
                 'DBDebug'      => (ENVIRONMENT !== 'production'),
