@@ -13,6 +13,6 @@
     }
   ],
   "env": {
-    "APP_ENV": "production"
+    "APP_ENV": "production" 
   }
 }
