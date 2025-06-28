@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
+    <?= $this->include('layout/isian') ?>
     <title>Buat Pesanan Baru</title>
      <style>
         body { font-family: sans-serif; }

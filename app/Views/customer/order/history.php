@@ -2,7 +2,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
+    <?= $this->include('layout/isian') ?>
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Riwayat Pesanan</title>
     <style>
         body { font-family: sans-serif; }
@@ -51,5 +52,5 @@
         <p>Anda belum memiliki riwayat pesanan.</p>
     <?php endif; ?>
 
-</body>
-</html>
+<?= $this->include('layout/bottom_nav') ?>
+<?= $this->include('layout/footer') ?>

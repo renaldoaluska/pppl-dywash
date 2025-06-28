@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
+    <?= $this->include('layout/isian') ?>
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Cari Outlet Laundry</title>
     <style>
         body { font-family: sans-serif; background-color: #f4f4f9; color: #333; }
@@ -51,5 +52,5 @@
         <?php endif; ?>
     </div>
 
-</body>
-</html>
+<?= $this->include('layout/bottom_nav') ?>
+<?= $this->include('layout/footer') ?>
