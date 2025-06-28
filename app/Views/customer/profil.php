@@ -1,4 +1,3 @@
-<?php // file: app/Views/customer/payment/index.php (contoh nama file) ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,9 +6,15 @@
     <title>Pembayaran Pesanan</title>
 </head>
 <body class="bg-slate-50">
+<?= $this->include('layout/top_nav') ?>
+    <main>
 <!-- app/Views/dashboard/customer.php -->
 <h1>Selamat datang, <?= session('name') ?> (Customer)</h1>
 <a href="/customer/outlet">Cari Outlet Laundry</a> <br>
 <a href="/customer/monitor">Monitor Pesanan Saya</a> <br>
 
 <a href="/logout">Logout</a>
+</main>
+
+<?= $this->include('layout/bottom_nav') ?>
+<?= $this->include('layout/footer') ?>
