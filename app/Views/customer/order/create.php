@@ -121,7 +121,7 @@
 
             if (totalQuantity === 0) {
                 event.preventDefault();
-                showToast('Pilih layananan dulu');
+                showToast('Pilih layanan dulu');
             }
         });
     }

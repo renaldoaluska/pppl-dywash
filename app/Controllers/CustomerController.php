@@ -208,4 +208,14 @@ class CustomerController extends BaseController
 
         return redirect()->back()->with('error', 'Gagal menyimpan ulasan.');
     }
+
+    /**
+     * Fitur: Monitor Pesanan
+     * Menampilkan halaman riwayat pesanan.
+     */
+    public function cekProfil()
+    {
+        #return view('customer/profil', $data);
+        return view('customer/profil');
+    }
 }

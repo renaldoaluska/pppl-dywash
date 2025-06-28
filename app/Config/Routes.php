@@ -26,6 +26,7 @@ $routes->get('/customer/order/create/(:num)', 'CustomerController::createOrder/$
 $routes->post('/customer/order/store', 'CustomerController::storeOrder');
 $routes->get('/customer/monitor', 'CustomerController::monitorOrder');
 $routes->post('/customer/review/store', 'CustomerController::storeReview');
+$routes->post('/customer/profil', 'CustomerController::cekProfil');
 
 // Rute untuk fitur-fitur Outlet
 // Rute untuk manajemen banyak outlet
