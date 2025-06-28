@@ -21,12 +21,13 @@
                 <p class="mt-1 text-slate-500">Atur semua layanan yang tersedia di outlet Anda.</p>
             </div>
             <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
+                                        <a href="/dashboard" class="w-full sm:w-auto text-center text-white bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-200">
+            Kembali ke Dashboard
+        </a>
                 <a href="/outlet/services/create" class="w-full text-center text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-200">
                     Tambah Layanan Baru
                 </a>
-                        <a href="/dashboard" class="w-full sm:w-auto text-center text-white bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-200">
-            Kembali ke Dashboard
-        </a>
+
             </div>
         </header>
 

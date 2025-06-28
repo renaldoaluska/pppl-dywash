@@ -24,7 +24,6 @@ $statusColors = [
 </head>
 <body class="bg-slate-100">
 
-<<<<<<< HEAD
     <div class="container max-w-7xl mx-auto my-8 px-4">
         <header class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
             <div>
@@ -82,33 +81,6 @@ $statusColors = [
             </div>
 
             <div class="block md:hidden space-y-4">
-=======
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <title>Order List - Dywash Laundry</title>
-    <?= $this->include('layout/isian') ?>
-</head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
-
-<!-- KONTEN UTAMA HALAMAN MULAI DI SINI -->
-<!-- BAGIAN 1: PESANAN AKTIF -->
-<div class="bg-white rounded-xl shadow-lg p-6 mt-6">
-    <h2 class="text-xl font-bold text-slate-700 mb-5">Pesanan Aktif</h2>
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left">
-            <thead class="text-xs text-slate-500 uppercase bg-slate-50">
-                <tr>
-                    <th scope="col" class="p-4">ID Pesanan</th>
-                    <th scope="col" class="p-4">Outlet</th>
-                    <th scope="col" class="p-4">Customer</th>
-                    <th scope="col" class="p-4">Tanggal</th>
-                    <th scope="col" class="p-4">Status</th>
-                    <th scope="col" class="p-4">Tindakan</th>
-                </tr>
-            </thead>
-            <tbody>
->>>>>>> 17e48ce59d5b4548fe33235ce60f0c53d61fb919
                 <?php if (!empty($pending_orders)): ?>
                     <?php foreach ($pending_orders as $order): ?>
                         <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
@@ -195,7 +167,6 @@ $statusColors = [
                 const updateButtons = document.querySelectorAll('.update-btn');
                 let formToSubmit = null;
 
-<<<<<<< HEAD
                 updateButtons.forEach(button => {
                     button.addEventListener('click', function(event) {
                         formToSubmit = event.target.closest('form');
@@ -236,6 +207,3 @@ $statusColors = [
     </script>
 </body>
 </html>
-=======
-<?= $this->include('layout/footer') ?>
->>>>>>> 17e48ce59d5b4548fe33235ce60f0c53d61fb919
