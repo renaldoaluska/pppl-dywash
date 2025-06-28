@@ -157,6 +157,14 @@ class App extends BaseConfig
 
         // IP Proxy untuk Koyeb agar bisa mendeteksi IP asli pengguna
         // Ini adalah rentang IP private yang umum digunakan oleh provider cloud/container
-        $this->proxyIPs = ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '127.0.0.1'];
-    }
+            // PERUBAHAN DI SINI:
+    // Untuk Koyeb, kita menganggap mereka meneruskan IP melalui X-Forwarded-For
+    $this->proxyIPs = [
+        '10.0.0.0/8'     => 'X-Forwarded-For',  // Rentang IP private (Class A)
+        '172.16.0.0/12'  => 'X-Forwarded-For',  // Rentang IP private (Class B)
+        '192.168.0.0/16' => 'X-Forwarded-For',  // Rentang IP private (Class C)
+        '127.0.0.1'      => 'X-Forwarded-For',  // localhost
+        // Jika ada IP khusus dari Koyeb atau internal proxy lain, tambahkan di sini
+     ];
+        }
 }
