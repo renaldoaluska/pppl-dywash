@@ -101,10 +101,10 @@ public function listOutlet()
     $userId = session()->get('user_id');
 
     $keyword = $this->request->getGet('search');
+    $maxDistance = $this->request->getGet('max_distance') ?? 50;
 
     $outletModel->where('status', 'verified');
 
-    // Tambahkan pencarian keyword jika ada
     if ($keyword) {
         $keyword = strtolower($keyword);
         $outletModel->groupStart()
@@ -113,7 +113,6 @@ public function listOutlet()
             ->groupEnd();
     }
 
-    // Cek apakah user login dan punya alamat aktif
     $activeAddress = null;
     if ($userId) {
         $activeAddress = $addressModel
@@ -122,14 +121,14 @@ public function listOutlet()
             ->first();
     }
 
-    // Jika ada alamat aktif dan koordinat, hitung jarak
     if ($activeAddress && !empty($activeAddress['latitude']) && !empty($activeAddress['longitude'])) {
         $userLat = $activeAddress['latitude'];
         $userLon = $activeAddress['longitude'];
 
-        $distanceQuery = "( 6371 * acos( cos( radians({$userLat}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians({$userLon}) ) + sin( radians({$userLat}) ) * sin( radians( latitude ) ) ) )";
+        $distanceExpr = "(6371 * acos(cos(radians({$userLat})) * cos(radians(latitude)) * cos(radians(longitude) - radians({$userLon})) + sin(radians({$userLat})) * sin(radians(latitude))))";
 
-        $outletModel->select("outlets.*, {$distanceQuery} AS distance")
+        $outletModel->select("outlets.*, {$distanceExpr} AS distance")
+                    ->where("{$distanceExpr} <= {$maxDistance}")
                     ->orderBy('distance', 'ASC');
     }
 
@@ -137,12 +136,10 @@ public function listOutlet()
     $data['keyword'] = $keyword;
     $data['userLat'] = $activeAddress['latitude'] ?? null;
     $data['userLon'] = $activeAddress['longitude'] ?? null;
+    $data['maxDistance'] = $maxDistance;
 
     return view('customer/list_outlet', $data);
 }
-
-
-
 
     /**
      * Fitur: Melakukan Pesanan (Langkah 1)
