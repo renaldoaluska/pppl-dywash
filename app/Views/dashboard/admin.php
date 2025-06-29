@@ -14,8 +14,9 @@ Dashboard
         <div class="flex items-center justify-between">
             <div>
                 <div class="text-sm font-medium text-gray-500">Outlet Menunggu</div>
+                <!-- Menampilkan data dinamis dari controller -->
                 <div class="text-3xl font-bold text-gray-800 mt-1">
-                    5 
+                    <?= $pending_outlets_count ?? 0 ?> 
                 </div>
             </div>
             <div class="bg-blue-100 text-blue-600 rounded-full p-3">
@@ -29,8 +30,9 @@ Dashboard
         <div class="flex items-center justify-between">
             <div>
                 <div class="text-sm font-medium text-gray-500">Pembayaran Menunggu</div>
+                <!-- Menampilkan data dinamis dari controller -->
                 <div class="text-3xl font-bold text-gray-800 mt-1">
-                    12
+                    <?= $pending_payments_count ?? 0 ?>
                 </div>
             </div>
             <div class="bg-blue-100 text-blue-600 rounded-full p-3">
@@ -44,8 +46,9 @@ Dashboard
         <div class="flex items-center justify-between">
             <div>
                 <div class="text-sm font-medium text-gray-500">Total Outlet</div>
+                <!-- Menampilkan data dinamis dari controller -->
                 <div class="text-3xl font-bold text-gray-800 mt-1">
-                    42
+                    <?= $total_outlets_count ?? 0 ?>
                 </div>
             </div>
             <div class="bg-blue-100 text-blue-600 rounded-full p-3">
@@ -59,8 +62,9 @@ Dashboard
         <div class="flex items-center justify-between">
             <div>
                 <div class="text-sm font-medium text-gray-500">Total Pesanan</div>
+                <!-- Menampilkan data dinamis dari controller -->
                 <div class="text-3xl font-bold text-gray-800 mt-1">
-                    157
+                    <?= $total_orders_count ?? 0 ?>
                 </div>
             </div>
             <div class="bg-blue-100 text-blue-600 rounded-full p-3">

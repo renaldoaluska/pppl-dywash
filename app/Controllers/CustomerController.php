@@ -17,6 +17,76 @@ class CustomerController extends BaseController
      * Fitur: Melihat/Mencari Outlet
      * Menampilkan halaman dengan daftar semua outlet yang tersedia.
      */
+/**
+     * Fitur: Menampilkan Halaman Utama/Dashboard Customer yang Dinamis
+     * - Menampilkan outlet terdekat berdasarkan alamat utama user.
+     * - Menampilkan outlet dengan rating tertinggi.
+     */
+public function dashboard()
+{
+    helper('text'); // Pastikan helper ini ada
+
+    // Inisialisasi model
+    $outletModel = new \App\Models\OutletModel();
+    $addressModel = new \App\Models\AddressModel();
+    $userId = session()->get('user_id');
+
+    // Data default
+    $data = [
+        'nearestLaundries' => [],
+        'topRatedLaundries' => [],
+        'allUserAddresses' => [],
+        'activeAddress'    => null,
+    ];
+
+    if (!$userId) {
+        return view('dashboard/customer', $data);
+    }
+
+    // Ambil semua alamat user
+    $data['allUserAddresses'] = $addressModel->where('user_id', $userId)->orderBy('is_primary', 'DESC')->findAll();
+
+    // Tentukan alamat aktif
+    $selectedAddressId = $this->request->getGet('address_id');
+    $activeAddress = null;
+
+    if ($selectedAddressId) {
+        $activeAddress = $addressModel->where('user_id', $userId)->where('address_id', $selectedAddressId)->first();
+    } else {
+        $activeAddress = $addressModel->where('user_id', $userId)->where('is_primary', true)->first();
+    }
+    
+    $data['activeAddress'] = $activeAddress;
+
+    // >> PERUBAHAN DI SINI <<
+    // Kita hanya akan mengisi 'nearestLaundries' JIKA ada alamat yang aktif.
+    // Bagian 'else' yang mengambil data acak sudah dihapus.
+    if ($activeAddress && !empty($activeAddress['latitude'])) {
+        $userLat = $activeAddress['latitude'];
+        $userLon = $activeAddress['longitude'];
+
+        $distanceQuery = "( 6371 * acos( cos( radians({$userLat}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians({$userLon}) ) + sin( radians({$userLat}) ) * sin( radians( latitude ) ) ) )";
+
+        $data['nearestLaundries'] = $outletModel
+            ->where('status', 'verified')
+            ->select("outlets.*, {$distanceQuery} AS distance")
+            ->orderBy('distance', 'ASC')
+            ->findAll(5);
+    }
+    
+    // Logika ini sudah benar, mengurutkan berdasarkan rating terbaik seluruhnya
+    $data['topRatedLaundries'] = $outletModel
+        ->where('status', 'verified')
+        ->select('outlets.*, AVG(reviews.rating) as average_rating')
+        ->join('reviews', 'reviews.outlet_id = outlets.outlet_id', 'left')
+        ->groupBy('outlets.outlet_id')
+        //->orderBy('average_rating', 'DESC')
+        ->orderBy('average_rating', 'DESC NULLS LAST')
+        ->findAll(5);
+    
+    return view('dashboard/customer', $data);
+}
+
 public function listOutlet()
 {
     $outletModel = new OutletModel();
@@ -44,7 +114,7 @@ public function listOutlet()
      * Menampilkan form untuk membuat pesanan.
      * @param int $outlet_id
      */
-    public function createOrder($outlet_id)
+public function createOrder($outlet_id)
 {
     $outletModel = new OutletModel();
     $serviceModel = new ServiceModel();
@@ -58,14 +128,22 @@ public function listOutlet()
 
     $data['services'] = $serviceModel->where('outlet_id', $outlet_id)->findAll();
 
-    // 🔥 Tambahkan data alamat customer di sini
-    $data['addresses'] = $addressModel->where('user_id', session()->get('user_id'))->findAll();
-    foreach ($data['addresses'] as &$address) {
-    $address['is_primary'] = ($address['is_primary'] === 't' || $address['is_primary'] === true || $address['is_primary'] == 1);
-}
+    // Ambil primary address
+    $data['primary_address'] = $addressModel
+        ->where('user_id', session()->get('user_id'))
+        ->where('is_primary', true)
+        ->first();
+
+    // Ambil other addresses (selain primary)
+    $data['other_addresses'] = $addressModel
+        ->where('user_id', session()->get('user_id'))
+        ->where('is_primary', false)
+        ->findAll();
 
     return view('customer/order/create', $data);
 }
+
+
 
 
     /**
@@ -85,6 +163,13 @@ public function storeOrder()
     $customer_notes = $this->request->getPost('customer_notes');
     $address_id = $this->request->getPost('address_id');
 
+    // 🔥 Cek jika user belum punya alamat
+    if (!$address_id) {
+        return redirect()->to('/customer/profil/tambah-alamat')
+            ->with('error', 'Tambah alamat pengiriman dulu sebelum membuat pesanan.');
+    }
+
+    // 🔥 Cek minimal ada 1 layanan
     if (empty($services)) {
         return redirect()->back()->withInput()->with('error', 'Pilih minimal satu layanan.');
     }
@@ -206,12 +291,14 @@ public function storeOrder()
         
         // Logika berdasarkan metode pembayaran
         if ($payment_method === 'cod') {
-            $paymentData['status'] = 'lunas';
+            $paymentData['status'] = 'cod';
             // Langsung ubah status pesanan menjadi 'diterima'
             $orderModel->update($order_id, ['status' => 'diterima']);
         } else { // Untuk 'transfer' dan 'ewallet'
             $paymentData['status'] = 'pending';
             // Status pesanan tetap 'menunggu_pembayaran' sampai admin verifikasi
+            // Langsung ubah status pesanan menjadi 'diterima'
+            $orderModel->update($order_id, ['status' => 'diterima']);
         }
 
         $paymentModel->save($paymentData);
@@ -453,5 +540,220 @@ public function paymentLater()
     return redirect()->to('/customer/monitor')
         ->with('success', 'Kamu bisa konfirmasi pembayaran nanti ya!');
 }
+public function createAlamat()
+{
+    $redirect_to = $this->request->getGet('redirect_to') ?? '/customer/profil/alamat';
+
+    $addressModel = new \App\Models\AddressModel();
+    $user_id = session()->get('user_id');
+    $hasAnyAddress = $addressModel->where('user_id', $user_id)->countAllResults() > 0;
+
+    return view('customer/alamat/tambah', [
+        'redirect_to' => $redirect_to,
+        'force_primary' => !$hasAnyAddress, // true jika belum punya alamat sama sekali
+    ]);
+}
+
+
+public function storeAlamat()
+{
+    $validation = \Config\Services::validation();
+    $data = $this->request->getPost();
+
+    $validation->setRules([
+        'label' => 'required|string|max_length[100]',
+        'recipient_name' => 'required|string|max_length[255]',
+        'phone_number' => 'required|string|max_length[20]',
+        'address_detail' => 'required|string',
+        'latitude' => 'required|decimal',
+        'longitude' => 'required|decimal',
+    ]);
+
+    if (!$validation->run($data)) {
+        return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+    }
+
+    $addressModel = new \App\Models\AddressModel();
+    $user_id = session()->get('user_id');
+    $hasAnyAddress = $addressModel->where('user_id', $user_id)->countAllResults() > 0;
+
+    $is_primary = !$hasAnyAddress;
+
+    if ($is_primary) {
+        // reset semua (just in case)
+        $addressModel->where('user_id', $user_id)
+                     ->set(['is_primary' => false])
+                     ->update();
+    }
+
+    $insertData = [
+        'user_id'        => $user_id,
+        'label'          => $data['label'],
+        'recipient_name' => $data['recipient_name'],
+        'phone_number'   => $data['phone_number'],
+        'address_detail' => $data['address_detail'],
+        'latitude'       => $data['latitude'],
+        'longitude'      => $data['longitude'],
+        'is_primary'     => $is_primary,
+    ];
+    $addressModel->insert($insertData);
+
+    $redirect_to = $this->request->getPost('redirect_to') ?? '/customer/profil/alamat';
+
+    return redirect()->to($redirect_to)->with('success', 'Alamat berhasil ditambahkan.');
+}
+
+
+
+
+public function editAlamat($id)
+{
+    $addressModel = new \App\Models\AddressModel();
+    $user_id = session()->get('user_id');
+    $address = $addressModel->where('user_id', $user_id)->find($id);
+
+    if (!$address) {
+        return redirect()->to('/customer/profil/alamat')->with('error', 'Alamat tidak ditemukan.');
+    }
+
+    // Force cast boolean
+    $address['is_primary'] = ($address['is_primary'] === 't' || $address['is_primary'] === true || $address['is_primary'] === 1);
+
+    // Cek total alamat user
+    $total = $addressModel->where('user_id', $user_id)->countAllResults();
+    $force_primary = ($total == 1); // jika cuma 1 alamat, paksa jadi primary
+
+    return view('customer/alamat/edit', [
+        'address' => $address,
+        'force_primary' => $force_primary,
+    ]);
+}
+
+public function setPrimaryAlamat($id)
+{
+    $addressModel = new \App\Models\AddressModel();
+    $userId = session()->get('user_id');
+
+    // Ambil alamat milik user
+    $address = $addressModel
+        ->where('user_id', $userId)
+        ->find($id);
+
+    if (!$address) {
+        return redirect()->to('/customer/profil/alamat')->with('error', 'Alamat tidak ditemukan.');
+    }
+
+    // Reset semua alamat user jadi non-primary
+    $addressModel->where('user_id', $userId)
+                 ->set(['is_primary' => false])
+                 ->update();
+
+    // Set alamat ini jadi primary
+    $addressModel->update($id, ['is_primary' => true]);
+
+    // Redirect dengan flashdata success untuk toast
+    return redirect()->back()->with('success', 'Alamat berhasil dijadikan utama.');
+}
+
+public function updateAlamat($id)
+{
+    $addressModel = new \App\Models\AddressModel();
+    $address = $addressModel->where('user_id', session()->get('user_id'))->find($id);
+
+    if (!$address) {
+        return redirect()->to('/customer/profil/alamat')->with('error', 'Alamat tidak ditemukan.');
+    }
+
+    $validation = \Config\Services::validation();
+    $data = $this->request->getPost();
+
+    // Validasi
+    $validation->setRules([
+        'label' => 'required|string|max_length[100]',
+        'recipient_name' => 'required|string|max_length[255]',
+        'phone_number' => 'required|string|max_length[20]',
+        'address_detail' => 'required|string',
+        'latitude' => 'required|decimal',
+        'longitude' => 'required|decimal',
+    ]);
+
+    if (!$validation->run($data)) {
+        return redirect()->back()->withInput()->with('errors', $validation->getErrors());
+    }
+
+    // HAPUS is_primary dari data update agar tidak ke-reset
+    unset($data['is_primary']);
+
+    $updateData = [
+        'label'          => $data['label'],
+        'recipient_name' => $data['recipient_name'],
+        'phone_number'   => $data['phone_number'],
+        'address_detail' => $data['address_detail'],
+        'latitude'       => $data['latitude'],
+        'longitude'      => $data['longitude'],
+        // 'is_primary' dihapus agar tidak mengubah status utama
+    ];
+
+    $addressModel
+    ->where('address_id', $id)
+    ->where('user_id', session()->get('user_id'))
+    ->set($updateData)
+    ->update();
+
+
+    return redirect()->to('/customer/profil/alamat')->with('success', 'Alamat berhasil diperbarui.');
+}
+
+public function deleteAlamat($id)
+{
+    $addressModel = new \App\Models\AddressModel();
+    $address = $addressModel->where('user_id', session()->get('user_id'))->find($id);
+
+    if (!$address) {
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON(['error' => 'Alamat tidak ditemukan.']);
+        }
+        return redirect()->to('/customer/profil/alamat')->with('error', 'Alamat tidak ditemukan.');
+    }
+
+    if (filter_var($address['is_primary'], FILTER_VALIDATE_BOOLEAN)) {
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON(['error' => 'Alamat utama tidak dapat dihapus.']);
+        }
+        return redirect()->to('/customer/profil/alamat')->with('error', 'Alamat utama tidak dapat dihapus.');
+    }
+
+    $addressModel->delete($id);
+
+    if ($this->request->isAJAX()) {
+        return $this->response->setJSON(['success' => 'Alamat berhasil dihapus.']);
+    }
+    return redirect()->to('/customer/profil/alamat')->with('success', 'Alamat berhasil dihapus.');
+}
+
+
+
+
+public function indexAlamat()
+{
+    $addressModel = new \App\Models\AddressModel();
+
+    $addresses = $addressModel
+        ->where('user_id', session()->get('user_id'))
+        ->orderBy('is_primary', 'DESC') // 👉 tambah baris ini
+        ->findAll();
+
+    // FIX CASTING is_primary ke boolean
+    foreach ($addresses as &$addr) {
+        $addr['is_primary'] = ($addr['is_primary'] === 't' || $addr['is_primary'] === true || $addr['is_primary'] === 1 || $addr['is_primary'] === '1');
+    }
+
+
+    return view('customer/alamat/daftar', [
+        'addresses' => $addresses
+    ]);
+}
+
+
 
 }

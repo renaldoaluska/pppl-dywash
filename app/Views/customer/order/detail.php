@@ -25,21 +25,50 @@ Detail Pesanan
         </div>
         <div>
             <p class="text-slate-500">Status Pesanan</p>
-            <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
-                <?= ($order['status'] == 'selesai' || $order['status'] == 'diulas') ? 'bg-green-100 text-green-800' :
-                    (($order['status'] == 'diproses' || $order['status'] == 'dijemput' || $order['status'] == 'dikirim') ? 'bg-yellow-100 text-yellow-800' :
-                    ($order['status'] == 'ditolak' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-800')) ?>">
-                <?= ucfirst($order['status']) ?>
-            </span>
+<span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
+    <?php
+    if ($order['status'] == 'diterima') {
+    echo 'bg-blue-100 text-blue-800';
+} elseif ($order['status'] == 'ditolak') {
+    echo 'bg-red-100 text-red-800';
+} elseif ($order['status'] == 'diambil') {
+    echo 'bg-purple-100 text-purple-800';
+} elseif ($order['status'] == 'dicuci') {
+    echo 'bg-yellow-100 text-yellow-800';
+} elseif ($order['status'] == 'dikirim') {
+    echo 'bg-teal-100 text-teal-800';
+} elseif ($order['status'] == 'selesai') {
+    echo 'bg-green-100 text-green-800';
+} elseif ($order['status'] == 'diulas') {
+    echo 'bg-green-200 text-green-900';
+} else {
+    echo 'bg-gray-200 text-gray-800';
+}
+    ?>">
+    <?= ucfirst($order['status']) ?>
+</span>
+
         </div>
         <div>
-            <p class="text-slate-500">Status Pembayaran</p>
-            <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
-                <?= ($order['payment_status'] == 'lunas') ? 'bg-green-100 text-green-800' :
-                    (($order['payment_status'] == 'pending') ? 'bg-yellow-100 text-yellow-800' :
-                    ($order['payment_status'] == 'gagal' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-800')) ?>">
-                <?= ucfirst($order['payment_status'] ?? '-') ?>
-            </span>
+<p class="text-slate-500">Status Pembayaran</p>
+<span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
+    <?php
+        if ($order['payment_status'] == 'pending') {
+            echo 'bg-yellow-100 text-yellow-800';
+        } elseif ($order['payment_status'] == 'lunas') {
+            echo 'bg-green-100 text-green-800';
+        } elseif ($order['payment_status'] == 'gagal') {
+            echo 'bg-red-100 text-red-800';
+        } elseif ($order['payment_status'] == 'cod') {
+            echo 'bg-blue-100 text-blue-800';
+        } else {
+            echo 'bg-gray-200 text-gray-800';
+        }
+    ?>">
+    <?= ucfirst($order['payment_status'] ?? '-') ?>
+</span>
+
+
         </div>
         <div>
             <p class="text-slate-500">Metode Pembayaran</p>
@@ -75,9 +104,22 @@ Detail Pesanan
         </ul>
     </div>
 
-    <a href="/customer/monitor" class="inline-block mt-4 px-5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full text-center">
-        Kembali ke Riwayat
+<div class="flex justify-between items-center mt-4">
+    <?php if (empty($order['payment_status'])): ?>
+        <a href="/customer/payment/<?= $order['order_id'] ?>"
+            class="px-4 py-1.5 bg-white border border-emerald-400 text-emerald-600 text-sm rounded-full shadow-sm hover:bg-emerald-50 transition">
+            Konfirmasi Bayar
+        </a>
+    <?php else: ?>
+        <div></div> <!-- Spacer agar tombol kanan tetap di kanan -->
+    <?php endif; ?>
+
+    <a href="/customer/monitor"
+        class="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm rounded-full shadow-sm transition">
+        Kembali
     </a>
+</div>
+
 </div>
 
 <?= $this->endSection() ?>

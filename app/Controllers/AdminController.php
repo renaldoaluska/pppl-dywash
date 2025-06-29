@@ -1,4 +1,4 @@
-<?php // file: app/Controllers/AdminController.php
+<?php
 
 namespace App\Controllers;
 
@@ -8,6 +8,29 @@ use App\Models\PaymentModel;
 
 class AdminController extends BaseController
 {
+    /**
+     * FUNGSI BARU: Menampilkan dashboard utama admin dengan data ringkasan.
+     * Method ini ditambahkan untuk menghitung data statistik di halaman dashboard.
+     */
+    public function dashboard()
+    {
+        // Inisialisasi model yang akan kita gunakan
+        $outletModel = new OutletModel();
+        $paymentModel = new PaymentModel();
+        $orderModel = new OrderModel();
+
+        // Siapkan array data untuk dikirim ke view
+        $data = [
+            'pending_outlets_count' => $outletModel->where('status', 'pending')->countAllResults(),
+            'pending_payments_count' => $paymentModel->where('status', 'pending')->countAllResults(),
+            'total_outlets_count' => $outletModel->countAllResults(), // Menghitung semua outlet
+            'total_orders_count' => $orderModel->countAllResults()  // Menghitung semua pesanan
+        ];
+
+        // Tampilkan view dashboard dan kirim data yang sudah dihitung
+        return view('dashboard/admin', $data);
+    }
+
     /**
      * Fitur: Memverifikasi Outlet (Langkah 1)
      * Menampilkan daftar outlet yang statusnya masih 'pending'.
@@ -25,8 +48,6 @@ class AdminController extends BaseController
     /**
      * Fitur: Memverifikasi Outlet (Langkah 2)
      * Memproses aksi verifikasi (setujui atau tolak).
-     * @param int $outlet_id
-     * @param string $status ('verified' atau 'rejected')
      */
     public function verifyOutlet($outlet_id, $status)
     {
@@ -43,8 +64,9 @@ class AdminController extends BaseController
 
         return redirect()->back()->with('error', 'Gagal memperbarui status outlet.');
     }
+    
     /**
-     * FUNGSI BARU: Menampilkan daftar pembayaran yang perlu diverifikasi
+     * FUNGSI: Menampilkan daftar pembayaran yang perlu diverifikasi
      */
     public function listPendingPayments()
     {
@@ -61,8 +83,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * FUNGSI BARU: Memproses verifikasi pembayaran
-     * @param int $payment_id
+     * FUNGSI: Memproses verifikasi pembayaran
      */
     public function verifyPayment($payment_id)
     {
@@ -82,40 +103,37 @@ class AdminController extends BaseController
         
         return redirect()->to('/admin/payments/verify')->with('success', 'Pembayaran berhasil diverifikasi.');
     }
-        /**
-     * FUNGSI YANG DIPERBARUI: Menampilkan semua outlet, dengan fitur pencarian.
+    
+    /**
+     * FUNGSI: Menampilkan semua outlet, dengan fitur pencarian.
      */
     public function listAllOutlets()
     {
         $outletModel = new OutletModel();
         
-        // 1. Ambil kata kunci pencarian dari URL (contoh: /admin/outlets?search=...)
+        // Ambil kata kunci pencarian dari URL
         $searchKeyword = $this->request->getGet('search');
 
-        // 2. Siapkan query builder. Kita mulai dengan model dasarnya.
         $query = $outletModel;
 
-        // 3. JIKA ADA kata kunci pencarian, tambahkan filter 'like' ke query.
+        // Jika ada kata kunci pencarian, tambahkan filter 'like'
         if ($searchKeyword) {
-            $query = $outletModel->groupStart() // Mulai grup kondisi OR
-                                 ->like('name', $searchKeyword)      // Cari di kolom 'name'
-                                 ->orLike('address', $searchKeyword) // ATAU cari di kolom 'address'
-                                 ->groupEnd();   // Selesai grup kondisi OR
+            $query = $outletModel->groupStart()
+                                 ->like('name', $searchKeyword)
+                                 ->orLike('address', $searchKeyword)
+                                 ->groupEnd();
         }
 
-        // 4. Eksekusi query yang sudah difilter (atau query semua data jika tidak ada pencarian)
+        // Eksekusi query
         $data['outlets'] = $query->findAll();
 
-        // 5. Tampilkan view dengan data yang sudah siap
+        // Tampilkan view
         return view('admin/list_outlets', $data);
     }
 
 
     /**
-     * FUNGSI BARU: Menampilkan semua pesanan dari semua customer.
-     */
-        /**
-     * FUNGSI BARU: Menampilkan semua pesanan dengan fitur pencarian.
+     * FUNGSI: Menampilkan semua pesanan dengan fitur pencarian.
      */
     public function listAllOrders()
     {
@@ -124,8 +142,7 @@ class AdminController extends BaseController
         // Ambil kata kunci pencarian dari URL
         $searchKeyword = $this->request->getGet('search');
 
-        // Siapkan query builder. Kita mulai dengan JOIN ke tabel lain
-        // untuk mendapatkan nama customer dan nama outlet.
+        // Siapkan query builder
         $query = $orderModel
             ->join('users', 'users.user_id = orders.customer_id')
             ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
@@ -134,8 +151,8 @@ class AdminController extends BaseController
         // Jika ada kata kunci pencarian, tambahkan filter
         if ($searchKeyword) {
             $query->groupStart()
-                  ->like('users.name', $searchKeyword)      // Cari berdasarkan nama customer
-                  ->orLike('orders.order_id', $searchKeyword) // ATAU berdasarkan ID Pesanan
+                  ->like('users.name', $searchKeyword)
+                  ->orLike('orders.order_id', $searchKeyword)
                   ->groupEnd();
         }
 
