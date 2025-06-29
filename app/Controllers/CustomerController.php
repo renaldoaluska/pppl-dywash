@@ -101,7 +101,7 @@ public function listOutlet()
     $userId = session()->get('user_id');
 
     $keyword = $this->request->getGet('search');
-    $maxDistance = $this->request->getGet('max_distance') ?? 50;
+    $maxDistance = $this->request->getGet('max_distance') ?? 10;
 
     $outletModel->where('status', 'verified');
 

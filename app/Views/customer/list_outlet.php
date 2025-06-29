@@ -25,12 +25,12 @@ Daftar Outlet
 <div class="flex flex-col w-full">
     <label for="max_distance" class="text-sm text-slate-700 mb-1">Jarak Maksimal (km)</label>
     <input type="range" name="max_distance" id="max_distance"
-           min="1" max="50"
-           value="<?= esc($maxDistance ?? 50, 'attr') ?>"
+           min="1" max="20"
+           value="<?= esc($maxDistance ?? 10, 'attr') ?>"
            <?= empty($userLat) || empty($userLon) ? 'disabled class="opacity-50 cursor-not-allowed"' : '' ?>
            oninput="document.getElementById('distanceLabel').innerText = this.value + ' km'" />
     <div class="text-sm text-slate-600 mt-1">
-        Sampai <span id="distanceLabel"><?= esc($maxDistance ?? 50) ?> km</span>
+        Sampai <span id="distanceLabel"><?= esc($maxDistance ?? 5) ?> km</span>
         <?php if (empty($userLat) || empty($userLon)): ?>
             <span class="text-red-500 ml-2">(Alamat utama belum tersedia)</span>
         <?php endif; ?>
