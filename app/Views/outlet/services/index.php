@@ -1,150 +1,107 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Layanan Outlet - Dywash</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Poppins', sans-serif; }
-    </style>
-</head>
-<body class="bg-slate-100">
+<?= $this->extend('outlet/layout') ?>
 
-    <div class="container max-w-7xl mx-auto my-8 px-4">
-        <header class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
-            <div>
-                <h1 class="text-3xl font-bold text-slate-800">Kelola Layanan Anda</h1>
-                <p class="mt-1 text-slate-500">Atur semua layanan yang tersedia di outlet Anda.</p>
-            </div>
-            <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
-                                        <a href="/dashboard" class="w-full sm:w-auto text-center text-white bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-200">
-            Kembali ke Dashboard
-        </a>
-                <a href="/outlet/services/create" class="w-full text-center text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-200">
-                    Tambah Layanan Baru
-                </a>
+<?= $this->section('title') ?>
+Kelola Layanan
+<?= $this->endSection() ?>
 
-            </div>
-        </header>
+<?= $this->section('content') ?>
 
-        <!-- ============================================== -->
-        <!-- ==      KONTEN UTAMA (DESKTOP & MOBILE)     == -->
-        <!-- ============================================== -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
-            <h2 class="text-xl font-bold text-slate-700 mb-5">Daftar Layanan</h2>
-
-            <!-- Tampilan Desktop: Tabel -->
-            <div class="hidden md:block overflow-x-auto">
-                <table class="w-full text-sm text-left">
-                    <thead class="text-xs text-slate-500 uppercase bg-slate-50">
-                        <tr>
-                            <th class="p-4">Nama Layanan</th>
-                            <th class="p-4">Harga</th>
-                            <th class="p-4">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200">
-                        <?php if (!empty($services)): ?>
-                            <?php foreach ($services as $service): ?>
-                                <tr class="hover:bg-slate-50">
-                                    <td class="p-4 font-semibold text-slate-800"><?= esc($service['name']) ?></td>
-                                    <td class="p-4 text-slate-600">Rp <?= number_format($service['price'], 0, ',', '.') ?> / <?= esc($service['unit']) ?></td>
-                                    <td class="p-4">
-                                        <div class="flex items-center gap-4">
-                                            <a href="/outlet/services/edit/<?= $service['service_id'] ?>" class="font-medium text-blue-600 hover:underline">Edit</a>
-                                            <button data-url="/outlet/services/delete/<?= $service['service_id'] ?>" data-name="<?= esc($service['name']) ?>" class="delete-btn font-medium text-red-600 hover:underline">Hapus</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr><td colspan="3" class="text-center p-10 text-slate-500">Anda belum memiliki layanan.</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Tampilan Mobile: Kartu -->
-            <div class="block md:hidden space-y-4">
-                <?php if (!empty($services)): ?>
-                    <?php foreach ($services as $service): ?>
-                        <div class="border border-slate-200 rounded-lg p-4 shadow-sm">
-                            <div class="mb-2">
-                                <h3 class="font-bold text-slate-800"><?= esc($service['name']) ?></h3>
-                                <p class="text-sm text-blue-600 font-semibold">Rp <?= number_format($service['price'], 0, ',', '.') ?> / <?= esc($service['unit']) ?></p>
-                            </div>
-                            <div class="flex items-center gap-2 mt-4 border-t border-slate-100 pt-3">
-                                <a href="/outlet/services/edit/<?= $service['service_id'] ?>" class="w-full text-center bg-slate-100 text-slate-700 font-semibold py-2 px-4 rounded-lg hover:bg-slate-200 transition-colors duration-200">
-                                    Edit
-                                </a>
-                                <button data-url="/outlet/services/delete/<?= $service['service_id'] ?>" data-name="<?= esc($service['name']) ?>" class="delete-btn w-full text-center bg-red-100 text-red-700 font-semibold py-2 px-4 rounded-lg hover:bg-red-200 transition-colors duration-200">
-                                    Hapus
-                                </button>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p class="text-center p-10 text-slate-500">Anda belum memiliki layanan. Klik tombol di atas untuk memulai.</p>
-                <?php endif; ?>
-            </div>
-        </div>
+<!-- Header Halaman -->
+<div class="flex flex-col sm:flex-row items-center justify-between pb-4 mb-6 border-b">
+    <div>
+        <h3 class="text-lg font-semibold text-gray-700">Layanan untuk: <?= esc($current_outlet['name']) ?></h3>
+        <p class="text-sm text-gray-500 mt-1">Tambah, edit, atau hapus layanan yang tersedia di outlet ini.</p>
     </div>
+    <a href="/outlet/services/create/<?= $current_outlet['outlet_id'] ?>" class="w-full sm:w-auto mt-4 sm:mt-0 px-4 py-2 text-sm text-center font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700">
+        Tambah Layanan Baru
+    </a>
+</div>
 
-    <!-- POPUP MODAL KONFIRMASI HAPUS -->
-    <div id="deleteConfirmationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
-            <svg class="w-16 h-16 text-red-500 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-            </svg>
-            <h3 class="text-xl font-bold text-slate-800">Anda Yakin?</h3>
-            <p class="text-slate-500 mt-2 mb-6">Anda akan menghapus layanan <strong id="serviceNameToDelete" class="font-bold"></strong>. Aksi ini tidak dapat dibatalkan.</p>
-            <div class="flex justify-center gap-4">
-                <button id="cancelDeleteBtn" class="px-6 py-2 font-semibold text-white bg-gray-500 rounded-lg hover:bg-gray-600">Batal</button>
-                <a id="confirmDeleteBtn" href="#" class="px-6 py-2 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700">Ya, Hapus</a>
-            </div>
-        </div>
+<!-- Menampilkan pesan sukses/error jika ada -->
+<?php if (session()->getFlashdata('success')): ?>
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow" role="alert">
+        <p><?= session()->getFlashdata('success') ?></p>
     </div>
+<?php endif; ?>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('deleteConfirmationModal');
-            if (modal) {
-                const serviceNameToDelete = document.getElementById('serviceNameToDelete');
-                const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-                const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-                const deleteButtons = document.querySelectorAll('.delete-btn');
+<!-- Daftar Kartu Layanan -->
+<div class="space-y-4">
+    <?php if (!empty($services)): ?>
+        <?php foreach ($services as $service): ?>
+            <!-- Kartu Individual untuk Setiap Layanan -->
+            <div class="bg-white rounded-xl shadow-md flex items-center justify-between p-4">
+                <div>
+                    <h4 class="font-bold text-gray-800"><?= esc($service['name']) ?></h4>
+                    <p class="text-sm text-gray-500">
+                        Rp <?= number_format($service['price'], 0, ',', '.') ?> / <?= esc($service['unit']) ?>
+                    </p>
+                </div>
+                <!-- Tombol Aksi -->
+                <div class="flex items-center gap-2">
+                    <!-- Tombol Edit -->
+                    <a href="/outlet/services/edit/<?= $service['service_id'] ?>" class="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-gray-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                    </a>
+                    <!-- Tombol Hapus (Trigger untuk Modal) -->
+                    <button type="button" data-service-id="<?= $service['service_id'] ?>" class="delete-btn p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-gray-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="text-center bg-white p-8 rounded-xl shadow-md">
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Belum Ada Layanan</h3>
+            <p class="mt-1 text-sm text-gray-500">Anda belum menambahkan layanan apapun untuk outlet ini.</p>
+        </div>
+    <?php endif; ?>
+</div>
 
-                deleteButtons.forEach(button => {
-                    button.addEventListener('click', function(event) {
-                        event.preventDefault(); // Mencegah link langsung berjalan
-                        const serviceName = this.dataset.name;
-                        const deleteUrl = this.dataset.url;
-                        
-                        // Isi data ke modal
-                        serviceNameToDelete.textContent = serviceName;
-                        confirmDeleteBtn.href = deleteUrl;
+<!-- Modal Konfirmasi Hapus -->
+<div id="deleteConfirmationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm text-center">
+        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <p class="text-lg font-medium text-gray-800 mt-4">Anda yakin ingin menghapus layanan ini?</p>
+        <p class="text-sm text-gray-500 mt-2">Aksi ini tidak dapat dibatalkan.</p>
+        
+        <!-- Form untuk mengirim request delete -->
+        <form id="deleteForm" action="" method="post" class="mt-6 flex justify-center gap-4">
+             <?= csrf_field() ?>
+            <button type="button" id="confirmBtnTidak" class="w-full px-6 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Tidak, Batal</button>
+            <button type="submit" class="w-full px-6 py-2 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700">Ya, Hapus</button>
+        </form>
+    </div>
+</div>
 
-                        // Tampilkan modal
-                        modal.classList.remove('hidden');
-                    });
-                });
 
-                function hideModal() {
-                    modal.classList.add('hidden');
-                }
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('deleteConfirmationModal');
+    if (!modal) return;
 
-                cancelDeleteBtn.addEventListener('click', hideModal);
-                modal.addEventListener('click', (event) => {
-                    if (event.target === modal) {
-                        hideModal();
-                    }
-                });
-            }
+    const deleteForm = document.getElementById('deleteForm');
+    const confirmBtnTidak = document.getElementById('confirmBtnTidak');
+
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+            const serviceId = this.dataset.serviceId;
+            // Set action form dinamis berdasarkan serviceId yang diklik
+            deleteForm.action = `/outlet/services/delete/${serviceId}`;
+            modal.classList.remove('hidden');
         });
-    </script>
-</body>
-</html>
+    });
+
+    function hideModal() {
+        modal.classList.add('hidden');
+    }
+
+    confirmBtnTidak.addEventListener('click', hideModal);
+    modal.addEventListener('click', (event) => { 
+        if (event.target === modal) hideModal();
+    });
+});
+</script>
+
+<?= $this->endSection() ?>

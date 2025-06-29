@@ -53,6 +53,16 @@ $routes->get('/outlet/my-outlets/create', 'OutletController::createOutletForm');
 
 // Rute untuk MENYIMPAN data dari form (baik data baru maupun update)
 $routes->post('/outlet/my-outlets/store', 'OutletController::storeOrUpdateOutlet');
+// Rute untuk menampilkan halaman manajemen layanan untuk outlet tertentu
+$routes->get('/outlet/services/manage/(:num)', 'OutletController::listServices/$1');
+// Rute untuk menampilkan form tambah layanan
+$routes->get('/outlet/services/create/(:num)', 'OutletController::createService/$1');
+// Rute untuk memproses penyimpanan layanan (baik baru maupun update)
+$routes->post('/outlet/services/store', 'OutletController::storeService');
+// Rute untuk menampilkan form edit layanan
+$routes->get('/outlet/services/edit/(:num)', 'OutletController::editService/$1');
+// Rute untuk menghapus layanan
+$routes->post('/outlet/services/delete/(:num)', 'OutletController::deleteService/$1');
 
 // Rute lainnya tetap sama
 $routes->get('/outlet/orders', 'OutletController::listOrders');

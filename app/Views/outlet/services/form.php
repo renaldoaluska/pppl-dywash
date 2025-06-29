@@ -1,65 +1,85 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $service ? 'Edit' : 'Tambah' ?> Layanan - Dywash</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Poppins', sans-serif; }
-    </style>
-</head>
-<body class="bg-slate-100">
+<?= $this->extend('outlet/layout') ?>
 
-    <div class="container max-w-2xl mx-auto my-8 px-4">
-        
-        <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-            
-            <header class="mb-6">
-                <h1 class="text-3xl font-bold text-slate-800"><?= $service ? 'Edit Layanan' : 'Tambah Layanan Baru' ?></h1>
-                <p class="mt-1 text-slate-500">Isi detail layanan pada form di bawah ini.</p>
-                <a href="/outlet/services" class="text-sm text-blue-600 hover:underline mt-4 inline-block">&larr; Kembali ke Daftar Layanan</a>
-            </header>
+<?= $this->section('title') ?>
+    <!-- Judul dinamis: "Tambah" atau "Edit" -->
+    <?= $service ? 'Edit Layanan' : 'Tambah Layanan Baru' ?>
+<?= $this->endSection() ?>
 
-            <hr class="my-6 border-t border-slate-200">
+<?= $this->section('content') ?>
 
-            <form action="/outlet/services/store" method="post">
-                <?= csrf_field() ?>
-                <input type="hidden" name="service_id" value="<?= $service['service_id'] ?? '' ?>">
-
-                <div class="space-y-6">
-                    <div>
-                        <label for="name" class="block mb-2 text-sm font-medium text-slate-700">Nama Layanan</label>
-                        <input type="text" id="name" name="name" value="<?= esc($service['name'] ?? '') ?>" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Contoh: Cuci Kering Kiloan" required>
-                    </div>
-
-                    <div>
-                        <label for="price" class="block mb-2 text-sm font-medium text-slate-700">Harga</label>
-                        <div class="flex">
-                            <span class="inline-flex items-center px-3 text-sm text-slate-900 bg-slate-200 border border-r-0 border-slate-300 rounded-l-md">
-                                Rp
-                            </span>
-                            <input type="number" id="price" name="price" value="<?= esc($service['price'] ?? '') ?>" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Contoh: 7000" required>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="unit" class="block mb-2 text-sm font-medium text-slate-700">Satuan</label>
-                        <input type="text" id="unit" name="unit" value="<?= esc($service['unit'] ?? '') ?>" class="bg-slate-50 border border-slate-300 text-slate-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Contoh: Kg, Pcs, Setel, m2" required>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-6 border-t border-slate-200 text-right">
-                    <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-6 py-3 text-center transition-colors duration-200">
-                        Simpan Layanan
-                    </button>
-                </div>
-            </form>
-        </div>
+<div class="bg-white p-4 sm:p-6 rounded-xl shadow-md max-w-2xl mx-auto">
+    
+    <!-- Header Form -->
+    <div class="pb-4 mb-6 border-b">
+        <h3 class="text-lg font-semibold text-gray-700">
+            <?= $service ? 'Edit Layanan' : 'Tambah Layanan Baru' ?>
+        </h3>
+        <!-- Menampilkan nama outlet yang layanannya sedang dikelola -->
+        <p class="text-sm text-gray-500 mt-1">
+            Untuk outlet: <strong><?= esc($current_outlet['name']) ?></strong>
+        </p>
     </div>
 
-</body>
-</html>
+    <!-- Menampilkan error validasi jika ada -->
+    <?php if (session()->getFlashdata('errors')): ?>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-5" role="alert">
+            <strong class="font-bold">Terjadi Kesalahan!</strong>
+            <ul>
+                <?php foreach (session()->getFlashdata('errors') as $error) : ?>
+                    <li class="list-disc ml-4"><?= esc($error) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    <?php endif; ?>
+
+    <!-- Form -->
+    <form action="/outlet/services/store" method="post">
+        <?= csrf_field() ?>
+        
+        <!-- Hidden input untuk ID layanan (penting untuk proses update) -->
+        <input type="hidden" name="service_id" value="<?= $service['service_id'] ?? '' ?>">
+        <!-- Hidden input untuk ID outlet agar controller tahu layanan ini milik siapa -->
+        <input type="hidden" name="outlet_id" value="<?= $current_outlet['outlet_id'] ?>">
+
+        <div class="space-y-6">
+            <!-- Nama Layanan -->
+            <div>
+                <label for="name" class="block text-sm font-bold text-gray-700">Nama Layanan</label>
+                <div class="mt-1">
+                    <input type="text" name="name" id="name" class="block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm caret-blue-600 p-2.5" placeholder="Contoh: Cuci Kering Setrika" value="<?= old('name', $service['name'] ?? '') ?>" required>
+                </div>
+            </div>
+
+            <!-- Harga -->
+            <div>
+                <label for="price" class="block text-sm font-bold text-gray-700">Harga</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 sm:text-sm">Rp</span>
+                    </div>
+                    <input type="number" name="price" id="price" class="block w-full pl-8 pr-3 border-gray-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 sm:text-sm caret-blue-600 p-2.5" placeholder="7000" value="<?= old('price', $service['price'] ?? '') ?>" required>
+                </div>
+            </div>
+
+            <!-- Satuan -->
+            <div>
+                <label for="unit" class="block text-sm font-bold text-gray-700">Satuan</label>
+                <div class="mt-1">
+                    <input type="text" name="unit" id="unit" class="block w-full border-gray-300 rounded-xl shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm caret-blue-600 p-2.5" placeholder="Contoh: kg, pcs, pasang, meter" value="<?= old('unit', $service['unit'] ?? '') ?>" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="border-t mt-8 pt-6 flex justify-end gap-3">
+            <a href="/outlet/services/manage/<?= $current_outlet['outlet_id'] ?>" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
+                Batal
+            </a>
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700">
+                <?= $service ? 'Simpan Perubahan' : 'Tambah Layanan' ?>
+            </button>
+        </div>
+    </form>
+</div>
+
+<?= $this->endSection() ?>

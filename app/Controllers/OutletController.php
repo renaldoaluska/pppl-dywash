@@ -210,43 +210,52 @@ class OutletController extends BaseController
 
     // --- FUNGSI KELOLA LAYANAN ---
     
-    public function listServices()
+    public function listServices($outlet_id)
     {
         $serviceModel = new ServiceModel();
         $outletModel = new OutletModel();
 
-        $outlet = $outletModel->where(['owner_id' => session()->get('user_id'), 'status' => 'verified'])->first();
-        if (!$outlet) {
-            return redirect()->to('/dashboard')->with('error', 'Anda harus memiliki setidaknya satu outlet terverifikasi untuk mengelola layanan.');
+        // 1. Ambil data outlet yang akan dikelola
+        $outlet = $outletModel->find($outlet_id);
+
+        // 2. Validasi Keamanan: Pastikan outlet ada & dimiliki oleh user yg login
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
         }
 
-        $data['services'] = $serviceModel->where('outlet_id', $outlet['outlet_id'])->findAll();
+        // 3. Ambil semua layanan untuk outlet ini
+        $data['services'] = $serviceModel->where('outlet_id', $outlet_id)->findAll();
+        // 4. Kirim juga data outlet agar tahu layanan ini milik outlet mana
         $data['current_outlet'] = $outlet; 
         
         return view('outlet/services/index', $data);
     }
 
-    public function createService()
+    public function createService($outlet_id)
     {
-        return view('outlet/services/form', ['service' => null]);
-    }
+        $outletModel = new OutletModel();
+        $outlet = $outletModel->find($outlet_id);
 
-    public function editService($service_id)
-    {
-        $serviceModel = new ServiceModel();
-        $data['service'] = $serviceModel->find($service_id);
-        
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Outlet tidak ditemukan.');
+        }
+
+        $data = [
+            'service' => null,
+            'current_outlet' => $outlet
+        ];
         return view('outlet/services/form', $data);
     }
 
     public function storeService()
     {
         $serviceModel = new ServiceModel();
-        $outletModel = new OutletModel();
+        $outlet_id = $this->request->getPost('outlet_id');
 
-        $outlet = $outletModel->where(['owner_id' => session()->get('user_id'), 'status' => 'verified'])->first();
-        if (!$outlet) {
-            return redirect()->to('/dashboard')->with('error', 'Tidak ada outlet terverifikasi untuk ditambahkan layanan.');
+        $outletModel = new OutletModel();
+        $outlet = $outletModel->find($outlet_id);
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Aksi tidak diizinkan.');
         }
 
         $rules = [
@@ -260,25 +269,74 @@ class OutletController extends BaseController
 
         $service_id = $this->request->getPost('service_id');
         $data = [
-            'outlet_id' => $outlet['outlet_id'],
+            'outlet_id' => $outlet_id,
             'name'      => $this->request->getPost('name'),
             'price'     => $this->request->getPost('price'),
             'unit'      => $this->request->getPost('unit'),
         ];
 
-        if ($service_id) {
+        if ($service_id) { // Update
             $serviceModel->update($service_id, $data);
-        } else {
+        } else { // Buat baru
             $serviceModel->insert($data);
         }
 
-        return redirect()->to('/outlet/services')->with('success', 'Layanan berhasil disimpan.');
+        return redirect()->to('/outlet/services/manage/' . $outlet_id)->with('success', 'Layanan berhasil disimpan.');
     }
 
+    public function editService($service_id)
+    {
+        $serviceModel = new ServiceModel();
+        $outletModel = new OutletModel();
+
+        // 1. Ambil data layanan yang akan diedit
+        $service = $serviceModel->find($service_id);
+        if (!$service) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Layanan tidak ditemukan.');
+        }
+
+        // 2. Ambil data outlet dari layanan tersebut untuk validasi & ditampilkan di view
+        $outlet = $outletModel->find($service['outlet_id']);
+
+        // 3. Validasi Keamanan: Pastikan outlet ini milik owner yang sedang login
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Anda tidak memiliki akses untuk mengedit layanan ini.');
+        }
+        
+        // 4. Kirim data ke view form yang sama
+        $data = [
+            'service'        => $service,
+            'current_outlet' => $outlet
+        ];
+        return view('outlet/services/form', $data);
+    }
+    
     public function deleteService($service_id)
     {
         $serviceModel = new ServiceModel();
-        $serviceModel->delete($service_id);
-        return redirect()->to('/outlet/services')->with('success', 'Layanan berhasil dihapus.');
+        $outletModel = new OutletModel();
+        $outlet_id_to_redirect = null;
+
+        // 1. Ambil data layanan yang akan dihapus
+        $service = $serviceModel->find($service_id);
+        
+        // Pastikan layanan ada
+        if ($service) {
+            $outlet_id_to_redirect = $service['outlet_id'];
+            
+            // 2. Ambil data outlet dari layanan tersebut untuk validasi
+            $outlet = $outletModel->find($service['outlet_id']);
+
+            // 3. Validasi Keamanan: Pastikan outlet ini milik owner yang sedang login
+            if ($outlet && $outlet['owner_id'] == session()->get('user_id')) {
+                // 4. Jika valid, hapus layanan
+                $serviceModel->delete($service_id);
+                // Redirect kembali ke halaman daftar layanan dengan pesan sukses
+                return redirect()->to('/outlet/services/manage/' . $outlet_id_to_redirect)->with('success', 'Layanan berhasil dihapus.');
+            }
+        }
+        
+        // Jika validasi gagal atau layanan tidak ditemukan, redirect dengan pesan error
+        return redirect()->to('/outlet/my-outlets')->with('error', 'Gagal menghapus layanan atau Anda tidak memiliki akses.');
     }
 }
