@@ -91,18 +91,26 @@ Detail Pesanan
             <p><?= esc($order['address_detail']) ?></p>
         </div>
     </div>
+<div>
+    <h2 class="font-semibold text-base mb-1">Layanan</h2>
+    <ul class="bg-gray-50 rounded-lg divide-y">
+        <?php 
+        $totalBiaya = 0;
+        foreach ($items as $item): 
+            $totalBiaya += $item['subtotal'];
+        ?>
+        <li class="flex justify-between items-center p-3 text-sm">
+            <span><?= esc($item['service_name']) ?> (<?= $item['quantity'] ?> <?= esc($item['unit']) ?>)</span>
+            <span class="font-semibold">Rp <?= number_format($item['subtotal'],0,',','.') ?></span>
+        </li>
+        <?php endforeach; ?>
+        <li class="flex justify-between items-center p-3 text-sm font-bold text-slate-700">
+            <span>Total Biaya</span>
+            <span>Rp <?= number_format($totalBiaya,0,',','.') ?></span>
+        </li>
+    </ul>
+</div>
 
-    <div>
-        <h2 class="font-semibold text-base mb-1">Layanan</h2>
-        <ul class="bg-gray-50 rounded-lg divide-y">
-            <?php foreach ($items as $item): ?>
-            <li class="flex justify-between items-center p-3 text-sm">
-                <span><?= esc($item['service_name']) ?> (<?= $item['quantity'] ?> <?= esc($item['unit']) ?>)</span>
-                <span class="font-semibold">Rp <?= number_format($item['subtotal'],0,',','.') ?></span>
-            </li>
-            <?php endforeach; ?>
-        </ul>
-    </div>
 
 <div class="flex justify-between items-center mt-4">
     <?php if (empty($order['payment_status'])): ?>
