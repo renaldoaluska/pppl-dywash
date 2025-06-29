@@ -186,25 +186,37 @@ class OutletController extends BaseController
     }
     
     // --- FUNGSI LIHAT ULASAN ---
-     public function listReviews()
+    public function showReviewsForOutlet($outlet_id)
     {
-        $reviewModel = new ReviewModel();
+        // Inisialisasi model yang kita perlukan
         $outletModel = new OutletModel();
+        $reviewModel = new ReviewModel();
 
-        $outlets = $outletModel->where('owner_id', session()->get('user_id'))->findAll();
-        if (empty($outlets)) {
-            return redirect()->to('/dashboard')->with('error', 'Anda tidak memiliki outlet untuk melihat ulasan.');
+        // 1. Ambil data outlet untuk ditampilkan di header halaman
+        $outlet = $outletModel->find($outlet_id);
+
+        // 2. Validasi Keamanan (PENTING!): 
+        //    Pastikan outlet ada & benar-benar dimiliki oleh user yang sedang login
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            // Jika tidak, lempar kembali ke halaman daftar outlet dengan pesan error
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Anda tidak memiliki akses ke halaman ulasan ini.');
         }
 
-        $outletIds = array_column($outlets, 'outlet_id');
-
-        $data['reviews'] = $reviewModel
-            ->whereIn('reviews.outlet_id', $outletIds)
+        // 3. Ambil semua ulasan untuk outlet ini, dan gabungkan (join) dengan data customer
+        $reviews = $reviewModel
+            ->where('reviews.outlet_id', $outlet_id)
             ->join('users', 'users.user_id = reviews.customer_id')
-            ->join('outlets', 'outlets.outlet_id = reviews.outlet_id')
-            ->select('reviews.*, users.name as customer_name, outlets.name as outlet_name')
+            ->select('reviews.*, users.name as customer_name')
+            ->orderBy('reviews.order_id', 'DESC') // Urutkan dari ulasan terbaru
             ->findAll();
 
+        // 4. Siapkan data untuk dikirim ke view
+        $data = [
+            'outlet'  => $outlet,
+            'reviews' => $reviews
+        ];
+
+        // 5. Tampilkan view 'list_reviews' dan kirim datanya
         return view('outlet/list_reviews', $data);
     }
     public function listReviewsForOutlet($outlet_id)
@@ -240,44 +252,53 @@ class OutletController extends BaseController
 
     // --- FUNGSI KELOLA LAYANAN ---
     
-    public function listServices()
+    public function listServices($outlet_id)
     {
         $serviceModel = new ServiceModel();
         $outletModel = new OutletModel();
 
-        $outlet = $outletModel->where(['owner_id' => session()->get('user_id'), 'status' => 'verified'])->first();
-        if (!$outlet) {
-            return redirect()->to('/dashboard')->with('error', 'Anda harus memiliki setidaknya satu outlet terverifikasi untuk mengelola layanan.');
+        // 1. Ambil data outlet yang akan dikelola
+        $outlet = $outletModel->find($outlet_id);
+
+        // 2. Validasi Keamanan: Pastikan outlet ada & dimiliki oleh user yg login
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Anda tidak memiliki akses ke halaman ini.');
         }
 
-        $data['services'] = $serviceModel->where('outlet_id', $outlet['outlet_id'])->findAll();
+        // 3. Ambil semua layanan untuk outlet ini
+        $data['services'] = $serviceModel->where('outlet_id', $outlet_id)->findAll();
+        // 4. Kirim juga data outlet agar tahu layanan ini milik outlet mana
         $data['current_outlet'] = $outlet; 
         
         return view('outlet/services/index', $data);
     }
     
 
-    public function createService()
+    public function createService($outlet_id)
     {
-        return view('outlet/services/form', ['service' => null]);
-    }
+        $outletModel = new OutletModel();
+        $outlet = $outletModel->find($outlet_id);
 
-    public function editService($service_id)
-    {
-        $serviceModel = new ServiceModel();
-        $data['service'] = $serviceModel->find($service_id);
-        
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Outlet tidak ditemukan.');
+        }
+
+        $data = [
+            'service' => null,
+            'current_outlet' => $outlet
+        ];
         return view('outlet/services/form', $data);
     }
 
     public function storeService()
     {
         $serviceModel = new ServiceModel();
-        $outletModel = new OutletModel();
+        $outlet_id = $this->request->getPost('outlet_id');
 
-        $outlet = $outletModel->where(['owner_id' => session()->get('user_id'), 'status' => 'verified'])->first();
-        if (!$outlet) {
-            return redirect()->to('/dashboard')->with('error', 'Tidak ada outlet terverifikasi untuk ditambahkan layanan.');
+        $outletModel = new OutletModel();
+        $outlet = $outletModel->find($outlet_id);
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Aksi tidak diizinkan.');
         }
 
         $rules = [
@@ -291,25 +312,173 @@ class OutletController extends BaseController
 
         $service_id = $this->request->getPost('service_id');
         $data = [
-            'outlet_id' => $outlet['outlet_id'],
+            'outlet_id' => $outlet_id,
             'name'      => $this->request->getPost('name'),
             'price'     => $this->request->getPost('price'),
             'unit'      => $this->request->getPost('unit'),
         ];
 
-        if ($service_id) {
+        if ($service_id) { // Update
             $serviceModel->update($service_id, $data);
-        } else {
+        } else { // Buat baru
             $serviceModel->insert($data);
         }
 
-        return redirect()->to('/outlet/services')->with('success', 'Layanan berhasil disimpan.');
+        return redirect()->to('/outlet/services/manage/' . $outlet_id)->with('success', 'Layanan berhasil disimpan.');
     }
 
+    public function editService($service_id)
+    {
+        $serviceModel = new ServiceModel();
+        $outletModel = new OutletModel();
+
+        // 1. Ambil data layanan yang akan diedit
+        $service = $serviceModel->find($service_id);
+        if (!$service) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Layanan tidak ditemukan.');
+        }
+
+        // 2. Ambil data outlet dari layanan tersebut untuk validasi & ditampilkan di view
+        $outlet = $outletModel->find($service['outlet_id']);
+
+        // 3. Validasi Keamanan: Pastikan outlet ini milik owner yang sedang login
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Anda tidak memiliki akses untuk mengedit layanan ini.');
+        }
+        
+        // 4. Kirim data ke view form yang sama
+        $data = [
+            'service'        => $service,
+            'current_outlet' => $outlet
+        ];
+        return view('outlet/services/form', $data);
+    }
+    
     public function deleteService($service_id)
     {
         $serviceModel = new ServiceModel();
-        $serviceModel->delete($service_id);
-        return redirect()->to('/outlet/services')->with('success', 'Layanan berhasil dihapus.');
+        $outletModel = new OutletModel();
+        $outlet_id_to_redirect = null;
+
+        // 1. Ambil data layanan yang akan dihapus
+        $service = $serviceModel->find($service_id);
+        
+        // Pastikan layanan ada
+        if ($service) {
+            $outlet_id_to_redirect = $service['outlet_id'];
+            
+            // 2. Ambil data outlet dari layanan tersebut untuk validasi
+            $outlet = $outletModel->find($service['outlet_id']);
+
+            // 3. Validasi Keamanan: Pastikan outlet ini milik owner yang sedang login
+            if ($outlet && $outlet['owner_id'] == session()->get('user_id')) {
+                // 4. Jika valid, hapus layanan
+                $serviceModel->delete($service_id);
+                // Redirect kembali ke halaman daftar layanan dengan pesan sukses
+                return redirect()->to('/outlet/services/manage/' . $outlet_id_to_redirect)->with('success', 'Layanan berhasil dihapus.');
+            }
+        }
+        
+        // Jika validasi gagal atau layanan tidak ditemukan, redirect dengan pesan error
+        return redirect()->to('/outlet/my-outlets')->with('error', 'Gagal menghapus layanan atau Anda tidak memiliki akses.');
+    }
+    public function profile()
+    {
+        return view('outlet/profile');
+    }
+    public function editProfile()
+    {
+        // Untuk form ini, kita perlu model User, bukan Outlet
+        $userModel = new \App\Models\UserModel(); 
+        
+        // Ambil data user yang sedang login
+        $data['user'] = $userModel->find(session()->get('user_id'));
+
+        return view('outlet/profile/edit', $data);
+    }
+
+    /**
+     * FUNGSI BARU: Memproses update data profil user outlet.
+     */
+    public function updateProfile()
+    {
+        $userModel = new \App\Models\UserModel();
+        $user_id = session()->get('user_id');
+
+        // Aturan validasi
+        $rules = [
+            'name' => 'required|min_length[3]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // Siapkan data untuk diupdate
+        $data = [
+            'name' => $this->request->getPost('name'),
+        ];
+
+        // Lakukan update
+        if ($userModel->update($user_id, $data)) {
+            // Update juga data nama di session agar langsung berubah di tampilan
+            session()->set('name', $data['name']);
+            return redirect()->to('/outlet/profile')->with('success', 'Profil berhasil diperbarui!');
+        }
+
+        return redirect()->back()->withInput()->with('error', 'Gagal memperbarui profil.');
+    }
+
+    public function changePasswordForm()
+    {
+        return view('outlet/profile/change_password');
+    }
+
+    /**
+     * FUNGSI BARU: Memproses update password.
+     */
+    public function updatePassword()
+    {
+        $userModel = new \App\Models\UserModel();
+        $user_id = session()->get('user_id');
+        $user = $userModel->find($user_id);
+
+        // 1. Verifikasi password lama (tanpa hash)
+        $old_password = $this->request->getPost('password_lama');
+        // PERHATIAN: Pengecekan ini hanya berfungsi jika password lama di database TIDAK di-hash.
+        if ($old_password !== $user['password']) {
+            return redirect()->back()->with('error', 'Password lama yang Anda masukkan salah.');
+        }
+
+        // 2. Validasi password baru
+        $rules = [
+            'password_baru' => 'required|min_length[8]',
+            'konfirmasi_password' => 'required|matches[password_baru]',
+        ];
+        
+        $validationMessages = [
+            'password_baru' => [
+                'min_length' => 'Password baru minimal harus 8 karakter.'
+            ],
+            'konfirmasi_password' => [
+                'matches' => 'Konfirmasi password tidak cocok dengan password baru.'
+            ]
+        ];
+
+        if (!$this->validate($rules, $validationMessages)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // 3. Jika semua validasi lolos, update password baru TANPA HASHING
+        // PERINGATAN: Menyimpan password sebagai teks biasa adalah praktik yang sangat tidak aman.
+        // Ini hanya untuk tujuan development. Di lingkungan produksi, selalu gunakan hashing.
+        $newPassword = $this->request->getPost('password_baru');
+        
+        if ($userModel->update($user_id, ['password' => $newPassword])) {
+            // Redirect dengan pesan sukses
+            return redirect()->to('/outlet/profile')->with('success', 'Password berhasil diperbarui.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal memperbarui password, silakan coba lagi.');
     }
 }
