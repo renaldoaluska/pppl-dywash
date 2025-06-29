@@ -5,9 +5,6 @@ Daftar Outlet
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-
-<main class="max-w-3xl mx-auto p-4 md:p-6">
-
     <form action="/customer/outlet" method="get" class="flex items-center gap-3 mb-8">
         <div class="relative flex-grow">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -47,6 +44,4 @@ Daftar Outlet
             </div>
         <?php endif; ?>
     </div>
-</main>
-
 <?= $this->endSection() ?>

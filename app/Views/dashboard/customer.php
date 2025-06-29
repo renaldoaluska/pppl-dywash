@@ -1,12 +1,10 @@
 <?= $this->extend('customer/layout') ?>
 
 <?= $this->section('title') ?>
-Beranda
+Home
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-
-<main class="p-4">
 
     <section class="mb-8">
         <div class="swiper h-48 rounded-lg">
@@ -82,8 +80,9 @@ Beranda
             </a>
              </div>
     </section>
-</main>
+<?= $this->endSection() ?>
 
+<?= $this->section('script') ?>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <script>

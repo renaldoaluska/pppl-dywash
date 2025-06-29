@@ -60,13 +60,14 @@ Pembayaran Pesanan
             </div>
         </form>
     </div>
-</main>
 
 <div id="toast-notification" class="fixed bottom-5 right-5 flex items-center gap-3 bg-red-600 text-white py-3 px-5 rounded-lg shadow-lg opacity-0 translate-y-10 pointer-events-none transition-all duration-300 ease-out z-50">
     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
     <p id="toast-message" class="font-medium text-sm">Pesan error di sini.</p>
 </div>
+<?= $this->endSection() ?>
 
+<?= $this->section('script') ?>
 <script>
     // Fungsi untuk menampilkan toast
     function showToast(message) {

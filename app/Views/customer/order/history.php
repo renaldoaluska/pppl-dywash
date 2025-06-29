@@ -43,12 +43,7 @@ Riwayat Pesanan
             color: #FBBF24;
         }
     </style>
-</head>
-<body class="bg-slate-50">
 
-<?= $this->include('layout/top_nav') ?>
-
-<main class="max-w-3xl mx-auto p-4 md:p-6 pb-24">
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold text-slate-700">Riwayat Pesanan</h2>
     </div>
@@ -178,13 +173,14 @@ Riwayat Pesanan
             </div>
         <?php endif; ?>
     </div>
-</main>
 
 <!-- TOAST ERROR RATING -->
 <div id="rating-toast" class="fixed bottom-20 right-5 bg-red-600 text-white py-3 px-5 rounded-lg shadow-lg transition-all duration-300 opacity-0 transform translate-y-2 hidden z-50">
     <p class="font-semibold">⚠️ Rating tidak boleh kosong!</p>
 </div>
+<?= $this->endSection() ?>
 
+<?= $this->section('script') ?>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const reviewForms = document.querySelectorAll('.review-form');
@@ -210,6 +206,5 @@ Riwayat Pesanan
         });
     });
 </script>
-
 
 <?= $this->endSection() ?>

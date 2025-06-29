@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" type="image/png" href="<?= base_url('assets/img/favicon.ico') ?>">
     <title><?= $this->renderSection('title') ?> - DyWash</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
 </head>
 <body class="bg-gray-100 antialiased">
 
@@ -40,11 +41,12 @@
     <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24">
         <?= $this->renderSection('content') ?>
     </main>
+    <?= $this->renderSection('script') ?>
 
     <!-- Navbar Bawah (Fixed) -->
     <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-lg z-10">
         <div class="flex justify-around h-16">
-            <a href="/" class="flex flex-col items-center justify-center w-full transition-colors duration-200 <?= (uri_string() == '') ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600' ?>">
+            <a href="/" class="flex flex-col items-center justify-center w-full transition-colors duration-200 <?= (uri_string() == 'dashboard') ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600' ?>">
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 <span class="text-xs font-medium">Home</span>
             </a>
@@ -64,6 +66,6 @@
     </nav>
 
 </div>
-
+        
 </body>
 </html>
