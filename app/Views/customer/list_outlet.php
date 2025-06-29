@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <?= $this->include('layout/isian') ?>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Cari Outlet Laundry</title>
-</head>
-<body class="bg-slate-50"> <?= $this->include('layout/top_nav') ?>
+<?= $this->extend('customer/layout') ?>
 
-<main class="max-w-3xl mx-auto p-4 md:p-6">
+<?= $this->section('title') ?>
+Daftar Outlet
+<?= $this->endSection() ?>
 
+<?= $this->section('content') ?>
     <form action="/customer/outlet" method="get" class="flex items-center gap-3 mb-8">
         <div class="relative flex-grow">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -19,8 +15,6 @@
         <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0">Cari</button>
     </form>
     
-    <h2 class="text-xl font-bold text-slate-700 mb-4">Daftar Outlet</h2>
-
     <div class="space-y-4">
         <?php if (!empty($outlets)): ?>
             <?php foreach ($outlets as $outlet): ?>
@@ -48,7 +42,4 @@
             </div>
         <?php endif; ?>
     </div>
-</main>
-
-<?= $this->include('layout/bottom_nav') ?>
-<?= $this->include('layout/footer') ?>
+<?= $this->endSection() ?>

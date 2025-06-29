@@ -8,6 +8,7 @@ use App\Models\OrderItemModel;
 use App\Models\ServiceModel;
 use App\Models\ReviewModel;
 use App\Models\PaymentModel;
+use App\Models\UserModel;
 
 class CustomerController extends BaseController
 {
@@ -228,13 +229,123 @@ public function monitorOrder()
         return redirect()->back()->with('error', 'Gagal menyimpan ulasan.');
     }
 
-    /**
-     * Fitur: Cek Profil
-     * Menampilkan halaman profil.
+      /**
+     * Menampilkan halaman profil utama.
      */
     public function cekProfil()
     {
-        #return view('customer/profil', $data);
+        // Kode ini sudah benar, tidak perlu diubah.
         return view('customer/profil');
     }
+
+    /**
+     * Menampilkan form untuk mengubah data profil.
+     */
+    public function editProfil()
+    {
+        // Kode ini sudah benar, mengambil data user untuk ditampilkan di form.
+        $userModel = new UserModel();
+        $data['user'] = $userModel->find(session('user_id'));
+
+        return view('customer/edit_profil', $data);
+    }
+
+    /**
+     * Memproses pembaruan nama dari form edit profil.
+     * Email tidak lagi diproses sesuai permintaan.
+     */
+    public function updateProfil()
+    {
+        $userModel = new UserModel();
+        $userId = session('user_id');
+
+        // Validasi hanya untuk 'name'.
+        $rules = [
+            'name'  => 'required|min_length[3]|max_length[100]',
+        ];
+
+        if (!$this->validate($rules)) {
+            // Jika validasi gagal, kirim error ke view.
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // Siapkan data hanya 'name' untuk diupdate.
+        $data = [
+            'name'  => $this->request->getPost('name'),
+        ];
+
+        $userModel->update($userId, $data);
+
+        // Perbarui session 'name'.
+        session()->set(['name' => $data['name']]);
+
+        return redirect()->to('/customer/profil')->with('toast', [
+            'type' => 'success', 
+            'message' => 'Profil berhasil diperbarui!'
+        ]);
+    }
+
+    /**
+     * Memproses form ganti password (tanpa hash).
+     */
+    
+    // METHOD BARU: Untuk menampilkan halaman ganti password
+    public function showChangePasswordForm()
+    {
+        return view('customer/ganti_password');
+    }
+
+    // NAMA METHOD DIUBAH: Untuk memproses form ganti password
+// app/Controllers/CustomerController.php
+
+public function processChangePassword()
+{
+    $rules = [
+        'password_lama' => 'required',
+        'password_baru' => 'required|min_length[8]',
+        'konfirmasi_password' => 'required|matches[password_baru]',
+    ];
+
+    // Tambahkan pesan error kustom dalam Bahasa Indonesia
+    $errors = [
+        'password_baru' => [
+            'min_length' => 'Password baru minimal harus 8 karakter.'
+        ],
+        'konfirmasi_password' => [
+            'matches' => 'Konfirmasi password tidak cocok dengan password baru.'
+        ]
+    ];
+
+    // PERUBAHAN UTAMA DI SINI
+    if (!$this->validate($rules, $errors)) {
+        // Ambil pesan error pertama yang muncul
+        $errorMsg = array_values($this->validator->getErrors())[0];
+
+        // Redirect kembali dengan TOAST, bukan dengan array 'errors'
+        return redirect()->back()->withInput()->with('toast', [
+            'type' => 'error',
+            'message' => $errorMsg
+        ]);
+    }
+
+    $userModel = new \App\Models\UserModel();
+    $userId = session('user_id');
+    $user = $userModel->find($userId);
+
+    if ($this->request->getPost('password_lama') !== $user['password']) {
+        return redirect()->back()->with('toast', [
+            'type' => 'error',
+            'message' => 'Password lama yang Anda masukkan salah.'
+        ]);
+    }
+    
+    $newPassword = $this->request->getPost('password_baru');
+    $userModel->update($userId, ['password' => $newPassword]);
+
+    return redirect()->to('/customer/profil')->with('toast', [
+        'type' => 'success',
+        'message' => 'Password berhasil diganti!'
+    ]);
+}
+    
 }

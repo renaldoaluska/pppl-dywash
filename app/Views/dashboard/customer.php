@@ -1,6 +1,10 @@
-<?= $this->include('layout/header') ?>
-<?= $this->include('layout/top_nav') ?>
-<main class="p-4">
+<?= $this->extend('customer/layout') ?>
+
+<?= $this->section('title') ?>
+Home
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
 
     <section class="mb-8">
         <div class="swiper h-48 rounded-lg">
@@ -76,9 +80,9 @@
             </a>
              </div>
     </section>
-</main>
+<?= $this->endSection() ?>
 
-<?= $this->include('layout/bottom_nav') ?>
+<?= $this->section('script') ?>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <script>
@@ -96,4 +100,5 @@
     },
   });
 </script>
-<?= $this->include('layout/footer') ?>
+
+<?= $this->endSection() ?>
