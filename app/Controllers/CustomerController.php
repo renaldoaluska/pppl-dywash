@@ -17,6 +17,11 @@ class CustomerController extends BaseController
      * Fitur: Melihat/Mencari Outlet
      * Menampilkan halaman dengan daftar semua outlet yang tersedia.
      */
+    public function dashboard()
+{
+    return view('dashboard/customer');
+}
+
 public function listOutlet()
 {
     $outletModel = new OutletModel();
