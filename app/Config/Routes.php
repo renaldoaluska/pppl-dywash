@@ -63,6 +63,18 @@ $routes->get('/outlet/services/edit/(:num)', 'OutletController::editService/$1')
 $routes->post('/outlet/services/delete/(:num)', 'OutletController::deleteService/$1');
 // Rute untuk menampilkan ulasan dari satu outlet spesifik
 $routes->get('/outlet/(:num)/reviews', 'OutletController::showReviewsForOutlet/$1');
+// lihat profil
+$routes->get('/outlet/profile', 'OutletController::profile');
+// Rute BARU untuk menampilkan form edit profil
+$routes->get('/outlet/profile/edit', 'OutletController::editProfile');
+
+// Rute BARU untuk memproses update profil
+$routes->post('/outlet/profile/update', 'OutletController::updateProfile');
+// Rute untuk menampilkan form ganti password
+$routes->get('/outlet/profile/ganti-password', 'OutletController::changePasswordForm');
+
+// Rute untuk memproses update password
+$routes->post('/outlet/profile/update-password', 'OutletController::updatePassword');
 
 // Rute lainnya tetap sama
 $routes->get('/outlet/orders', 'OutletController::listOrders');

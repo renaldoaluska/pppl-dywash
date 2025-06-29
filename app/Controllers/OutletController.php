@@ -351,4 +351,103 @@ class OutletController extends BaseController
         // Jika validasi gagal atau layanan tidak ditemukan, redirect dengan pesan error
         return redirect()->to('/outlet/my-outlets')->with('error', 'Gagal menghapus layanan atau Anda tidak memiliki akses.');
     }
+    public function profile()
+    {
+        return view('outlet/profile');
+    }
+    public function editProfile()
+    {
+        // Untuk form ini, kita perlu model User, bukan Outlet
+        $userModel = new \App\Models\UserModel(); 
+        
+        // Ambil data user yang sedang login
+        $data['user'] = $userModel->find(session()->get('user_id'));
+
+        return view('outlet/profile/edit', $data);
+    }
+
+    /**
+     * FUNGSI BARU: Memproses update data profil user outlet.
+     */
+    public function updateProfile()
+    {
+        $userModel = new \App\Models\UserModel();
+        $user_id = session()->get('user_id');
+
+        // Aturan validasi
+        $rules = [
+            'name' => 'required|min_length[3]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // Siapkan data untuk diupdate
+        $data = [
+            'name' => $this->request->getPost('name'),
+        ];
+
+        // Lakukan update
+        if ($userModel->update($user_id, $data)) {
+            // Update juga data nama di session agar langsung berubah di tampilan
+            session()->set('name', $data['name']);
+            return redirect()->to('/outlet/profile')->with('success', 'Profil berhasil diperbarui!');
+        }
+
+        return redirect()->back()->withInput()->with('error', 'Gagal memperbarui profil.');
+    }
+
+    public function changePasswordForm()
+    {
+        return view('outlet/profile/change_password');
+    }
+
+    /**
+     * FUNGSI BARU: Memproses update password.
+     */
+    public function updatePassword()
+    {
+        $userModel = new \App\Models\UserModel();
+        $user_id = session()->get('user_id');
+        $user = $userModel->find($user_id);
+
+        // 1. Verifikasi password lama (tanpa hash)
+        $old_password = $this->request->getPost('password_lama');
+        // PERHATIAN: Pengecekan ini hanya berfungsi jika password lama di database TIDAK di-hash.
+        if ($old_password !== $user['password']) {
+            return redirect()->back()->with('error', 'Password lama yang Anda masukkan salah.');
+        }
+
+        // 2. Validasi password baru
+        $rules = [
+            'password_baru' => 'required|min_length[8]',
+            'konfirmasi_password' => 'required|matches[password_baru]',
+        ];
+        
+        $validationMessages = [
+            'password_baru' => [
+                'min_length' => 'Password baru minimal harus 8 karakter.'
+            ],
+            'konfirmasi_password' => [
+                'matches' => 'Konfirmasi password tidak cocok dengan password baru.'
+            ]
+        ];
+
+        if (!$this->validate($rules, $validationMessages)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // 3. Jika semua validasi lolos, update password baru TANPA HASHING
+        // PERINGATAN: Menyimpan password sebagai teks biasa adalah praktik yang sangat tidak aman.
+        // Ini hanya untuk tujuan development. Di lingkungan produksi, selalu gunakan hashing.
+        $newPassword = $this->request->getPost('password_baru');
+        
+        if ($userModel->update($user_id, ['password' => $newPassword])) {
+            // Redirect dengan pesan sukses
+            return redirect()->to('/outlet/profile')->with('success', 'Password berhasil diperbarui.');
+        }
+
+        return redirect()->back()->with('error', 'Gagal memperbarui password, silakan coba lagi.');
+    }
 }

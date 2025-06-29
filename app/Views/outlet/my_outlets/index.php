@@ -17,12 +17,18 @@ Outlet Saya
     </a>
 </div>
 
-<!-- ... (kode untuk pesan sukses/error tetap sama) ... -->
+<!-- Menampilkan pesan sukses/error jika ada -->
 <?php if (session()->getFlashdata('success')): ?>
     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow" role="alert">
         <p><?= session()->getFlashdata('success') ?></p>
     </div>
 <?php endif; ?>
+<?php if (session()->getFlashdata('error')): ?>
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg shadow" role="alert">
+        <p><?= session()->getFlashdata('error') ?></p>
+    </div>
+<?php endif; ?>
+
 
 <!-- Daftar Kartu Outlet -->
 <div class="space-y-4">
@@ -31,7 +37,6 @@ Outlet Saya
             <!-- Kartu Individual untuk Setiap Outlet -->
             <div class="bg-white rounded-xl shadow-md transition-all duration-300">
                 <div class="p-4 sm:p-6">
-                    <!-- ... (kode info outlet tetap sama) ... -->
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-800 leading-tight"><?= esc($outlet['name']) ?></h3>
                         <?php
@@ -47,7 +52,6 @@ Outlet Saya
                 </div>
                 <!-- Bagian Aksi (Tombol) -->
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-col sm:flex-row justify-end gap-3 rounded-b-xl">
-                    <!-- PERUBAHAN: Link ini sekarang mengarah ke halaman kelola layanan -->
                     <a href="/outlet/services/manage/<?= $outlet['outlet_id'] ?>" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
                         Kelola Layanan
                     </a>
@@ -58,7 +62,18 @@ Outlet Saya
             </div>
         <?php endforeach; ?>
     <?php else: ?>
-        <!-- ... (kode jika outlet kosong tetap sama) ... -->
+        <!-- KODE YANG HILANG: Tampilan jika outlet kosong -->
+        <div class="text-center bg-white p-8 rounded-xl shadow-md border-2 border-dashed border-gray-300">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Anda Belum Memiliki Outlet</h3>
+            <p class="mt-1 text-sm text-gray-500">Daftarkan outlet pertama Anda untuk memulai.</p>
+             <div class="mt-6">
+                <a href="/outlet/my-outlets/create" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Tambah Outlet Baru
+                </a>
+            </div>
+        </div>
+        <!-- AKHIR DARI KODE YANG HILANG -->
     <?php endif; ?>
 </div>
 
