@@ -1,5 +1,4 @@
 <?php // app/Models/OrderModel.php
-// Model ini berinteraksi dengan tabel 'orders'.
 
 namespace App\Models;
 
@@ -16,7 +15,8 @@ class OrderModel extends Model
         'order_date', 
         'total_amount', 
         'status', 
-        'customer_notes'
+        'customer_notes',
+        'orders_address_id' // ✅ tambahkan ini
     ];
     
     // Mengaktifkan penggunaan created_at dan updated_at secara otomatis

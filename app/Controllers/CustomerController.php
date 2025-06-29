@@ -9,6 +9,7 @@ use App\Models\ServiceModel;
 use App\Models\ReviewModel;
 use App\Models\PaymentModel;
 use App\Models\UserModel;
+use App\Models\AddressModel;
 
 class CustomerController extends BaseController
 {
@@ -16,22 +17,27 @@ class CustomerController extends BaseController
      * Fitur: Melihat/Mencari Outlet
      * Menampilkan halaman dengan daftar semua outlet yang tersedia.
      */
-    public function listOutlet()
-    {
-        $outletModel = new OutletModel();
-        
-        $keyword = $this->request->getGet('search');
-        
-        $outletModel->where('status', 'verified');
+public function listOutlet()
+{
+    $outletModel = new OutletModel();
+    
+    $keyword = $this->request->getGet('search');
+    
+    $outletModel->where('status', 'verified');
 
-        if ($keyword) {
-            $outletModel->like('name', $keyword);
-        }
-
-        $data['outlets'] = $outletModel->findAll();
-
-        return view('customer/list_outlet', $data);
+    if ($keyword) {
+        $keyword = strtolower($keyword);
+        $outletModel->groupStart()
+            ->where('LOWER(name) LIKE', '%' . $keyword . '%')
+            ->orWhere('LOWER(address) LIKE', '%' . $keyword . '%')
+        ->groupEnd();
     }
+
+    $data['outlets'] = $outletModel->findAll();
+    $data['keyword'] = $keyword; // 🟢 Tambahkan baris ini
+
+    return view('customer/list_outlet', $data);
+}
 
     /**
      * Fitur: Melakukan Pesanan (Langkah 1)
@@ -39,69 +45,128 @@ class CustomerController extends BaseController
      * @param int $outlet_id
      */
     public function createOrder($outlet_id)
-    {
-        $outletModel = new OutletModel();
-        $serviceModel = new ServiceModel();
+{
+    $outletModel = new OutletModel();
+    $serviceModel = new ServiceModel();
+    $addressModel = new AddressModel();
 
-        $data['outlet'] = $outletModel->where(['outlet_id' => $outlet_id, 'status' => 'verified'])->first();
+    $data['outlet'] = $outletModel->where(['outlet_id' => $outlet_id, 'status' => 'verified'])->first();
 
-        if (!$data['outlet']) {
-            return redirect()->to('/customer/outlet')->with('error', 'Outlet tidak ditemukan.');
-        }
-
-        $data['services'] = $serviceModel->where('outlet_id', $outlet_id)->findAll();
-
-        return view('customer/order/create', $data);
+    if (!$data['outlet']) {
+        return redirect()->to('/customer/outlet')->with('error', 'Outlet tidak ditemukan.');
     }
+
+    $data['services'] = $serviceModel->where('outlet_id', $outlet_id)->findAll();
+
+    // 🔥 Tambahkan data alamat customer di sini
+    $data['addresses'] = $addressModel->where('user_id', session()->get('user_id'))->findAll();
+    foreach ($data['addresses'] as &$address) {
+    $address['is_primary'] = ($address['is_primary'] === 't' || $address['is_primary'] === true || $address['is_primary'] == 1);
+}
+
+    return view('customer/order/create', $data);
+}
+
 
     /**
      * Fitur: Melakukan Pesanan (Langkah 2)
      * Menyimpan data pesanan baru.
      */
-    public function storeOrder()
-    {
-        $orderModel = new OrderModel();
-        $orderItemModel = new OrderItemModel();
-        $serviceModel = new ServiceModel();
+public function storeOrder()
+{
+    $orderModel = new OrderModel();
+    $orderItemModel = new OrderItemModel();
+    $serviceModel = new ServiceModel();
+    $addressModel = new AddressModel();
+    $db = \Config\Database::connect();
 
-        $outlet_id = $this->request->getPost('outlet_id');
-        $services = $this->request->getPost('services');
-        $customer_notes = $this->request->getPost('customer_notes');
+    $outlet_id = $this->request->getPost('outlet_id');
+    $services = $this->request->getPost('services');
+    $customer_notes = $this->request->getPost('customer_notes');
+    $address_id = $this->request->getPost('address_id');
 
-        $totalAmount = 0;
-        $orderItemsData = [];
-
-        if (empty($services)) {
-             return redirect()->back()->withInput()->with('error', 'Pilih minimal satu layanan.');
-        }
-
-        foreach ($services as $service_id => $quantity) {
-            if ($quantity > 0) {
-                $service = $serviceModel->find($service_id);
-                $subtotal = $service['price'] * $quantity;
-                $totalAmount += $subtotal;
-                $orderItemsData[] = ['service_id' => $service_id, 'quantity' => $quantity, 'subtotal' => $subtotal];
-            }
-        }
-        
-        $orderData = [
-            'customer_id'    => session()->get('user_id'),
-            'outlet_id'      => $outlet_id,
-            'total_amount'   => $totalAmount,
-            // STATUS AWAL BARU
-            // 'status'         => 'pending', 
-            'customer_notes' => $customer_notes,
-        ];
-        $order_id = $orderModel->insert($orderData);
-
-        foreach ($orderItemsData as &$item) {
-            $item['order_id'] = $order_id;
-        }
-        $orderItemModel->insertBatch($orderItemsData);
-
-        // Arahkan ke halaman pembayaran, bukan riwayat
-        return redirect()->to('/customer/payment/' . $order_id)->with('success', 'Pesanan dibuat. Silakan lakukan pembayaran.');
+    if (empty($services)) {
+        return redirect()->back()->withInput()->with('error', 'Pilih minimal satu layanan.');
     }
+
+    $totalAmount = 0;
+    $orderItemsData = [];
+
+    foreach ($services as $service_id => $quantity) {
+        if ($quantity > 0) {
+            $service = $serviceModel->find($service_id);
+            if (!$service) continue;
+            $subtotal = $service['price'] * $quantity;
+            $totalAmount += $subtotal;
+            $orderItemsData[] = [
+                'service_id' => $service_id,
+                'quantity'   => $quantity,
+                'subtotal'   => $subtotal
+            ];
+        }
+    }
+
+    $db->transStart();
+
+    // Insert orders (tanpa orders_address_id dulu)
+    $orderData = [
+        'customer_id'    => session()->get('user_id'),
+        'outlet_id'      => $outlet_id,
+        'total_amount'   => $totalAmount,
+        'customer_notes' => $customer_notes,
+    ];
+    $orderModel->insert($orderData);
+    $order_id = $orderModel->getInsertID();
+
+    if (!$order_id) {
+        $db->transRollback();
+        return redirect()->back()->with('error', 'Gagal membuat pesanan.');
+    }
+
+    // Insert orders_address snapshot
+    $address = $addressModel->find($address_id);
+    if ($address) {
+        $db->table('orders_address')->insert([
+            'order_id'       => $order_id,
+            'label'          => $address['label'],
+            'recipient_name' => $address['recipient_name'],
+            'phone_number'   => $address['phone_number'],
+            'address_detail' => $address['address_detail'],
+            'latitude'       => $address['latitude'],
+            'longitude'      => $address['longitude'],
+        ]);
+        $orders_address_id = $db->insertID();
+
+        if (!$orders_address_id) {
+            $db->transRollback();
+            return redirect()->back()->with('error', 'Gagal menyimpan alamat pesanan.');
+        }
+
+        // Update orders dengan orders_address_id
+        // 🔥 Pastikan allowedFields di model orders sudah ada field ini
+        $orderModel->update($order_id, ['orders_address_id' => $orders_address_id]);
+    } else {
+        $db->transRollback();
+        return redirect()->back()->with('error', 'Alamat tidak ditemukan.');
+    }
+
+    // Insert order_items
+    foreach ($orderItemsData as &$item) {
+        $item['order_id'] = $order_id;
+    }
+    $orderItemModel->insertBatch($orderItemsData);
+
+    $db->transComplete();
+
+    if ($db->transStatus() === false) {
+        return redirect()->back()->with('error', 'Gagal menyimpan pesanan.');
+    }
+
+    return redirect()->to('/customer/payment/' . $order_id)
+        ->with('success', 'Pesanan dibuat. Silakan lakukan pembayaran.');
+}
+
+
 
         /**
      * FUNGSI BARU: Menampilkan form pembayaran untuk sebuah pesanan.
@@ -347,5 +412,39 @@ public function processChangePassword()
         'message' => 'Password berhasil diganti!'
     ]);
 }
-    
+ 
+public function orderDetail($order_id)
+{
+    $orderModel = new OrderModel();
+    $orderItemModel = new OrderItemModel();
+
+    // Ambil data order + join outlet + join payments + join orders_address
+    $order = $orderModel
+        ->where('orders.order_id', $order_id)
+        ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+        ->join('payments', 'payments.order_id = orders.order_id', 'left')
+        ->join('orders_address', 'orders.orders_address_id = orders_address.order_address_id', 'left')
+        ->select('orders.*, outlets.name as outlet_name, outlets.address as outlet_address,
+                  payments.payment_method, payments.status as payment_status,
+                  orders_address.label, orders_address.recipient_name, orders_address.phone_number, orders_address.address_detail')
+        ->first();
+
+    // Validasi apakah order ada dan milik user login
+    if (!$order || $order['customer_id'] != session()->get('user_id')) {
+        return redirect()->to('/customer/monitor')->with('error', 'Pesanan tidak ditemukan.');
+    }
+
+    // Ambil data item layanan
+    $items = $orderItemModel
+        ->where('order_id', $order_id)
+        ->join('services', 'services.service_id = order_items.service_id')
+        ->select('order_items.*, services.name as service_name, services.unit')
+        ->findAll();
+
+    return view('customer/order/detail', [
+        'order' => $order,
+        'items' => $items,
+    ]);
+}
+
 }
