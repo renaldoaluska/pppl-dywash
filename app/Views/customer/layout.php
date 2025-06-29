@@ -11,31 +11,33 @@
 <body class="bg-gray-100 antialiased">
 
 <div class="flex flex-col min-h-screen">
-
-    <!-- Header Atas (Sticky) -->
-    <header class="sticky top-0 bg-white shadow-sm z-10">
+<header class="sticky top-0 bg-white shadow-sm z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Judul Halaman -->
-                <h1 class="text-xl font-semibold text-gray-800"><?= $this->renderSection('title') ?></h1>
+            <div class="flex justify-between items-center h-16 relative">
                 
-                    <div class="flex justify-around h-16">
-        <a href="<?= site_url('/') ?>" class="flex flex-col items-center justify-center w-full text-gray-500 hover:text-blue-600 transition-colors">
-            
-        <img src="<?= base_url('assets/img/logo.png') ?>" alt="Ilustrasi Login" class="w-32 h-32 object-contain">
-        </a>
-    </div>
-                <!-- Profil Admin -->
-                <div class="flex items-center">
-                    <span class="mr-3 text-sm font-medium hidden sm:block"><?= esc(session('name')) ?></span>
-                    <div class="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow">
-                        A
+                <div class="flex-1">
+                    <h1 class="text-xl font-semibold text-gray-800"><?= $this->renderSection('title') ?></h1>
+                </div>
+                
+                <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <a href="<?= site_url('/') ?>">
+                        <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo" class="h-12 w-auto object-contain">
+                    </a>
+                </div>
+
+                <div class="flex-1 flex justify-end">
+                    <div class="flex items-center">
+                        <span class="mr-3 text-sm font-medium hidden sm:block"><?= esc(session('name')) ?></span>
+                        <div class="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow">
+                            A
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </header>
-
+    
     <!-- Konten Utama -->
     <!-- Diberi padding bawah agar tidak tertutup navbar -->
     <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24">
