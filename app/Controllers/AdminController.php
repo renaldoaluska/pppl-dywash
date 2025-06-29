@@ -82,4 +82,68 @@ class AdminController extends BaseController
         
         return redirect()->to('/admin/payments/verify')->with('success', 'Pembayaran berhasil diverifikasi.');
     }
+        /**
+     * FUNGSI YANG DIPERBARUI: Menampilkan semua outlet, dengan fitur pencarian.
+     */
+    public function listAllOutlets()
+    {
+        $outletModel = new OutletModel();
+        
+        // 1. Ambil kata kunci pencarian dari URL (contoh: /admin/outlets?search=...)
+        $searchKeyword = $this->request->getGet('search');
+
+        // 2. Siapkan query builder. Kita mulai dengan model dasarnya.
+        $query = $outletModel;
+
+        // 3. JIKA ADA kata kunci pencarian, tambahkan filter 'like' ke query.
+        if ($searchKeyword) {
+            $query = $outletModel->groupStart() // Mulai grup kondisi OR
+                                 ->like('name', $searchKeyword)      // Cari di kolom 'name'
+                                 ->orLike('address', $searchKeyword) // ATAU cari di kolom 'address'
+                                 ->groupEnd();   // Selesai grup kondisi OR
+        }
+
+        // 4. Eksekusi query yang sudah difilter (atau query semua data jika tidak ada pencarian)
+        $data['outlets'] = $query->findAll();
+
+        // 5. Tampilkan view dengan data yang sudah siap
+        return view('admin/list_outlets', $data);
+    }
+
+
+    /**
+     * FUNGSI BARU: Menampilkan semua pesanan dari semua customer.
+     */
+        /**
+     * FUNGSI BARU: Menampilkan semua pesanan dengan fitur pencarian.
+     */
+    public function listAllOrders()
+    {
+        $orderModel = new OrderModel();
+        
+        // Ambil kata kunci pencarian dari URL
+        $searchKeyword = $this->request->getGet('search');
+
+        // Siapkan query builder. Kita mulai dengan JOIN ke tabel lain
+        // untuk mendapatkan nama customer dan nama outlet.
+        $query = $orderModel
+            ->join('users', 'users.user_id = orders.customer_id')
+            ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name');
+
+        // Jika ada kata kunci pencarian, tambahkan filter
+        if ($searchKeyword) {
+            $query->groupStart()
+                  ->like('users.name', $searchKeyword)      // Cari berdasarkan nama customer
+                  ->orLike('orders.order_id', $searchKeyword) // ATAU berdasarkan ID Pesanan
+                  ->groupEnd();
+        }
+
+        // Urutkan dari yang terbaru dan ambil semua hasilnya
+        $data['orders'] = $query->orderBy('orders.created_at', 'DESC')->findAll();
+        
+        // Tampilkan view
+        return view('admin/list_orders', $data);
+    }
+
 }

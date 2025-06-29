@@ -59,3 +59,6 @@ $routes->post('/customer/payment/process', 'CustomerController::processPayment')
 // Rute untuk verifikasi pembayaran oleh admin
 $routes->get('/admin/payments/verify', 'AdminController::listPendingPayments');
 $routes->get('/admin/payments/verify/action/(:num)', 'AdminController::verifyPayment/$1');
+// di dalam app/Config/Routes.php
+$routes->get('/admin/outlets', 'AdminController::listAllOutlets');
+$routes->get('/admin/orders', 'AdminController::listAllOrders');
