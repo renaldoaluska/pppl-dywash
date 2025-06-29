@@ -1,14 +1,10 @@
-<?php // file: app/Views/customer/payment/index.php (contoh nama file) ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <?= $this->include('layout/isian') ?>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Pembayaran Pesanan</title>
-</head>
-<body class="bg-slate-50">
+<?= $this->extend('customer/layout') ?>
 
-<?= $this->include('layout/top_nav') ?>
+<?= $this->section('title') ?>
+Pembayaran Pesanan
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
 
 <main class="max-w-lg mx-auto p-4 md:p-6">
     <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
@@ -110,4 +106,5 @@
         });
     }
 </script>
-<?= $this->include('layout/footer') ?>
+
+<?= $this->endSection() ?>

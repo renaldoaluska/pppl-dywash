@@ -1,5 +1,11 @@
-<?= $this->include('layout/header') ?>
-<?= $this->include('layout/top_nav') ?>
+<?= $this->extend('customer/layout') ?>
+
+<?= $this->section('title') ?>
+Beranda
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
+
 <main class="p-4">
 
     <section class="mb-8">
@@ -96,4 +102,5 @@
     },
   });
 </script>
-<?= $this->include('layout/footer') ?>
+
+<?= $this->endSection() ?>

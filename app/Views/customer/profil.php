@@ -1,13 +1,12 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <?= $this->include('layout/isian') ?>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Pembayaran Pesanan</title>
-</head>
-<body class="bg-slate-50">
-<?= $this->include('layout/top_nav') ?>
-    <main>
+<?= $this->extend('customer/layout') ?>
+
+<?= $this->section('title') ?>
+Profil
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
+
+<main>
 <!-- app/Views/dashboard/customer.php -->
 <h1>Selamat datang, <?= session('name') ?> (Customer)</h1>
 <a href="/customer/outlet">Cari Outlet Laundry</a> <br>
@@ -16,5 +15,4 @@
 <a href="/logout">Logout</a>
 </main>
 
-<?= $this->include('layout/bottom_nav') ?>
-<?= $this->include('layout/footer') ?>
+<?= $this->endSection() ?>

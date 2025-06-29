@@ -1,14 +1,10 @@
-<?php // file: app/Views/customer/order/create.php ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <?= $this->include('layout/isian') ?>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Buat Pesanan Baru</title>
-</head>
-<body class="bg-slate-50">
+<?= $this->extend('customer/layout') ?>
 
-<?= $this->include('layout/top_nav') ?>
+<?= $this->section('title') ?>
+Buat Pesanan
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
 
 <main class="max-w-2xl mx-auto p-4 md:p-6">
     <div class="bg-white rounded-2xl shadow-lg p-6">
@@ -142,4 +138,5 @@
     }
 
 </script>
-<?= $this->include('layout/footer') ?>
+
+<?= $this->endSection() ?>

@@ -1,5 +1,10 @@
+<?= $this->extend('auth/layout') ?>
 
-<?= $this->include('layout/header') ?>
+<?= $this->section('title') ?>
+Login
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
   <div class="flex-1 flex flex-col justify-center">
     <!-- Logo/Ilustrasi -->
     <div class="flex flex-col items-center bg-blue-50 py-10">
@@ -154,4 +159,4 @@
     });
   </script>
 
-<?= $this->include('layout/footer') ?>
+<?= $this->endSection() ?>

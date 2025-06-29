@@ -1,11 +1,10 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <?= $this->include('layout/isian') ?>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Cari Outlet Laundry</title>
-</head>
-<body class="bg-slate-50"> <?= $this->include('layout/top_nav') ?>
+<?= $this->extend('customer/layout') ?>
+
+<?= $this->section('title') ?>
+Daftar Outlet
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
 
 <main class="max-w-3xl mx-auto p-4 md:p-6">
 
@@ -50,5 +49,4 @@
     </div>
 </main>
 
-<?= $this->include('layout/bottom_nav') ?>
-<?= $this->include('layout/footer') ?>
+<?= $this->endSection() ?>

@@ -1,10 +1,10 @@
-<?php // file: app/Views/customer/order/history.php ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <?= $this->include('layout/isian') ?>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Riwayat Pesanan</title>
+<?= $this->extend('customer/layout') ?>
+
+<?= $this->section('title') ?>
+Riwayat Pesanan
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
 
     <style>
         .rating {
@@ -214,5 +214,5 @@
     });
 </script>
 
-</body>
-</html>
+
+<?= $this->endSection() ?>

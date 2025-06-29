@@ -1,5 +1,10 @@
-<?= $this->include('layout/header') ?>
+<?= $this->extend('auth/layout') ?>
 
+<?= $this->section('title') ?>
+Register
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
   <div class="container mx-auto p-6 md:p-8 max-w-lg">
     
     <div class="mb-8">
@@ -198,4 +203,5 @@
         });
     });
 </script>
-<?= $this->include('layout/footer') ?>
+
+<?= $this->endSection() ?>
