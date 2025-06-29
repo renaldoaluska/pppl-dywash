@@ -14,8 +14,12 @@
     </style>
 </head>
 <body class="bg-gray-100 antialiased">
-
+<?php
+    // PERUBAHAN DI SINI: Definisikan kondisi untuk menyembunyikan bar
+    $hideBars = strpos(uri_string(), 'customer/payment') !== false || strpos(uri_string(), 'customer/order/create') !== false;
+?>
 <div class="flex flex-col min-h-screen">
+    <?php if (!$hideBars): // JIKA BUKAN HALAMAN PAYMENT/CREATE, TAMPILKAN TOP BAR ?>
 <header class="sticky top-0 bg-white shadow-sm z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16 relative">
@@ -43,6 +47,7 @@
         </div>
     </header>
     
+    <?php endif; ?>
     <!-- Konten Utama -->
     <!-- Diberi padding bawah agar tidak tertutup navbar -->
     <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24">
@@ -50,6 +55,7 @@
     </main>
     <?= $this->renderSection('script') ?>
 
+    <?php if (!$hideBars): // JIKA BUKAN HALAMAN PAYMENT/CREATE, TAMPILKAN BOTTOM BAR ?>
     <!-- Navbar Bawah (Fixed) -->
     <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-lg z-10">
         <div class="flex justify-around h-16">
@@ -72,6 +78,7 @@
             </a>
         </div>
     </nav>
+    <?php endif; ?>
 
 </div>
         

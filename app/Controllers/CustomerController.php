@@ -151,7 +151,7 @@ class CustomerController extends BaseController
 
         $paymentModel->save($paymentData);
 
-        return redirect()->to('/customer/monitor')->with('success', 'Proses pembayaran Anda telah dicatat. Terima kasih.');
+        return redirect()->to('/customer/monitor')->with('success', 'Proses pembayaran dicatat');
     }
 
     /**
