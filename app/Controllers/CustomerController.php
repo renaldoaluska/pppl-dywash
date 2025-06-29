@@ -93,15 +93,17 @@ public function dashboard()
 
     return view('dashboard/customer', $data);
 }
-
 public function listOutlet()
 {
+    
+    helper('text');
     $outletModel = new \App\Models\OutletModel();
     $addressModel = new \App\Models\AddressModel();
     $userId = session()->get('user_id');
 
     $keyword = $this->request->getGet('search');
     $maxDistance = $this->request->getGet('max_distance') ?? 10;
+    $addressId = $this->request->getGet('address_id');
 
     $outletModel->where('status', 'verified');
 
@@ -115,10 +117,17 @@ public function listOutlet()
 
     $activeAddress = null;
     if ($userId) {
-        $activeAddress = $addressModel
-            ->where('user_id', $userId)
-            ->where('is_primary', true)
-            ->first();
+        if ($addressId) {
+            $activeAddress = $addressModel
+                ->where('user_id', $userId)
+                ->where('address_id', $addressId)
+                ->first();
+        } else {
+            $activeAddress = $addressModel
+                ->where('user_id', $userId)
+                ->where('is_primary', true)
+                ->first();
+        }
     }
 
     if ($activeAddress && !empty($activeAddress['latitude']) && !empty($activeAddress['longitude'])) {
@@ -137,9 +146,12 @@ public function listOutlet()
     $data['userLat'] = $activeAddress['latitude'] ?? null;
     $data['userLon'] = $activeAddress['longitude'] ?? null;
     $data['maxDistance'] = $maxDistance;
+    $data['activeAddress'] = $activeAddress;
+    $data['allUserAddresses'] = $userId ? $addressModel->where('user_id', $userId)->findAll() : [];
 
     return view('customer/list_outlet', $data);
 }
+
 
     /**
      * Fitur: Melakukan Pesanan (Langkah 1)
