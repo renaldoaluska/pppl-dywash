@@ -1,6 +1,6 @@
 -- ====================================================================
 -- SKRIP LENGKAP: RESET DATABASE & ISI DATA DUMMY
--- Versi Modifikasi dengan Latitude & Longitude
+-- Versi Final dengan Tabel Alamat & Orders Address Snapshot
 -- Cukup jalankan seluruh file ini dari atas ke bawah.
 -- ====================================================================
 
@@ -9,9 +9,11 @@
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS payments;
 DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders_address; -- Ditambahkan
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS services;
 DROP TABLE IF EXISTS outlets;
+DROP TABLE IF EXISTS addresses;
 DROP TABLE IF EXISTS users;
 
 DROP TYPE IF EXISTS user_role CASCADE;
@@ -26,7 +28,8 @@ DROP TYPE IF EXISTS payment_status_enum CASCADE;
 -- ====================================================================
 CREATE TYPE user_role AS ENUM ('admin', 'outlet', 'cust');
 CREATE TYPE outlet_status AS ENUM ('pending', 'verified', 'rejected');
-CREATE TYPE order_status_enum AS ENUM ('diterima', 'ditolak', 'diproses', 'selesai', 'diulas');
+-- Status 'dijemput' dan 'dikirim' ditambahkan
+CREATE TYPE order_status_enum AS ENUM ('diterima', 'ditolak', 'diproses', 'dijemput', 'dikirim', 'selesai', 'diulas');
 CREATE TYPE payment_method_enum AS ENUM ('transfer', 'cod', 'ewallet');
 CREATE TYPE payment_status_enum AS ENUM ('pending', 'lunas', 'gagal');
 
@@ -36,16 +39,29 @@ CREATE TYPE payment_status_enum AS ENUM ('pending', 'lunas', 'gagal');
 -- ====================================================================
 
 -- Tabel Users
+-- Kolom latitude & longitude dihapus dari sini
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role user_role NOT NULL,
-    latitude DOUBLE PRECISION, -- Penambahan kolom latitude
-    longitude DOUBLE PRECISION, -- Penambahan kolom longitude
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabel Addresses (BARU)
+CREATE TABLE addresses (
+    address_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    label VARCHAR(100) NOT NULL, -- Contoh: 'Rumah', 'Kantor'
+    recipient_name VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    address_detail TEXT NOT NULL,
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+    is_primary BOOLEAN DEFAULT FALSE,
+    CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 -- Tabel Outlets
@@ -54,8 +70,8 @@ CREATE TABLE outlets (
     owner_id INT NOT NULL,
     name VARCHAR(255) NOT NULL,
     address TEXT NOT NULL,
-    latitude DOUBLE PRECISION, -- Penambahan kolom latitude
-    longitude DOUBLE PRECISION, -- Penambahan kolom longitude
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
     contact_phone VARCHAR(20),
     operating_hours VARCHAR(255),
     status outlet_status DEFAULT 'pending',
@@ -75,10 +91,12 @@ CREATE TABLE services (
 );
 
 -- Tabel Orders
+-- Kolom address_id diubah menjadi orders_address_id yang menunjuk ke tabel snapshot
 CREATE TABLE orders (
     order_id SERIAL PRIMARY KEY,
     customer_id INT NOT NULL,
     outlet_id INT NOT NULL,
+    orders_address_id INT, -- Diubah
     order_date TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     total_amount DECIMAL(10, 2),
     status order_status_enum DEFAULT 'diterima',
@@ -87,7 +105,27 @@ CREATE TABLE orders (
     updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_customer FOREIGN KEY(customer_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT fk_outlet FOREIGN KEY(outlet_id) REFERENCES outlets(outlet_id) ON DELETE CASCADE
+    -- FK ke orders_address ditambahkan setelah create orders_address
 );
+
+-- Tabel Orders Address (Snapshot)
+CREATE TABLE orders_address (
+    order_address_id SERIAL PRIMARY KEY,
+    order_id INT NOT NULL,
+    label VARCHAR(100) NOT NULL,
+    recipient_name VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    address_detail TEXT NOT NULL,
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+);
+
+-- Tambah FK di Orders ke Orders Address
+ALTER TABLE orders
+ADD CONSTRAINT fk_orders_address
+FOREIGN KEY (orders_address_id) REFERENCES orders_address(order_address_id) ON DELETE RESTRICT;
 
 -- Tabel Order Items
 CREATE TABLE order_items (
@@ -131,23 +169,27 @@ CREATE TABLE reviews (
 -- ====================================================================
 
 -- Tabel Users
--- Data koordinat untuk customer ditambahkan, untuk admin/outlet dikosongkan (NULL)
-INSERT INTO users (name, email, password, role, latitude, longitude) VALUES
-('Admin Dywash', 'admin@dywash.com', 'password123', 'admin', NULL, NULL),
-('Budi Laundry', 'budi.laundry@mail.com', 'password123', 'outlet', NULL, NULL),
-('Siti Laundry', 'siti.laundry@mail.com', 'password123', 'outlet', NULL, NULL),
-('Andi Pratama', 'andi@mail.com', 'password123', 'cust', -7.2893, 112.7222),
-('Citra Lestari', 'citra@mail.com', 'password123', 'cust', -7.2915, 112.7305),
-('Dewi Anggraini', 'dewi@mail.com', 'password123', 'cust', -7.2881, 112.7259);
+INSERT INTO users (name, email, password, role) VALUES
+('Admin Dywash', 'admin@dywash.com', 'password123', 'admin'),
+('Budi Laundry', 'budi.laundry@mail.com', 'password123', 'outlet'),
+('Siti Laundry', 'siti.laundry@mail.com', 'password123', 'outlet'),
+('Andi Pratama', 'andi@mail.com', 'password123', 'cust'),
+('Citra Lestari', 'citra@mail.com', 'password123', 'cust'),
+('Dewi Anggraini', 'dewi@mail.com', 'password123', 'cust');
 
+-- Tabel Addresses (DATA DUMMY BARU)
+-- user_id 4=Andi, 5=Citra, 6=Dewi
+INSERT INTO addresses (user_id, label, recipient_name, phone_number, address_detail, latitude, longitude, is_primary) VALUES
+(4, 'Rumah', 'Andi Pratama', '081234567890', 'Jl. Darmo Permai III No. 45', -7.2893, 112.7222, true),
+(4, 'Kantor', 'Andi (Penerima)', '081234567890', 'Gedung Sinar Mas, Jl. Jend. Sudirman Kav. 10', -7.2600, 112.7400, false),
+(5, 'Apartemen', 'Citra Lestari', '081223344557', 'Apartemen Puncak Kertajaya Tower A Lt. 15', -7.2915, 112.7305, true),
+(6, 'Rumah Ortu', 'Ibu Anggraini', '081987654322', 'Jl. Rungkut Madya No. 112', -7.2881, 112.7259, true);
 
 -- Tabel Outlets
--- Data koordinat untuk setiap outlet ditambahkan
 INSERT INTO outlets (owner_id, name, address, latitude, longitude, contact_phone, operating_hours, status) VALUES
 (2, 'KlinKlin Laundry', 'Jl. Mawar No. 10, Surabaya', -7.2905, 112.7248, '081234567890', 'Senin - Sabtu, 08:00 - 20:00', 'verified'),
 (3, 'BersihWangi Laundry', 'Jl. Melati No. 25, Surabaya', -7.2879, 112.7291, '081223344556', 'Setiap Hari, 07:00 - 21:00', 'verified'),
 (2, 'Cemerlang Laundry', 'Jl. Anggrek No. 5, Surabaya', -7.2922, 112.7211, '081987654321', 'Senin - Jumat, 09:00 - 17:00', 'pending');
-
 
 -- Tabel Services
 INSERT INTO services (outlet_id, name, price, unit) VALUES
@@ -158,13 +200,24 @@ INSERT INTO services (outlet_id, name, price, unit) VALUES
 (2, 'Cuci Sepatu', 25000, 'pasang'),
 (2, 'Dry Cleaning Jas', 35000, 'pcs');
 
+-- Tabel Orders & Orders Address snapshot
+INSERT INTO orders (customer_id, outlet_id, orders_address_id, status, customer_notes)
+VALUES (4, 1, NULL, 'diulas', 'Tolong jangan dicampur dengan pakaian warna putih.');
+INSERT INTO orders_address (order_id, label, recipient_name, phone_number, address_detail, latitude, longitude)
+VALUES (1, 'Rumah', 'Andi Pratama', '081234567890', 'Jl. Darmo Permai III No. 45', -7.2893, 112.7222);
+UPDATE orders SET orders_address_id = 1 WHERE order_id = 1;
 
--- Tabel Orders
-INSERT INTO orders (customer_id, outlet_id, status, customer_notes) VALUES
-(4, 1, 'diulas', 'Tolong jangan dicampur dengan pakaian warna putih.'),
-(5, 2, 'selesai', 'Sepatu kanvas, tolong sikat bagian dalamnya juga.'),
-(4, 2, 'diproses', NULL);
+INSERT INTO orders (customer_id, outlet_id, orders_address_id, status, customer_notes)
+VALUES (5, 2, NULL, 'selesai', 'Sepatu kanvas, tolong sikat bagian dalamnya juga.');
+INSERT INTO orders_address (order_id, label, recipient_name, phone_number, address_detail, latitude, longitude)
+VALUES (2, 'Apartemen', 'Citra Lestari', '081223344557', 'Apartemen Puncak Kertajaya Tower A Lt. 15', -7.2915, 112.7305);
+UPDATE orders SET orders_address_id = 2 WHERE order_id = 2;
 
+INSERT INTO orders (customer_id, outlet_id, orders_address_id, status, customer_notes)
+VALUES (4, 2, NULL, 'diproses', NULL);
+INSERT INTO orders_address (order_id, label, recipient_name, phone_number, address_detail, latitude, longitude)
+VALUES (3, 'Kantor', 'Andi (Penerima)', '081234567890', 'Gedung Sinar Mas, Jl. Jend. Sudirman Kav. 10', -7.2600, 112.7400);
+UPDATE orders SET orders_address_id = 3 WHERE order_id = 3;
 
 -- Tabel Order Items & Update Total
 INSERT INTO order_items (order_id, service_id, quantity, subtotal) VALUES
@@ -176,13 +229,11 @@ UPDATE orders SET total_amount = 21000 WHERE order_id = 1;
 UPDATE orders SET total_amount = 25000 WHERE order_id = 2;
 UPDATE orders SET total_amount = 20000 WHERE order_id = 3;
 
-
 -- Tabel Payments
 INSERT INTO payments (order_id, amount, payment_method, status, payment_date) VALUES
 (1, 21000, 'ewallet', 'lunas', '2025-06-13 10:30:00'),
 (2, 25000, 'cod', 'lunas', '2025-06-14 15:00:00'),
 (3, 20000, 'transfer', 'pending', NULL);
-
 
 -- Tabel Reviews
 INSERT INTO reviews (order_id, customer_id, outlet_id, rating, comment) VALUES

@@ -38,6 +38,8 @@ $routes->get('/customer/profil', 'CustomerController::cekProfil');
     // Untuk memproses form Ganti Password
     $routes->post('/customer/profil/ganti-password-process', 'CustomerController::processChangePassword'); 
 
+    $routes->get('/customer/order/detail/(:num)', 'CustomerController::orderDetail/$1');
+
 // Rute untuk fitur-fitur Outlet
 // Rute untuk manajemen banyak outlet
 $routes->get('/outlet/my-outlets', 'OutletController::listMyOutlets');
