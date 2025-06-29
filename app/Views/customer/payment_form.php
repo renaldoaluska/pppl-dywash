@@ -54,8 +54,12 @@ Pembayaran Pesanan
 
             <div class="mt-8">
                 <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition-colors text-base shadow-md hover:shadow-lg">
-                    Konfirmasi Pembayaran
+                    Konfirmasi Sekarang
                 </button>
+                <button type="button" onclick="konfirmasiNanti()" class="w-full mt-3 bg-slate-200 text-slate-700 font-bold py-3 rounded-lg hover:bg-slate-300 transition-colors text-base shadow-md hover:shadow-lg">
+    Konfirmasi Nanti
+</button>
+
             </div>
         </form>
     </div>
@@ -68,6 +72,13 @@ Pembayaran Pesanan
 
 <?= $this->section('script') ?>
 <script>
+function konfirmasiNanti() {
+    window.location.href = '/customer/monitor';
+}
+
+
+
+
     // Fungsi untuk menampilkan toast
     function showToast(message) {
         const toast = document.getElementById('toast-notification');
@@ -87,6 +98,33 @@ Pembayaran Pesanan
 
     // Cari form pembayaran berdasarkan ID yang tadi kita buat
     const paymentForm = document.getElementById('payment-form');
+
+    document.addEventListener('DOMContentLoaded', () => {
+    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+    const submitButton = paymentForm.querySelector('button[type="submit"]');
+
+    function updateButtonState() {
+    const selected = document.querySelector('input[name="payment_method"]:checked');
+    if (!selected) {
+        // Belum pilih metode, disable
+        submitButton.disabled = true;
+        submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+        // Sudah pilih metode apapun, enable
+        submitButton.disabled = false;
+        submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+}
+
+
+
+    paymentRadios.forEach(radio => {
+        radio.addEventListener('change', updateButtonState);
+    });
+
+    updateButtonState(); // initial check
+});
+
 
     // Cek hanya jika form tersebut ada di halaman ini
     if (paymentForm) {
