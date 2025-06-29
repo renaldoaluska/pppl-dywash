@@ -39,16 +39,18 @@ Riwayat Pesanan
 </style>
 
 <?php
-    $statuses = ['diterima', 'diambil', 'dikirim', 'selesai', 'diulas', 'ditolak'];
+    $statuses = ['diterima', 'diambil', 'dicuci', 'dikirim', 'selesai', 'diulas', 'ditolak'];
     $statusColors = [
         'diterima' => 'bg-blue-100 text-blue-800',
         'diambil'  => 'bg-purple-100 text-purple-800',
-        'dikirim'  => 'bg-purple-100 text-purple-800',
+        'dicuci'   => 'bg-yellow-100 text-yellow-800',
+        'dikirim'  => 'bg-teal-100 text-teal-800',
         'selesai'  => 'bg-green-100 text-green-800',
-        'diulas'   => 'bg-green-100 text-green-800',
+        'diulas'   => 'bg-green-200 text-green-900',
         'ditolak'  => 'bg-red-100 text-red-800',
     ];
 ?>
+
 
 <!-- SORT -->
 <div class="flex items-center mb-4 space-x-2 overflow-x-auto pb-1">
