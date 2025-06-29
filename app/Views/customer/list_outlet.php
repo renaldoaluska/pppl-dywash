@@ -26,6 +26,19 @@ Daftar Outlet
         <?php if (!empty($outlets)): ?>
             <?php foreach ($outlets as $outlet): ?>
                 <div class="bg-white rounded-lg shadow-md p-5 border border-slate-100">
+                    <?php if (isset($outlet['distance'])): ?>
+    <div class="bg-gray-50 px-4 py-2 rounded-t-xl border-b border-slate-200 -mx-5 -mt-5 mb-2">
+        <div class="flex items-center text-sm text-slate-600">
+            <svg class="w-4 h-4 mr-1 text-red-500" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2zm0 10s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z"/>
+            </svg>
+            <?= number_format($outlet['distance'], 1) ?> km dari lokasi Anda
+        </div>
+    </div>
+<?php endif; ?>
+
                     <div class="flex flex-col sm:flex-row justify-between gap-4">
                         <div class="flex-grow">
                             <h3 class="text-lg font-bold text-slate-800"><?= esc($outlet['name']) ?></h3>
@@ -35,11 +48,23 @@ Daftar Outlet
                                 <p><strong>Jam Buka:</strong> <?= esc($outlet['operating_hours']) ?></p>
                             </div>
                         </div>
-                        <div class="flex-shrink-0 mt-4 sm:mt-0 self-start sm:self-center">
-                            <a href="/customer/order/create/<?= $outlet['outlet_id'] ?>" class="bg-blue-100 text-blue-700 font-bold py-2 px-4 rounded-lg hover:bg-blue-200 transition-colors text-sm">
-                                + Laundry Sekarang
-                            </a>
-                        </div>
+<div class="flex justify-between items-center mt-4">
+    <!-- Tombol Laundry Sekarang -->
+    <a href="/customer/order/create/<?= $outlet['outlet_id'] ?>"
+       class="bg-blue-100 text-blue-700 font-bold py-2 px-4 rounded-lg hover:bg-blue-200 transition-colors text-sm">
+        + Laundry Sekarang
+    </a>
+
+    <!-- Tombol Lihat Peta -->
+<button onclick="openMapModal(<?= $outlet['latitude'] ?>, <?= $outlet['longitude'] ?>, '<?= esc(addslashes($outlet['name'])) ?>')"
+    class="bg-white border border-blue-300 text-blue-600 font-semibold py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors text-sm">
+    Lihat Peta
+</button>
+
+
+
+</div>
+
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -49,4 +74,89 @@ Daftar Outlet
             </div>
         <?php endif; ?>
     </div>
+
+    <div id="mapModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-4">
+        <h2 class="text-lg font-bold mb-2">Lokasi Outlet</h2>
+        <div id="mapContainer" class="w-full h-64 rounded-md border mb-4"></div>
+
+        <!-- Tombol Kembali -->
+        <div class="flex justify-end">
+            <button onclick="closeMapModal()"
+                class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm">
+                Kembali
+            </button>
+        </div>
+    </div>
+</div>
+
+<?= $this->endSection() ?>
+
+<?= $this->section('script') ?>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+    let map;
+    let marker;
+    let routeLine;
+
+    const userLat = <?= json_encode($userLat) ?>;
+    const userLon = <?= json_encode($userLon) ?>;
+
+    function openMapModal(lat, lon, name = 'Outlet') {
+        document.getElementById('mapModal').classList.remove('hidden');
+
+        setTimeout(() => {
+            if (!map) {
+                map = L.map('mapContainer').setView([lat, lon], 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+                marker = L.marker([lat, lon]).addTo(map).bindPopup(name).openPopup();
+            } else {
+                map.setView([lat, lon], 16);
+                marker.setLatLng([lat, lon]).bindPopup(name).openPopup();
+            }
+
+            // Tambahkan marker lokasi user
+            if (userLat && userLon) {
+                L.marker([userLat, userLon], {
+                    icon: L.icon({
+                        iconUrl: 'https://cdn-icons-png.flaticon.com/512/64/64113.png',
+                        iconSize: [25, 25],
+                        iconAnchor: [12, 25],
+                        popupAnchor: [0, -25]
+                    })
+                }).addTo(map).bindPopup("Lokasi Saya");
+
+                // Hapus garis sebelumnya jika ada
+                if (routeLine) {
+                    map.removeLayer(routeLine);
+                }
+
+                // Tambahkan garis putus-putus dari lokasi saya ke outlet
+                routeLine = L.polyline(
+                    [
+                        [userLat, userLon],
+                        [lat, lon]
+                    ],
+                    {
+                        color: 'blue',
+                        weight: 2,
+                        dashArray: '5, 10',
+                        opacity: 0.7
+                    }
+                ).addTo(map);
+            }
+        }, 100);
+    }
+
+    function closeMapModal() {
+        document.getElementById('mapModal').classList.add('hidden');
+    }
+</script>
+
+
 <?= $this->endSection() ?>

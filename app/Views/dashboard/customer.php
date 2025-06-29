@@ -59,7 +59,7 @@ Home
 <section class="mb-2">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-bold text-gray-800">Laundry Terdekat</h2>
-            <a href="<?= site_url('laundry/terdekat') ?>" class="text-sm font-semibold text-blue-500">See more</a>
+            <a href="<?= site_url('customer/outlet') ?>" class="text-sm font-semibold text-blue-500">See more</a>
         </div>
 
         <?php if (!empty($nearestLaundries)): ?>
@@ -140,7 +140,6 @@ Home
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-
 <script>
     // Inisialisasi Swiper
     const swiper = new Swiper('.swiper', {
@@ -156,50 +155,77 @@ Home
         },
     });
 
-    // =============================================
-    // SCRIPT BARU: AUTO-SUBMIT FORM SAAT DROPDOWN DIGANTI
-    // =============================================
-    document.getElementById('address_id').addEventListener('change', function() {
+    // Auto-submit form saat dropdown alamat diganti
+    document.getElementById('address_id').addEventListener('change', function () {
         document.getElementById('address-filter-form').submit();
     });
 
     let currentMap = null;
+    let routeLine = null;
 
-function showLaundryModal(name, imageUrl, address, phone, hours, lat, lng, distance) {
-    document.getElementById('modalLaundryName').textContent = name;
-    document.getElementById('modalLaundryImage').src = imageUrl;
-    document.getElementById('modalLaundryImage').alt = name;
-    document.getElementById('modalLaundryAddress').textContent = address;
-    document.getElementById('modalLaundryPhone').textContent = phone;
-    document.getElementById('modalLaundryHours').textContent = hours;
+    const userLat = <?= json_encode($userLat) ?>;
+    const userLon = <?= json_encode($userLon) ?>;
 
-    document.getElementById('laundryModal').classList.remove('hidden');
+    function showLaundryModal(name, imageUrl, address, phone, hours, lat, lng, distance) {
+        document.getElementById('modalLaundryName').textContent = name;
+        document.getElementById('modalLaundryImage').src = imageUrl;
+        document.getElementById('modalLaundryImage').alt = name;
+        document.getElementById('modalLaundryAddress').textContent = address;
+        document.getElementById('modalLaundryPhone').textContent = phone;
+        document.getElementById('modalLaundryHours').textContent = hours;
 
-    setTimeout(() => {
-        const mapContainer = document.getElementById('modalMap');
+        document.getElementById('laundryModal').classList.remove('hidden');
 
-        // Hapus instance map sebelumnya
-        if (currentMap) {
-            currentMap.remove();
-            currentMap = null;
-        }
+        setTimeout(() => {
+            const mapContainer = document.getElementById('modalMap');
 
-        currentMap = L.map(mapContainer).setView([lat, lng], 16);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(currentMap);
-        L.marker([lat, lng]).addTo(currentMap).bindPopup(name).openPopup();
-    }, 100);
-}
+            // Hapus instance map sebelumnya
+            if (currentMap) {
+                currentMap.remove();
+                currentMap = null;
+                routeLine = null;
+            }
 
+            currentMap = L.map(mapContainer).setView([lat, lng], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(currentMap);
 
-function closeLaundryModal() {
-    document.getElementById('laundryModal').classList.add('hidden');
-}
+            // Marker outlet
+            L.marker([lat, lng]).addTo(currentMap).bindPopup(name).openPopup();
 
+            // Marker lokasi user
+            if (userLat && userLon) {
+                L.marker([userLat, userLon], {
+                    icon: L.icon({
+                        iconUrl: 'https://cdn-icons-png.flaticon.com/512/64/64113.png',
+                        iconSize: [25, 25],
+                        iconAnchor: [12, 25],
+                        popupAnchor: [0, -25]
+                    })
+                }).addTo(currentMap).bindPopup("Lokasi Saya");
 
+                // Garis putus-putus dari lokasi saya ke outlet
+                routeLine = L.polyline(
+                    [
+                        [userLat, userLon],
+                        [lat, lng]
+                    ],
+                    {
+                        color: 'blue',
+                        weight: 2,
+                        dashArray: '5, 10',
+                        opacity: 0.7
+                    }
+                ).addTo(currentMap);
+            }
+        }, 100);
+    }
+
+    function closeLaundryModal() {
+        document.getElementById('laundryModal').classList.add('hidden');
+    }
 </script>
-
 
 <div id="laundryModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center px-4">
   <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
@@ -209,22 +235,26 @@ function closeLaundryModal() {
     
     <div class="text-sm text-gray-700 space-y-1 mb-3">
       <p><strong>Alamat:</strong> <span id="modalLaundryAddress"></span></p>
-      <p><strong>Telepon:</strong> <span id="modalLaundryPhone"></span></p>
-      <p><strong>Jam Operasional:</strong> <span id="modalLaundryHours"></span></p>
+      <p><strong>Kontak:</strong> <span id="modalLaundryPhone"></span></p>
+      <p><strong>Jam Buka:</strong> <span id="modalLaundryHours"></span></p>
       
     </div>
 
     <div id="modalMap" class="w-full h-48 rounded overflow-hidden mb-4"></div>
+<div class="flex justify-between mt-4 sm:mt-0">
+  <!-- Tombol Laundry Sekarang -->
+  <a href="/customer/order/create/<?= $laundry['outlet_id'] ?>"
+     class="bg-blue-100 text-blue-700 font-bold py-2 px-4 rounded-lg hover:bg-blue-200 transition-colors text-sm">
+    + Laundry Sekarang
+  </a>
 
-    <div class="text-center">
-<div class="mt-4">
+  <!-- Tombol Kembali -->
   <button onclick="closeLaundryModal()"
-    class="w-full px-4 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm rounded-full shadow-sm transition">
+    class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm">
     Kembali
   </button>
 </div>
 
-    </div>
   </div>
 </div>
 

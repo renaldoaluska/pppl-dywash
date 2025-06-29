@@ -24,19 +24,19 @@ class CustomerController extends BaseController
      */
 public function dashboard()
 {
-    helper('text'); // Pastikan helper ini ada
+    helper('text');
 
-    // Inisialisasi model
     $outletModel = new \App\Models\OutletModel();
     $addressModel = new \App\Models\AddressModel();
     $userId = session()->get('user_id');
 
-    // Data default
     $data = [
         'nearestLaundries' => [],
         'topRatedLaundries' => [],
         'allUserAddresses' => [],
         'activeAddress'    => null,
+        'userLat'          => null,
+        'userLon'          => null,
     ];
 
     if (!$userId) {
@@ -44,26 +44,35 @@ public function dashboard()
     }
 
     // Ambil semua alamat user
-    $data['allUserAddresses'] = $addressModel->where('user_id', $userId)->orderBy('is_primary', 'DESC')->findAll();
+    $data['allUserAddresses'] = $addressModel
+        ->where('user_id', $userId)
+        ->orderBy('is_primary', 'DESC')
+        ->findAll();
 
     // Tentukan alamat aktif
     $selectedAddressId = $this->request->getGet('address_id');
     $activeAddress = null;
 
     if ($selectedAddressId) {
-        $activeAddress = $addressModel->where('user_id', $userId)->where('address_id', $selectedAddressId)->first();
+        $activeAddress = $addressModel
+            ->where('user_id', $userId)
+            ->where('address_id', $selectedAddressId)
+            ->first();
     } else {
-        $activeAddress = $addressModel->where('user_id', $userId)->where('is_primary', true)->first();
+        $activeAddress = $addressModel
+            ->where('user_id', $userId)
+            ->where('is_primary', true)
+            ->first();
     }
-    
+
     $data['activeAddress'] = $activeAddress;
 
-    // >> PERUBAHAN DI SINI <<
-    // Kita hanya akan mengisi 'nearestLaundries' JIKA ada alamat yang aktif.
-    // Bagian 'else' yang mengambil data acak sudah dihapus.
-    if ($activeAddress && !empty($activeAddress['latitude'])) {
+    if ($activeAddress && !empty($activeAddress['latitude']) && !empty($activeAddress['longitude'])) {
         $userLat = $activeAddress['latitude'];
         $userLon = $activeAddress['longitude'];
+
+        $data['userLat'] = $userLat;
+        $data['userLon'] = $userLon;
 
         $distanceQuery = "( 6371 * acos( cos( radians({$userLat}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians({$userLon}) ) + sin( radians({$userLat}) ) * sin( radians( latitude ) ) ) )";
 
@@ -73,41 +82,67 @@ public function dashboard()
             ->orderBy('distance', 'ASC')
             ->findAll(5);
     }
-    
-    // Logika ini sudah benar, mengurutkan berdasarkan rating terbaik seluruhnya
+
     $data['topRatedLaundries'] = $outletModel
         ->where('status', 'verified')
         ->select('outlets.*, AVG(reviews.rating) as average_rating')
         ->join('reviews', 'reviews.outlet_id = outlets.outlet_id', 'left')
         ->groupBy('outlets.outlet_id')
-        //->orderBy('average_rating', 'DESC')
         ->orderBy('average_rating', 'DESC NULLS LAST')
         ->findAll(5);
-    
+
     return view('dashboard/customer', $data);
 }
 
 public function listOutlet()
 {
-    $outletModel = new OutletModel();
-    
+    $outletModel = new \App\Models\OutletModel();
+    $addressModel = new \App\Models\AddressModel();
+    $userId = session()->get('user_id');
+
     $keyword = $this->request->getGet('search');
-    
+
     $outletModel->where('status', 'verified');
 
+    // Tambahkan pencarian keyword jika ada
     if ($keyword) {
         $keyword = strtolower($keyword);
         $outletModel->groupStart()
             ->where('LOWER(name) LIKE', '%' . $keyword . '%')
             ->orWhere('LOWER(address) LIKE', '%' . $keyword . '%')
-        ->groupEnd();
+            ->groupEnd();
+    }
+
+    // Cek apakah user login dan punya alamat aktif
+    $activeAddress = null;
+    if ($userId) {
+        $activeAddress = $addressModel
+            ->where('user_id', $userId)
+            ->where('is_primary', true)
+            ->first();
+    }
+
+    // Jika ada alamat aktif dan koordinat, hitung jarak
+    if ($activeAddress && !empty($activeAddress['latitude']) && !empty($activeAddress['longitude'])) {
+        $userLat = $activeAddress['latitude'];
+        $userLon = $activeAddress['longitude'];
+
+        $distanceQuery = "( 6371 * acos( cos( radians({$userLat}) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians({$userLon}) ) + sin( radians({$userLat}) ) * sin( radians( latitude ) ) ) )";
+
+        $outletModel->select("outlets.*, {$distanceQuery} AS distance")
+                    ->orderBy('distance', 'ASC');
     }
 
     $data['outlets'] = $outletModel->findAll();
-    $data['keyword'] = $keyword; // 🟢 Tambahkan baris ini
+    $data['keyword'] = $keyword;
+    $data['userLat'] = $activeAddress['latitude'] ?? null;
+    $data['userLon'] = $activeAddress['longitude'] ?? null;
 
     return view('customer/list_outlet', $data);
 }
+
+
+
 
     /**
      * Fitur: Melakukan Pesanan (Langkah 1)
