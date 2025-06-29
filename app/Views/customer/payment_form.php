@@ -6,7 +6,6 @@ Pembayaran Pesanan
 
 <?= $this->section('content') ?>
 
-<main class="max-w-lg mx-auto p-4 md:p-6">
     <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
         <h1 class="text-2xl font-bold text-slate-800 text-center">Konfirmasi Pembayaran</h1>
         

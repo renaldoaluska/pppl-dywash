@@ -7,6 +7,11 @@
     <title><?= $this->renderSection('title') ?> - DyWash</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+        <style>
+        html {
+            overflow-y: scroll;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 antialiased">
 
