@@ -38,6 +38,8 @@ $routes->get('/customer/profil', 'CustomerController::cekProfil');
     // Untuk memproses form Ganti Password
     $routes->post('/customer/profil/ganti-password-process', 'CustomerController::processChangePassword'); 
 
+    $routes->get('/customer/order/detail/(:num)', 'CustomerController::orderDetail/$1');
+
 // Rute untuk fitur-fitur Outlet
 // Rute untuk manajemen banyak outlet
 $routes->get('/outlet/my-outlets', 'OutletController::listMyOutlets');
@@ -56,7 +58,12 @@ $routes->get('/outlet/services/create', 'OutletController::createService');
 $routes->get('/outlet/services/edit/(:num)', 'OutletController::editService/$1');
 $routes->post('/outlet/services/store', 'OutletController::storeService');
 $routes->get('/outlet/services/delete/(:num)', 'OutletController::deleteService/$1');
-
+$routes->post('/outlet/orders/update/(:num)', 'OutletController::updateOrderStatus/$1');
+// Daftarkan rute untuk halaman "Outlet Saya"
+$routes->get('/outlet/manage', 'OutletController::listMyOutlets');
+// Rute untuk menampilkan ulasan dari satu outlet spesifik
+// (:num) adalah placeholder untuk angka (ID outlet)
+$routes->get('/outlet/(:num)/reviews', 'OutletController::showReviewsForOutlet/$1');
 
 // Rute untuk fitur Admin
 $routes->get('/admin/verify', 'AdminController::listPendingOutlets');

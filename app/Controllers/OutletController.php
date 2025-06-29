@@ -1,4 +1,4 @@
-<?php // file: app/Controllers/OutletController.php
+<?php
 
 namespace App\Controllers;
 
@@ -9,14 +9,62 @@ use App\Models\ServiceModel;
 
 class OutletController extends BaseController
 {
+    /**
+     * FUNGSI DASHBOARD YANG DIPERBARUI: Mengambil data ringkasan untuk view.
+     */
+    public function dashboard()
+    {
+        $orderModel = new OrderModel();
+        $outletModel = new OutletModel();
+        $owner_id = session()->get('user_id');
+
+        // Langkah Kunci: Ambil semua ID outlet yang dimiliki oleh user ini.
+        // Jika user ini tidak memiliki satu pun outlet di tabel 'outlets',
+        // maka array ini akan kosong, dan semua hitungan pesanan akan menjadi 0.
+        $ownedOutletIds = $outletModel->where('owner_id', $owner_id)->findColumn('outlet_id') ?? [];
+
+        // Siapkan data default
+        $data = [
+            'new_orders_count'        => 0,
+            'processing_orders_count' => 0,
+            'recent_orders'           => []
+        ];
+
+        // Hanya jalankan query jika owner terbukti memiliki outlet
+        if (!empty($ownedOutletIds)) {
+            // Hitung jumlah pesanan dengan status 'diterima'
+            $data['new_orders_count'] = $orderModel
+                ->whereIn('outlet_id', $ownedOutletIds)
+                ->where('status', 'diterima')
+                ->countAllResults();
+
+            // Hitung jumlah pesanan dengan status 'diproses'
+            $data['processing_orders_count'] = $orderModel
+                ->whereIn('outlet_id', $ownedOutletIds)
+                ->where('status', 'diproses')
+                ->countAllResults();
+
+            // PERUBAHAN DI SINI:
+            // Ambil 3 aktivitas pesanan terbaru berdasarkan kapan statusnya terakhir diubah.
+            $data['recent_orders'] = $orderModel
+                ->whereIn('orders.outlet_id', $ownedOutletIds)
+                ->join('users', 'users.user_id = orders.customer_id')
+                ->select('orders.*, users.name as customer_name')
+                ->orderBy('orders.updated_at', 'DESC') // Diurutkan berdasarkan 'updated_at'
+                ->limit(3)
+                ->findAll();
+        }
+
+        return view('dashboard/outlet', $data);
+    }
+    
+    // ... SISA METHOD LAINNYA TIDAK PERLU DIUBAH ...
+    // (listMyOutlets, listOrders, dll. tetap sama)
+
     // ====================================================================
     // === FITUR BARU: MANAJEMEN BANYAK OUTLET ============================
     // ====================================================================
 
-    /**
-     * Menampilkan daftar semua outlet yang dimiliki oleh owner yang login.
-     * Ini menjadi halaman utama untuk manajemen outlet.
-     */
     public function listMyOutlets()
     {
         $outletModel = new OutletModel();
@@ -25,27 +73,16 @@ class OutletController extends BaseController
         return view('outlet/my_outlets/index', $data);
     }
 
-    
-
-    /**
-     * Menampilkan form KOSONG untuk mendaftarkan outlet baru.
-     */
     public function createOutletForm()
     {
-        // Selalu menampilkan form kosong dengan melewatkan data outlet sebagai null
         return view('outlet/my_outlets/form', ['outlet' => null]);
     }
     
-    /**
-     * Menampilkan form yang sudah terisi untuk mengedit outlet yang ada.
-     * @param int $outlet_id
-     */
     public function editOutletForm($outlet_id)
     {
         $outletModel = new OutletModel();
         $outlet = $outletModel->find($outlet_id);
 
-        // Validasi keamanan: Pastikan outlet ini milik owner yang sedang login
         if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
             return redirect()->to('/outlet/my-outlets')->with('error', 'Anda tidak memiliki akses ke outlet ini.');
         }
@@ -53,9 +90,6 @@ class OutletController extends BaseController
         return view('outlet/my_outlets/form', ['outlet' => $outlet]);
     }
 
-    /**
-     * Menyimpan data outlet (bisa untuk membuat baru atau update yang sudah ada).
-     */
     public function storeOrUpdateOutlet()
     {
         $outletModel = new OutletModel();
@@ -76,16 +110,15 @@ class OutletController extends BaseController
             'address'         => $this->request->getPost('address'),
             'contact_phone'   => $this->request->getPost('contact_phone'),
             'operating_hours' => $this->request->getPost('operating_hours'),
-            'status'          => 'pending' // Setiap perubahan data akan mengembalikan status ke pending untuk diverifikasi ulang
+            'status'          => 'pending'
         ];
 
-        if ($outlet_id) { // Jika ada ID, berarti ini adalah proses UPDATE
-            // Validasi keamanan sebelum update
+        if ($outlet_id) {
             $existing = $outletModel->find($outlet_id);
             if ($existing && $existing['owner_id'] == session()->get('user_id')) {
                 $outletModel->update($outlet_id, $data);
             }
-        } else { // Jika tidak ada ID, ini adalah proses INSERT (buat baru)
+        } else {
             $outletModel->insert($data);
         }
 
@@ -93,84 +126,66 @@ class OutletController extends BaseController
     }
 
 
-    // --- FUNGSI KELOLA PESANAN (DIPERBARUI) ---
+    // --- FUNGSI KELOLA PESANAN ---
     public function listOrders()
      {
         $orderModel = new OrderModel();
         $outletModel = new OutletModel();
         
-        // Ambil semua outlet terverifikasi milik owner
         $outlets = $outletModel->where(['owner_id' => session()->get('user_id'), 'status' => 'verified'])->findAll();
 
         if (empty($outlets)) {
-            // Jika tidak punya outlet terverifikasi, tidak bisa melihat pesanan
             return redirect()->to('/dashboard')->with('error', 'Anda tidak memiliki outlet terverifikasi untuk melihat pesanan.');
         }
 
-        // Kumpulkan semua ID outlet untuk query
         $outletIds = array_column($outlets, 'outlet_id');
         
-        // REVISI DIMULAI DI SINI: Kita akan membuat 2 query terpisah
-
-        // Grup 1: Pesanan yang perlu ditangani (statusnya BUKAN selesai, diulas, atau ditolak)
         $data['pending_orders'] = $orderModel
             ->whereIn('orders.outlet_id', $outletIds)
-            ->whereNotIn('orders.status', ['selesai', 'diulas', 'ditolak']) // Status yang dianggap aktif
+            ->whereNotIn('orders.status', ['selesai', 'diulas', 'ditolak'])
             ->join('users', 'users.user_id = orders.customer_id')
             ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
             ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
-            ->orderBy('orders.order_date', 'ASC') // Pesanan terlama di atas
+            ->orderBy('orders.created_at', 'ASC')
             ->findAll();
         
-        // Grup 2: Riwayat pesanan (statusnya selesai, diulas, atau ditolak)
         $data['history_orders'] = $orderModel
             ->whereIn('orders.outlet_id', $outletIds)
-            ->whereIn('orders.status', ['selesai', 'diulas', 'ditolak']) // Status yang dianggap riwayat
+            ->whereIn('orders.status', ['selesai', 'diulas', 'ditolak'])
             ->join('users', 'users.user_id = orders.customer_id')
             ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
             ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
-            ->orderBy('orders.order_date', 'DESC') // Riwayat terbaru di atas
+            ->orderBy('orders.created_at', 'DESC')
             ->findAll();
         
-        // Kirim dua variabel data ('pending_orders' dan 'history_orders') ke view
         return view('outlet/list_orders', $data);
     }
-    /**
-     * Fitur: Update Status Pesanan (Langkah 2) - DIPERBARUI
-     * Memproses perubahan status pesanan dengan validasi kepemilikan.
-     * @param int $order_id
-     */
+    
     public function updateOrderStatus($order_id)
     {
         $orderModel = new OrderModel();
-        $outletModel = new OutletModel(); // Diperlukan untuk validasi
+        $outletModel = new OutletModel();
         $status = $this->request->getPost('status');
         
-        // 1. Validasi input status
         if (!in_array($status, ['diproses', 'selesai', 'ditolak'])) {
             return redirect()->back()->with('error', 'Status tidak valid.');
         }
 
-        // 2. === VALIDASI KEPEMILIKAN PESANAN (BAGIAN PENTING YANG DITAMBAHKAN) ===
-        // Ambil ID dari semua outlet yang dimiliki oleh user yang login
         $ownedOutletIds = $outletModel->where('owner_id', session()->get('user_id'))->findColumn('outlet_id');
-        // Ambil data pesanan yang akan diupdate
         $order = $orderModel->find($order_id);
 
-        // Jika pesanan tidak ditemukan ATAU outlet_id dari pesanan tidak ada di dalam daftar outlet yang dimiliki
         if (!$order || !in_array($order['outlet_id'], $ownedOutletIds)) {
             return redirect()->back()->with('error', 'Anda tidak memiliki hak untuk mengubah pesanan ini.');
         }
-        // === AKHIR VALIDASI ===
 
-        // 3. Jika validasi lolos, lakukan update
         if ($orderModel->update($order_id, ['status' => $status])) {
             return redirect()->to('/outlet/orders')->with('success', 'Status pesanan berhasil diperbarui.');
         }
         
         return redirect()->back()->with('error', 'Gagal memperbarui status pesanan.');
     }
-    // --- FUNGSI LIHAT ULASAN (DIPERBARUI) ---
+    
+    // --- FUNGSI LIHAT ULASAN ---
      public function listReviews()
     {
         $reviewModel = new ReviewModel();
@@ -184,7 +199,6 @@ class OutletController extends BaseController
         $outletIds = array_column($outlets, 'outlet_id');
 
         $data['reviews'] = $reviewModel
-            // PERBAIKAN: Sebutkan nama tabel secara eksplisit untuk menghindari ambiguitas
             ->whereIn('reviews.outlet_id', $outletIds)
             ->join('users', 'users.user_id = reviews.customer_id')
             ->join('outlets', 'outlets.outlet_id = reviews.outlet_id')
@@ -194,43 +208,29 @@ class OutletController extends BaseController
         return view('outlet/list_reviews', $data);
     }
 
-    // --- FUNGSI KELOLA LAYANAN (SERVICES) ---
+    // --- FUNGSI KELOLA LAYANAN ---
     
-    /**
-     * Menampilkan daftar layanan yang dimiliki oleh outlet.
-     * Logika ini perlu disesuaikan karena satu owner bisa punya banyak outlet.
-     * Untuk saat ini, kita akan fokus pada satu outlet yang dipilih atau outlet pertama.
-     */
     public function listServices()
     {
         $serviceModel = new ServiceModel();
         $outletModel = new OutletModel();
 
-        // Sementara, kita ambil outlet pertama yang terverifikasi untuk dikelola layanannya
         $outlet = $outletModel->where(['owner_id' => session()->get('user_id'), 'status' => 'verified'])->first();
         if (!$outlet) {
             return redirect()->to('/dashboard')->with('error', 'Anda harus memiliki setidaknya satu outlet terverifikasi untuk mengelola layanan.');
         }
 
         $data['services'] = $serviceModel->where('outlet_id', $outlet['outlet_id'])->findAll();
-        // Kirim juga data outlet agar tahu layanan ini milik outlet mana
         $data['current_outlet'] = $outlet; 
         
         return view('outlet/services/index', $data);
     }
 
-    /**
-     * Menampilkan form untuk menambah layanan baru.
-     */
     public function createService()
     {
         return view('outlet/services/form', ['service' => null]);
     }
 
-    /**
-     * Menampilkan form untuk mengedit layanan yang ada.
-     * @param int $service_id
-     */
     public function editService($service_id)
     {
         $serviceModel = new ServiceModel();
@@ -239,16 +239,11 @@ class OutletController extends BaseController
         return view('outlet/services/form', $data);
     }
 
-    /**
-     * Menyimpan data layanan (baik baru maupun update).
-     */
     public function storeService()
     {
         $serviceModel = new ServiceModel();
         $outletModel = new OutletModel();
 
-        // Karena layanan terikat pada satu outlet, kita perlu tahu outlet mana yang layanannya akan ditambah/diubah.
-        // Untuk sementara, kita asumsikan layanan ditambahkan ke outlet terverifikasi pertama.
         $outlet = $outletModel->where(['owner_id' => session()->get('user_id'), 'status' => 'verified'])->first();
         if (!$outlet) {
             return redirect()->to('/dashboard')->with('error', 'Tidak ada outlet terverifikasi untuk ditambahkan layanan.');
@@ -265,25 +260,21 @@ class OutletController extends BaseController
 
         $service_id = $this->request->getPost('service_id');
         $data = [
-            'outlet_id' => $outlet['outlet_id'], // Tambahkan ke outlet yang aktif
+            'outlet_id' => $outlet['outlet_id'],
             'name'      => $this->request->getPost('name'),
             'price'     => $this->request->getPost('price'),
             'unit'      => $this->request->getPost('unit'),
         ];
 
-        if ($service_id) { // Update
+        if ($service_id) {
             $serviceModel->update($service_id, $data);
-        } else { // Buat baru
+        } else {
             $serviceModel->insert($data);
         }
 
         return redirect()->to('/outlet/services')->with('success', 'Layanan berhasil disimpan.');
     }
 
-    /**
-     * Menghapus layanan.
-     * @param int $service_id
-     */
     public function deleteService($service_id)
     {
         $serviceModel = new ServiceModel();

@@ -1,104 +1,80 @@
-<?php
-// Definisikan warna status untuk konsistensi
-$statusClasses = [
-    'pending'  => 'bg-yellow-100 text-yellow-800',
-    'verified' => 'bg-green-100 text-green-800',
-    'rejected' => 'bg-red-100 text-red-800',
-];
-?>
+<?= $this->extend('outlet/layout') ?>
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Outlet - Dywash</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Poppins', sans-serif; }
-    </style>
-</head>
-<body class="bg-slate-100">
+<?= $this->section('title') ?>
+Outlet Saya
+<?= $this->endSection() ?>
 
-<div class="container max-w-7xl mx-auto my-8 px-4">
-    <header class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
-        <div>
-            <h1 class="text-3xl font-bold text-slate-800">Kelola Outlet Saya</h1>
-            <p class="mt-1 text-slate-500">Tambah, lihat, atau ubah detail outlet Anda.</p>
-        </div>
-        <a href="/dashboard" class="w-full sm:w-auto text-center text-white bg-gray-600 hover:bg-gray-700 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-200">
-            Kembali ke Dashboard
-        </a>
-        <a href="/outlet/create" class="w-full sm:w-auto text-center text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 transition-colors duration-200">
-            Tambah Outlet Baru
-        </a>
-    </header>
+<?= $this->section('content') ?>
 
-    <!-- ============================================== -->
-    <!-- ==      KONTEN UTAMA (DESKTOP & MOBILE)     == -->
-    <!-- ============================================== -->
-    <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
-        <h2 class="text-xl font-bold text-slate-700 mb-5">Daftar Outlet Anda</h2>
-
-        <!-- Tampilan Desktop: Tabel (Hanya terlihat di layar medium ke atas) -->
-        <div class="hidden md:block overflow-x-auto">
-            <table class="w-full text-sm text-left">
-                <thead class="text-xs text-slate-500 uppercase bg-slate-50">
-                    <tr>
-                        <th class="p-4">Nama Outlet</th>
-                        <th class="p-4">Alamat</th>
-                        <th class="p-4">Status</th>
-                        <th class="p-4">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($outlets)): ?>
-                        <?php foreach ($outlets as $outlet): ?>
-                            <tr class="border-b hover:bg-slate-50">
-                                <td class="p-4 font-semibold text-slate-800"><?= esc($outlet['name']) ?></td>
-                                <td class="p-4 text-slate-600"><?= esc($outlet['address']) ?></td>
-                                <td class="p-4">
-                                    <span class="px-3 py-1 text-xs font-semibold rounded-full <?= $statusClasses[esc($outlet['status'])] ?? 'bg-gray-100' ?> capitalize">
-                                        <?= esc($outlet['status']) ?>
-                                    </span>
-                                </td>
-                                <td class="p-4">
-                                    <a href="/outlet/edit/<?= $outlet['outlet_id'] ?>" class="font-medium text-blue-600 hover:underline">Edit</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr><td colspan="4" class="text-center p-10 text-slate-500">Anda belum mendaftarkan outlet.</td></tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Tampilan Mobile: Kartu (Hanya terlihat di layar kecil) -->
-        <div class="block md:hidden space-y-4">
-            <?php if (!empty($outlets)): ?>
-                <?php foreach ($outlets as $outlet): ?>
-                    <div class="border border-slate-200 rounded-lg p-4 shadow-sm">
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-bold text-slate-800 pr-2"><?= esc($outlet['name']) ?></h3>
-                            <span class="flex-shrink-0 px-3 py-1 text-xs font-semibold rounded-full <?= $statusClasses[esc($outlet['status'])] ?? 'bg-gray-100' ?> capitalize">
-                                <?= esc($outlet['status']) ?>
-                            </span>
-                        </div>
-                        <p class="text-sm text-slate-500 mb-4"><?= esc($outlet['address']) ?></p>
-                        <a href="/outlet/edit/<?= $outlet['outlet_id'] ?>" class="block w-full text-center bg-slate-100 text-slate-700 font-semibold py-2 px-4 rounded-lg hover:bg-slate-200 transition-colors duration-200">
-                            Edit Outlet
-                        </a>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="text-center p-10 text-slate-500">Anda belum mendaftarkan outlet. Klik tombol di atas untuk memulai.</p>
-            <?php endif; ?>
-        </div>
+<!-- Header Halaman -->
+<div class="flex flex-col sm:flex-row items-center justify-between pb-4 mb-6">
+    <div>
+        <h3 class="text-lg font-semibold text-gray-700">Kelola Outlet Anda</h3>
+        <p class="text-sm text-gray-500 mt-1">Tambah, edit, dan lihat ulasan untuk setiap outlet.</p>
     </div>
+    <a href="/outlet/my-outlets/create" class="w-full sm:w-auto mt-4 sm:mt-0 px-4 py-2 text-sm text-center font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+        Tambah Outlet Baru
+    </a>
 </div>
-</body>
-</html>
+
+<!-- Menampilkan pesan sukses/error jika ada -->
+<?php if (session()->getFlashdata('success')): ?>
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow" role="alert">
+        <p><?= session()->getFlashdata('success') ?></p>
+    </div>
+<?php endif; ?>
+<?php if (session()->getFlashdata('error')): ?>
+    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg shadow" role="alert">
+        <p><?= session()->getFlashdata('error') ?></p>
+    </div>
+<?php endif; ?>
+
+
+<!-- Daftar Kartu Outlet -->
+<div class="space-y-4">
+    <?php if (!empty($outlets)): ?>
+        <?php foreach ($outlets as $outlet): ?>
+            <!-- Kartu Individual untuk Setiap Outlet -->
+            <div class="bg-white rounded-xl shadow-md transition-all duration-300">
+                <div class="p-4 sm:p-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-800 leading-tight">
+                            <?= esc($outlet['name']) ?>
+                        </h3>
+                        <?php
+                            $status = $outlet['status'];
+                            $badgeColor = 'bg-gray-100 text-gray-800'; // Default
+                            if ($status == 'verified') $badgeColor = 'bg-green-100 text-green-800';
+                            elseif ($status == 'pending') $badgeColor = 'bg-yellow-100 text-yellow-800';
+                            elseif ($status == 'rejected') $badgeColor = 'bg-red-100 text-red-800';
+                        ?>
+                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full <?= $badgeColor ?>">
+                            <?= ucfirst(esc($status)) ?>
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">
+                        <?= esc($outlet['address']) ?>
+                    </p>
+                </div>
+                <!-- Bagian Aksi (Tombol) -->
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-col sm:flex-row justify-end gap-3 rounded-b-xl">
+                    <a href="#" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
+                        Kelola Layanan
+                    </a>
+                    <!-- Tombol Lihat Ulasan yang mengarah ke halaman ulasan spesifik -->
+                    <a href="/outlet/<?= $outlet['outlet_id'] ?>/reviews" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                        Lihat Ulasan
+                    </a>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="text-center bg-white p-8 rounded-xl shadow-md">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Anda Belum Memiliki Outlet</h3>
+            <p class="mt-1 text-sm text-gray-500">Daftarkan outlet pertama Anda untuk memulai.</p>
+        </div>
+    <?php endif; ?>
+</div>
+
+<?= $this->endSection() ?>
