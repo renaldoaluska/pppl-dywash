@@ -234,7 +234,9 @@ public function monitorOrder()
         ->where('orders.customer_id', session()->get('user_id'))
         ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
         ->join('reviews', 'reviews.order_id = orders.order_id', 'left')
-        ->select('orders.*, outlets.name as outlet_name, reviews.rating as review_rating, reviews.comment as review_comment');
+        ->join('payments', 'payments.order_id = orders.order_id', 'left') // ✅ tambahkan join ini
+        ->select('orders.*, outlets.name as outlet_name, reviews.rating as review_rating, reviews.comment as review_comment, payments.payment_method, payments.status as payment_status');
+
 
     if ($filter_status) {
         $query->where('orders.status', $filter_status);
@@ -445,6 +447,11 @@ public function orderDetail($order_id)
         'order' => $order,
         'items' => $items,
     ]);
+}
+public function paymentLater()
+{
+    return redirect()->to('/customer/monitor')
+        ->with('success', 'Kamu bisa konfirmasi pembayaran nanti ya!');
 }
 
 }

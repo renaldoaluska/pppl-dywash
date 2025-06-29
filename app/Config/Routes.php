@@ -67,6 +67,7 @@ $routes->get('/admin/verify/action/(:num)/(:segment)', 'AdminController::verifyO
 // Rute untuk alur pembayaran customer
 $routes->get('/customer/payment/(:num)', 'CustomerController::paymentForm/$1');
 $routes->post('/customer/payment/process', 'CustomerController::processPayment');
+$routes->get('/customer/payment/later', 'CustomerController::paymentLater');
 
 // Rute untuk verifikasi pembayaran oleh admin
 $routes->get('/admin/payments/verify', 'AdminController::listPendingPayments');
