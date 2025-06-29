@@ -6,11 +6,17 @@ Kelola Layanan
 
 <?= $this->section('content') ?>
 
-<!-- Header Halaman -->
+<!-- Header Halaman - TELAH DIPERBARUI -->
 <div class="flex flex-col sm:flex-row items-center justify-between pb-4 mb-6 border-b">
-    <div>
-        <h3 class="text-lg font-semibold text-gray-700">Layanan untuk: <?= esc($current_outlet['name']) ?></h3>
-        <p class="text-sm text-gray-500 mt-1">Tambah, edit, atau hapus layanan yang tersedia di outlet ini.</p>
+    <div class="flex items-center">
+        <!-- Tombol Kembali -->
+        <a href="/outlet/my-outlets" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </a>
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700">Layanan untuk <?= esc($current_outlet['name']) ?></h3>
+            <p class="text-sm text-gray-500 mt-1">Tambah, edit, atau hapus layanan yang tersedia di outlet ini.</p>
+        </div>
     </div>
     <a href="/outlet/services/create/<?= $current_outlet['outlet_id'] ?>" class="w-full sm:w-auto mt-4 sm:mt-0 px-4 py-2 text-sm text-center font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700">
         Tambah Layanan Baru
@@ -66,7 +72,6 @@ Kelola Layanan
         <p class="text-lg font-medium text-gray-800 mt-4">Anda yakin ingin menghapus layanan ini?</p>
         <p class="text-sm text-gray-500 mt-2">Aksi ini tidak dapat dibatalkan.</p>
         
-        <!-- Form untuk mengirim request delete -->
         <form id="deleteForm" action="" method="post" class="mt-6 flex justify-center gap-4">
              <?= csrf_field() ?>
             <button type="button" id="confirmBtnTidak" class="w-full px-6 py-2 font-semibold text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300">Tidak, Batal</button>
@@ -87,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.delete-btn').forEach(button => {
         button.addEventListener('click', function(event) {
             const serviceId = this.dataset.serviceId;
-            // Set action form dinamis berdasarkan serviceId yang diklik
             deleteForm.action = `/outlet/services/delete/${serviceId}`;
             modal.classList.remove('hidden');
         });

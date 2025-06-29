@@ -6,16 +6,16 @@ Ulasan untuk <?= esc($outlet['name']) ?>
 
 <?= $this->section('content') ?>
 
-<!-- Header Halaman -->
-<div class="flex flex-col sm:flex-row items-center justify-between pb-4 mb-6 border-b">
+<!-- Header Halaman - TELAH DIPERBARUI -->
+<div class="flex items-center pb-4 mb-6 border-b">
+    <!-- Tombol Kembali -->
+    <a href="/outlet/my-outlets" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
+        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+    </a>
     <div>
-        <!-- Menampilkan nama outlet yang sedang dilihat ulasannya -->
         <h3 class="text-lg font-semibold text-gray-700">Ulasan untuk <?= esc($outlet['name']) ?></h3>
         <p class="text-sm text-gray-500 mt-1">Lihat apa kata pelanggan tentang outlet ini.</p>
     </div>
-    <a href="/outlet/my-outlets" class="w-full sm:w-auto mt-4 sm:mt-0 px-4 py-2 text-sm text-center font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
-        Kembali ke Daftar Outlet
-    </a>
 </div>
 
 
@@ -26,10 +26,9 @@ Ulasan untuk <?= esc($outlet['name']) ?>
             <div class="bg-white rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                 <div class="flex items-start justify-between">
                     <div>
-
                         <h4 class="font-bold text-gray-800"><?= esc($review['customer_name']) ?></h4>
-                        <p class="text-xs text-gray-500 mt-1"><?= date('d M Y', strtotime($review['order_id'])) ?></p>
-
+                        <!-- Menggunakan 'review_date' dari tabel reviews -->
+                        <p class="text-xs text-gray-500 mt-1"><?= date('d M Y', strtotime($review['review_date'])) ?></p>
                     </div>
                     <div class="flex items-center gap-1 flex-shrink-0 ml-4 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full">
                         <svg class="w-5 h-5 text-yellow-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -43,7 +42,6 @@ Ulasan untuk <?= esc($outlet['name']) ?>
                 <p class="text-gray-600 mt-4 text-sm italic">
                     "<?= esc($review['comment']) ?>"
                 </p>
-
                 <?php endif; ?>
             </div>
 

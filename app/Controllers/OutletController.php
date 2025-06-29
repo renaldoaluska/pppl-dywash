@@ -6,6 +6,8 @@ use App\Models\OutletModel;
 use App\Models\OrderModel;
 use App\Models\ReviewModel;
 use App\Models\ServiceModel;
+use App\Models\OrderAddressModel; // Pastikan ini sesuai dengan nama model Anda
+use App\Models\OrderItemModel; // Model untuk item dalam pesanan
 
 class OutletController extends BaseController
 {
@@ -41,7 +43,9 @@ class OutletController extends BaseController
             // Hitung jumlah pesanan dengan status 'diproses'
             $data['processing_orders_count'] = $orderModel
                 ->whereIn('outlet_id', $ownedOutletIds)
-                ->where('status', 'diproses')
+                ->where('status', 'dicuci')
+                ->orWhere('status', 'dikirim')
+                ->orWhere('status', 'diambil')
                 ->countAllResults();
 
             // PERUBAHAN DI SINI:
@@ -68,7 +72,20 @@ class OutletController extends BaseController
     public function listMyOutlets()
     {
         $outletModel = new OutletModel();
-        $data['outlets'] = $outletModel->where('owner_id', session()->get('user_id'))->findAll();
+        
+        // PERUBAHAN UTAMA: Menambahkan orderBy dengan CASE untuk urutan custom
+        $data['outlets'] = $outletModel
+            ->where('owner_id', session()->get('user_id'))
+            // Urutkan berdasarkan status: 'verified' dulu, lalu 'pending', lalu 'rejected'
+            ->orderBy("CASE 
+                            WHEN status = 'verified' THEN 1 
+                            WHEN status = 'pending' THEN 2 
+                            WHEN status = 'rejected' THEN 3 
+                            ELSE 4 
+                        END")
+            // Lalu urutkan berdasarkan ID outlet yang paling baru
+            ->orderBy('outlet_id', 'DESC')
+            ->findAll();
         
         return view('outlet/my_outlets/index', $data);
     }
@@ -128,7 +145,7 @@ class OutletController extends BaseController
 
     // --- FUNGSI KELOLA PESANAN ---
     public function listOrders()
-     {
+    {
         $orderModel = new OrderModel();
         $outletModel = new OutletModel();
         
@@ -140,21 +157,29 @@ class OutletController extends BaseController
 
         $outletIds = array_column($outlets, 'outlet_id');
         
+        // PERUBAHAN UTAMA: Query dibuat lebih eksplisit untuk setiap grup
+
+        // Grup 1: Pesanan Aktif (yang belum selesai/ditolak)
         $data['pending_orders'] = $orderModel
-            ->whereIn('orders.outlet_id', $outletIds)
-            ->whereNotIn('orders.status', ['selesai', 'diulas', 'ditolak'])
+            ->join('payments', 'payments.order_id = orders.order_id')
             ->join('users', 'users.user_id = orders.customer_id')
             ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+            ->whereIn('orders.outlet_id', $outletIds)
+            ->whereIn('payments.status', ['lunas', 'cod'])
+            ->whereNotIn('orders.status', ['selesai', 'diulas', 'ditolak'])
+            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name') // Select eksplisit
             ->orderBy('orders.created_at', 'ASC')
             ->findAll();
         
+        // Grup 2: Riwayat Pesanan (yang sudah selesai/ditolak)
         $data['history_orders'] = $orderModel
-            ->whereIn('orders.outlet_id', $outletIds)
-            ->whereIn('orders.status', ['selesai', 'diulas', 'ditolak'])
+            ->join('payments', 'payments.order_id = orders.order_id')
             ->join('users', 'users.user_id = orders.customer_id')
             ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+            ->whereIn('orders.outlet_id', $outletIds)
+            ->whereIn('payments.status', ['lunas', 'cod'])
+            ->whereIn('orders.status', ['selesai', 'diulas', 'ditolak'])
+            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name') // Select eksplisit
             ->orderBy('orders.created_at', 'DESC')
             ->findAll();
         
@@ -165,20 +190,41 @@ class OutletController extends BaseController
     {
         $orderModel = new OrderModel();
         $outletModel = new OutletModel();
-        $status = $this->request->getPost('status');
+        $newStatus = $this->request->getPost('status');
         
-        if (!in_array($status, ['diproses', 'selesai', 'ditolak'])) {
-            return redirect()->back()->with('error', 'Status tidak valid.');
+        // 1. Ambil data order saat ini dari database
+        $order = $orderModel->find($order_id);
+        if (!$order) {
+            return redirect()->back()->with('error', 'Pesanan tidak ditemukan.');
         }
 
+        // 2. Validasi kepemilikan (pastikan outlet ini milik user yang login)
         $ownedOutletIds = $outletModel->where('owner_id', session()->get('user_id'))->findColumn('outlet_id');
-        $order = $orderModel->find($order_id);
-
-        if (!$order || !in_array($order['outlet_id'], $ownedOutletIds)) {
+        if (!in_array($order['outlet_id'], $ownedOutletIds)) {
             return redirect()->back()->with('error', 'Anda tidak memiliki hak untuk mengubah pesanan ini.');
         }
 
-        if ($orderModel->update($order_id, ['status' => $status])) {
+        // 3. Definisikan alur status yang diizinkan (urutan yang benar)
+        $allowedTransitions = [
+            'diterima' => ['diambil', 'ditolak'],
+            'diambil'  => ['dicuci'],
+            'dicuci'   => ['dikirim'],    // Setelah dicuci, harus dikirim
+            'dikirim'  => ['selesai'],    // Setelah dikirim, baru bisa diselesaikan
+        ];
+        $currentStatus = $order['status'];
+
+        // 4. Cek apakah perubahan status yang diminta sesuai dengan alur
+        $isTransitionAllowed = isset($allowedTransitions[$currentStatus]) && in_array($newStatus, $allowedTransitions[$currentStatus]);
+        
+        // Pengecualian: 'ditolak' bisa dilakukan kapan saja sebelum dikirim
+        $isRejectAllowed = ($newStatus === 'ditolak' && !in_array($currentStatus, ['selesai', 'dikirim', 'diulas']));
+        
+        if (!$isTransitionAllowed && !$isRejectAllowed) {
+            return redirect()->back()->with('error', 'Perubahan status tidak diizinkan dari ' . ucfirst($currentStatus) . ' ke ' . ucfirst($newStatus) . '.');
+        }
+
+        // 5. Jika validasi lolos, lakukan update
+        if ($orderModel->update($order_id, ['status' => $newStatus])) {
             return redirect()->to('/outlet/orders')->with('success', 'Status pesanan berhasil diperbarui.');
         }
         
@@ -480,5 +526,92 @@ class OutletController extends BaseController
         }
 
         return redirect()->back()->with('error', 'Gagal memperbarui password, silakan coba lagi.');
+    }
+
+    public function showOrderDetail($order_id)
+    {
+        $orderModel = new OrderModel();
+        $outletModel = new OutletModel();
+        
+        // 1. Ambil data pesanan utama, join dengan semua data yang relevan
+        $order = $orderModel
+            ->where('orders.order_id', $order_id)
+            ->join('users', 'users.user_id = orders.customer_id')
+            ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+            ->first();
+
+        // Jika pesanan tidak ditemukan, lempar kembali
+        if (!$order) {
+            return redirect()->to('/outlet/orders')->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        // 2. Validasi Keamanan: Pastikan pesanan ini milik salah satu outlet dari user yang login
+        $ownedOutletIds = $outletModel->where('owner_id', session()->get('user_id'))->findColumn('outlet_id') ?? [];
+        if (!in_array($order['outlet_id'], $ownedOutletIds)) {
+            return redirect()->to('/outlet/orders')->with('error', 'Anda tidak memiliki akses ke pesanan ini.');
+        }
+
+        // 3. Ambil data alamat dari tabel snapshot
+        $addressModel = new \App\Models\OrderAddressModel(); // Ganti dengan nama model Anda
+        $address = $addressModel->where('order_id', $order_id)->first();
+        
+        // 4. Ambil semua item/layanan dalam pesanan ini
+        $orderItemModel = new \App\Models\OrderItemModel(); // Ganti dengan nama model Anda
+        $order_items = $orderItemModel
+            ->where('order_items.order_id', $order_id)
+            ->join('services', 'services.service_id = order_items.service_id')
+            ->select('order_items.*, services.name as service_name, services.unit')
+            ->findAll();
+
+        // 5. Kirim semua data ke view
+        $data = [
+            'order'       => $order,
+            'address'     => $address,
+            'order_items' => $order_items
+        ];
+
+        return view('outlet/order_detail', $data);
+    }
+    public function showOutletDetail($outlet_id)
+    {
+        $outletModel = new OutletModel();
+        
+        // 1. Ambil data outlet
+        $outlet = $outletModel->find($outlet_id);
+
+        // 2. Validasi Keamanan: Pastikan outlet ada & dimiliki oleh user yg login
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Outlet tidak ditemukan atau Anda tidak memiliki akses.');
+        }
+
+        // 3. Kirim data ke view
+        $data['outlet'] = $outlet;
+        return view('outlet/my_outlets/detail', $data);
+    }
+
+    /**
+     * FUNGSI BARU: Menghapus outlet beserta data terkait.
+     */
+    public function deleteOutlet($outlet_id)
+    {
+        $outletModel = new OutletModel();
+
+        // 1. Ambil data outlet yang akan dihapus untuk validasi
+        $outlet = $outletModel->find($outlet_id);
+
+        // 2. Validasi Keamanan: Pastikan outlet ada & dimiliki oleh user yg login
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Anda tidak memiliki akses untuk menghapus outlet ini.');
+        }
+
+        // 3. Jika validasi lolos, hapus outlet.
+        // Karena ada 'ON DELETE CASCADE' di database, data terkait (layanan, pesanan, ulasan)
+        // seharusnya ikut terhapus secara otomatis.
+        if ($outletModel->delete($outlet_id)) {
+            return redirect()->to('/outlet/my-outlets')->with('success', 'Outlet berhasil dihapus.');
+        }
+
+        return redirect()->to('/outlet/my-outlets')->with('error', 'Gagal menghapus outlet.');
     }
 }

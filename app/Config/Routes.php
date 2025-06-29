@@ -45,12 +45,9 @@ $routes->get('/customer/profil', 'CustomerController::cekProfil');
 // Rute untuk manajemen banyak outlet
 $routes->get('/outlet/my-outlets', 'OutletController::listMyOutlets');
 $routes->get('/outlet/edit/(:num)', 'OutletController::editOutletForm/$1');
-
 // di dalam app/Config/Routes.php
-
-// Rute untuk menampilkan halaman form tambah outlet baru
+// Rute untuk menampilkan form tambah outlet baru
 $routes->get('/outlet/my-outlets/create', 'OutletController::createOutletForm');
-
 // Rute untuk MENYIMPAN data dari form (baik data baru maupun update)
 $routes->post('/outlet/my-outlets/store', 'OutletController::storeOrUpdateOutlet');
 // Rute untuk menampilkan halaman manajemen layanan untuk outlet tertentu
@@ -69,18 +66,24 @@ $routes->get('/outlet/(:num)/reviews', 'OutletController::showReviewsForOutlet/$
 $routes->get('/outlet/profile', 'OutletController::profile');
 // Rute BARU untuk menampilkan form edit profil
 $routes->get('/outlet/profile/edit', 'OutletController::editProfile');
-
+// Rute untuk menampilkan halaman detail pesanan
+$routes->get('/outlet/orders/detail/(:num)', 'OutletController::showOrderDetail/$1');
 // Rute BARU untuk memproses update profil
 $routes->post('/outlet/profile/update', 'OutletController::updateProfile');
 // Rute untuk menampilkan form ganti password
 $routes->get('/outlet/profile/ganti-password', 'OutletController::changePasswordForm');
-
 // Rute untuk memproses update password
 $routes->post('/outlet/profile/update-password', 'OutletController::updatePassword');
-
 // Rute lainnya tetap sama
 $routes->get('/outlet/orders', 'OutletController::listOrders');
 $routes->post('/outlet/orders/update/(:num)', 'OutletController::updateOrderStatus/$1');
+// Rute untuk menampilkan halaman detail outlet
+$routes->get('/outlet/my-outlets/detail/(:num)', 'OutletController::showOutletDetail/$1');
+// Rute untuk menampilkan form edit outlet (akan dipanggil dari halaman detail)
+$routes->get('/outlet/my-outlets/edit/(:num)', 'OutletController::editOutletForm/$1');
+// Rute untuk menghapus outlet (akan dipanggil dari halaman detail)
+$routes->post('/outlet/my-outlets/delete/(:num)', 'OutletController::deleteOutlet/$1');
+
 
 // ... (rute untuk services)
 // Rute untuk Kelola Layanan oleh Outlet
