@@ -29,9 +29,9 @@ DROP TYPE IF EXISTS payment_status_enum CASCADE;
 CREATE TYPE user_role AS ENUM ('admin', 'outlet', 'cust');
 CREATE TYPE outlet_status AS ENUM ('pending', 'verified', 'rejected');
 -- Status 'dijemput' dan 'dikirim' ditambahkan
-CREATE TYPE order_status_enum AS ENUM ('diterima', 'ditolak', 'diproses', 'dijemput', 'dikirim', 'selesai', 'diulas');
+CREATE TYPE order_status_enum AS ENUM ('diterima', 'ditolak', 'diambil', 'dikirim', 'selesai', 'diulas');
 CREATE TYPE payment_method_enum AS ENUM ('transfer', 'cod', 'ewallet');
-CREATE TYPE payment_status_enum AS ENUM ('pending', 'lunas', 'gagal');
+CREATE TYPE payment_status_enum AS ENUM ('pending', 'lunas', 'gagal', 'cod');
 
 
 -- ====================================================================
@@ -214,7 +214,7 @@ VALUES (2, 'Apartemen', 'Citra Lestari', '081223344557', 'Apartemen Puncak Kerta
 UPDATE orders SET orders_address_id = 2 WHERE order_id = 2;
 
 INSERT INTO orders (customer_id, outlet_id, orders_address_id, status, customer_notes)
-VALUES (4, 2, NULL, 'diproses', NULL);
+VALUES (4, 2, NULL, 'diterima', NULL);
 INSERT INTO orders_address (order_id, label, recipient_name, phone_number, address_detail, latitude, longitude)
 VALUES (3, 'Kantor', 'Andi (Penerima)', '081234567890', 'Gedung Sinar Mas, Jl. Jend. Sudirman Kav. 10', -7.2600, 112.7400);
 UPDATE orders SET orders_address_id = 3 WHERE order_id = 3;
