@@ -79,12 +79,16 @@ class AuthController extends BaseController
 
         switch ($role) {
             case 'admin':
-                return view('dashboard/admin');
+                // JANGAN tampilkan view, tapi redirect ke controller admin
+                return redirect()->to('/admin/dashboard');
             case 'outlet':
-                return view('dashboard/outlet');
+                 // JANGAN tampilkan view, tapi redirect ke controller outlet
+                return redirect()->to('/outlet/dashboard');
             case 'cust':
-                return view('dashboard/customer');
+                 // Arahkan ke dashboard customer (jika ada)
+                return redirect()->to('/customer/dashboard');
             default:
+                // Jika role tidak jelas, paksa logout
                 return redirect()->to('/logout');
         }
     }

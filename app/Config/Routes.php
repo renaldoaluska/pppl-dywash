@@ -68,6 +68,8 @@ $routes->get('/outlet/(:num)/reviews', 'OutletController::showReviewsForOutlet/$
 // Rute untuk fitur Admin
 $routes->get('/admin/verify', 'AdminController::listPendingOutlets');
 $routes->get('/admin/verify/action/(:num)/(:segment)', 'AdminController::verifyOutlet/$1/$2');
+$routes->get('/admin/dashboard', 'AdminController::dashboard');
+$routes->get('/outlet/dashboard', 'OutletController::dashboard');
 
 // Rute untuk alur pembayaran customer
 $routes->get('/customer/payment/(:num)', 'CustomerController::paymentForm/$1');
