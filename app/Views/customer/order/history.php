@@ -185,9 +185,6 @@ Riwayat Pesanan
     <p class="font-semibold">⚠️ Rating tidak boleh kosong!</p>
 </div>
 
-<?= $this->include('layout/bottom_nav') ?>
-<?= $this->include('layout/footer') ?>
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const reviewForms = document.querySelectorAll('.review-form');
