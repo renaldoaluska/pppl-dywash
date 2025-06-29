@@ -48,7 +48,7 @@ $routes->get('/outlet/edit/(:num)', 'OutletController::editOutletForm/$1');
 
 // di dalam app/Config/Routes.php
 
-// Rute untuk menampilkan halaman form tambah outlet baru
+// Rute untuk menampilkan form tambah outlet baru
 $routes->get('/outlet/my-outlets/create', 'OutletController::createOutletForm');
 
 // Rute untuk MENYIMPAN data dari form (baik data baru maupun update)
