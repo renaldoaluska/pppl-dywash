@@ -21,6 +21,7 @@ $routes->get('/auth/register', 'AuthController::register');
 $routes->post('/auth/register', 'AuthController::register');
 
 // Rute untuk fitur-fitur Customer
+$routes->get('/customer/dashboard', 'CustomerController::dashboard');
 $routes->get('/customer/outlet', 'CustomerController::listOutlet');
 $routes->get('/customer/order/create/(:num)', 'CustomerController::createOrder/$1');
 $routes->post('/customer/order/store', 'CustomerController::storeOrder');

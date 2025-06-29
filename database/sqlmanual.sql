@@ -29,9 +29,9 @@ DROP TYPE IF EXISTS payment_status_enum CASCADE;
 CREATE TYPE user_role AS ENUM ('admin', 'outlet', 'cust');
 CREATE TYPE outlet_status AS ENUM ('pending', 'verified', 'rejected');
 -- Status 'dijemput' dan 'dikirim' ditambahkan
-CREATE TYPE order_status_enum AS ENUM ('diterima', 'ditolak', 'diproses', 'dijemput', 'dikirim', 'selesai', 'diulas');
+CREATE TYPE order_status_enum AS ENUM ('diterima', 'ditolak', 'diambil', 'dicuci','dikirim', 'selesai', 'diulas');
 CREATE TYPE payment_method_enum AS ENUM ('transfer', 'cod', 'ewallet');
-CREATE TYPE payment_status_enum AS ENUM ('pending', 'lunas', 'gagal');
+CREATE TYPE payment_status_enum AS ENUM ('pending', 'lunas', 'gagal', 'cod');
 
 
 -- ====================================================================
@@ -200,41 +200,85 @@ INSERT INTO services (outlet_id, name, price, unit) VALUES
 (2, 'Cuci Sepatu', 25000, 'pasang'),
 (2, 'Dry Cleaning Jas', 35000, 'pcs');
 
+-- ====================================================================
+-- BAGIAN 4: ISI DATA DUMMY (EXTENDED UNTUK TEST SEMUA STATUS)
+-- ====================================================================
+
+-- (Data user, addresses, outlets, services sudah ada, tidak diubah)
+
 -- Tabel Orders & Orders Address snapshot
+
+-- Order 1 - diulas
 INSERT INTO orders (customer_id, outlet_id, orders_address_id, status, customer_notes)
 VALUES (4, 1, NULL, 'diulas', 'Tolong jangan dicampur dengan pakaian warna putih.');
 INSERT INTO orders_address (order_id, label, recipient_name, phone_number, address_detail, latitude, longitude)
 VALUES (1, 'Rumah', 'Andi Pratama', '081234567890', 'Jl. Darmo Permai III No. 45', -7.2893, 112.7222);
 UPDATE orders SET orders_address_id = 1 WHERE order_id = 1;
 
+-- Order 2 - selesai
 INSERT INTO orders (customer_id, outlet_id, orders_address_id, status, customer_notes)
 VALUES (5, 2, NULL, 'selesai', 'Sepatu kanvas, tolong sikat bagian dalamnya juga.');
 INSERT INTO orders_address (order_id, label, recipient_name, phone_number, address_detail, latitude, longitude)
 VALUES (2, 'Apartemen', 'Citra Lestari', '081223344557', 'Apartemen Puncak Kertajaya Tower A Lt. 15', -7.2915, 112.7305);
 UPDATE orders SET orders_address_id = 2 WHERE order_id = 2;
 
+-- Order 3 - diterima
 INSERT INTO orders (customer_id, outlet_id, orders_address_id, status, customer_notes)
-VALUES (4, 2, NULL, 'diproses', NULL);
+VALUES (4, 2, NULL, 'diterima', NULL);
 INSERT INTO orders_address (order_id, label, recipient_name, phone_number, address_detail, latitude, longitude)
 VALUES (3, 'Kantor', 'Andi (Penerima)', '081234567890', 'Gedung Sinar Mas, Jl. Jend. Sudirman Kav. 10', -7.2600, 112.7400);
 UPDATE orders SET orders_address_id = 3 WHERE order_id = 3;
 
+-- Order 4 - diambil
+INSERT INTO orders (customer_id, outlet_id, orders_address_id, status, customer_notes)
+VALUES (5, 1, NULL, 'diambil', 'Ambil di resepsionis tower B.');
+INSERT INTO orders_address (order_id, label, recipient_name, phone_number, address_detail, latitude, longitude)
+VALUES (4, 'Apartemen', 'Citra Lestari', '081223344557', 'Apartemen Puncak Kertajaya Tower B Lt. 10', -7.2915, 112.7306);
+UPDATE orders SET orders_address_id = 4 WHERE order_id = 4;
+
+-- Order 5 - dikirim
+INSERT INTO orders (customer_id, outlet_id, orders_address_id, status, customer_notes)
+VALUES (6, 2, NULL, 'dikirim', 'Pastikan diterima oleh ibu saya.');
+INSERT INTO orders_address (order_id, label, recipient_name, phone_number, address_detail, latitude, longitude)
+VALUES (5, 'Rumah Ortu', 'Ibu Anggraini', '081987654322', 'Jl. Rungkut Madya No. 112', -7.2881, 112.7259);
+UPDATE orders SET orders_address_id = 5 WHERE order_id = 5;
+
+-- Order 6 - ditolak
+INSERT INTO orders (customer_id, outlet_id, orders_address_id, status, customer_notes)
+VALUES (6, 1, NULL, 'ditolak', 'Tidak sesuai jadwal penjemputan.');
+INSERT INTO orders_address (order_id, label, recipient_name, phone_number, address_detail, latitude, longitude)
+VALUES (6, 'Rumah Ortu', 'Ibu Anggraini', '081987654322', 'Jl. Rungkut Madya No. 112', -7.2881, 112.7259);
+UPDATE orders SET orders_address_id = 6 WHERE order_id = 6;
+
+
 -- Tabel Order Items & Update Total
+
 INSERT INTO order_items (order_id, service_id, quantity, subtotal) VALUES
 (1, 1, 3, 21000),
 (2, 5, 1, 25000),
-(3, 4, 2.5, 20000);
+(3, 4, 2.5, 20000),
+(4, 2, 4, 20000),
+(5, 6, 1, 35000),
+(6, 3, 2, 30000);
 
 UPDATE orders SET total_amount = 21000 WHERE order_id = 1;
 UPDATE orders SET total_amount = 25000 WHERE order_id = 2;
 UPDATE orders SET total_amount = 20000 WHERE order_id = 3;
+UPDATE orders SET total_amount = 20000 WHERE order_id = 4;
+UPDATE orders SET total_amount = 35000 WHERE order_id = 5;
+UPDATE orders SET total_amount = 30000 WHERE order_id = 6;
 
 -- Tabel Payments
+
 INSERT INTO payments (order_id, amount, payment_method, status, payment_date) VALUES
 (1, 21000, 'ewallet', 'lunas', '2025-06-13 10:30:00'),
 (2, 25000, 'cod', 'lunas', '2025-06-14 15:00:00'),
-(3, 20000, 'transfer', 'pending', NULL);
+(3, 20000, 'transfer', 'pending', NULL),
+(4, 20000, 'transfer', 'pending', NULL),
+(5, 35000, 'cod', 'lunas', '2025-06-15 17:20:00'),
+(6, 30000, 'ewallet', 'gagal', '2025-06-15 18:00:00');
 
 -- Tabel Reviews
+
 INSERT INTO reviews (order_id, customer_id, outlet_id, rating, comment) VALUES
 (1, 4, 1, 5, 'Hasilnya bersih dan wangi. Pengirimannya juga tepat waktu. Sangat direkomendasikan!');
