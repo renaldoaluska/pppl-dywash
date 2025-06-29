@@ -186,25 +186,37 @@ class OutletController extends BaseController
     }
     
     // --- FUNGSI LIHAT ULASAN ---
-     public function listReviews()
+    public function showReviewsForOutlet($outlet_id)
     {
-        $reviewModel = new ReviewModel();
+        // Inisialisasi model yang kita perlukan
         $outletModel = new OutletModel();
+        $reviewModel = new ReviewModel();
 
-        $outlets = $outletModel->where('owner_id', session()->get('user_id'))->findAll();
-        if (empty($outlets)) {
-            return redirect()->to('/dashboard')->with('error', 'Anda tidak memiliki outlet untuk melihat ulasan.');
+        // 1. Ambil data outlet untuk ditampilkan di header halaman
+        $outlet = $outletModel->find($outlet_id);
+
+        // 2. Validasi Keamanan (PENTING!): 
+        //    Pastikan outlet ada & benar-benar dimiliki oleh user yang sedang login
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            // Jika tidak, lempar kembali ke halaman daftar outlet dengan pesan error
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Anda tidak memiliki akses ke halaman ulasan ini.');
         }
 
-        $outletIds = array_column($outlets, 'outlet_id');
-
-        $data['reviews'] = $reviewModel
-            ->whereIn('reviews.outlet_id', $outletIds)
+        // 3. Ambil semua ulasan untuk outlet ini, dan gabungkan (join) dengan data customer
+        $reviews = $reviewModel
+            ->where('reviews.outlet_id', $outlet_id)
             ->join('users', 'users.user_id = reviews.customer_id')
-            ->join('outlets', 'outlets.outlet_id = reviews.outlet_id')
-            ->select('reviews.*, users.name as customer_name, outlets.name as outlet_name')
+            ->select('reviews.*, users.name as customer_name')
+            ->orderBy('reviews.order_id', 'DESC') // Urutkan dari ulasan terbaru
             ->findAll();
 
+        // 4. Siapkan data untuk dikirim ke view
+        $data = [
+            'outlet'  => $outlet,
+            'reviews' => $reviews
+        ];
+
+        // 5. Tampilkan view 'list_reviews' dan kirim datanya
         return view('outlet/list_reviews', $data);
     }
 

@@ -10,7 +10,7 @@ Ulasan Outlet
 <div class="flex flex-col sm:flex-row items-center justify-between pb-4 mb-6 border-b">
     <div>
         <!-- Menampilkan nama outlet yang sedang dilihat ulasannya -->
-        <h3 class="text-lg font-semibold text-gray-700">Ulasan untuk: <?= esc($outlet['name']) ?></h3>
+        <h3 class="text-lg font-semibold text-gray-700">Ulasan untuk <?= esc($outlet['name']) ?></h3>
         <p class="text-sm text-gray-500 mt-1">Lihat apa kata pelanggan tentang outlet ini.</p>
     </div>
     <a href="/outlet/my-outlets" class="w-full sm:w-auto mt-4 sm:mt-0 px-4 py-2 text-sm text-center font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
@@ -27,7 +27,7 @@ Ulasan Outlet
                 <div class="flex items-start justify-between">
                     <div>
                         <h4 class="font-bold text-gray-800"><?= esc($review['customer_name']) ?></h4>
-                        <p class="text-xs text-gray-500 mt-1"><?= date('d M Y', strtotime($review['created_at'])) ?></p>
+                        <p class="text-xs text-gray-500 mt-1"><?= date('d M Y', strtotime($review['order_id'])) ?></p>
                     </div>
                     <!-- Tampilan Rating Bintang -->
                     <div class="flex items-center">
@@ -40,7 +40,7 @@ Ulasan Outlet
                 </div>
                 <!-- Komentar Ulasan -->
                 <?php if (!empty($review['comment'])): ?>
-                <p class="text-gray-600 mt-4 text-sm">
+                <p class="text-gray-600 mt-4 text-sm italic">
                     "<?= esc($review['comment']) ?>"
                 </p>
                 <?php endif; ?>
