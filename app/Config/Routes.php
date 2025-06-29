@@ -46,6 +46,13 @@ $routes->get('/outlet/my-outlets', 'OutletController::listMyOutlets');
 $routes->get('/outlet/create', 'OutletController::createOutletForm');
 $routes->get('/outlet/edit/(:num)', 'OutletController::editOutletForm/$1');
 $routes->post('/outlet/store-update', 'OutletController::storeOrUpdateOutlet');
+// di dalam app/Config/Routes.php
+
+// Rute untuk menampilkan halaman form tambah outlet baru
+$routes->get('/outlet/my-outlets/create', 'OutletController::createOutletForm');
+
+// Rute untuk MENYIMPAN data dari form (baik data baru maupun update)
+$routes->post('/outlet/my-outlets/store', 'OutletController::storeOrUpdateOutlet');
 
 // Rute lainnya tetap sama
 $routes->get('/outlet/orders', 'OutletController::listOrders');
