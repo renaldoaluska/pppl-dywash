@@ -5,7 +5,7 @@ Daftar Outlet
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<form action="/customer/outlet" method="get" class="flex items-center gap-3 mb-8">
+<form action="/customer/outlet" method="get" class="flex items-center gap-3 mb-2">
     <div class="relative flex-grow">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,6 +20,24 @@ Daftar Outlet
     <a href="/customer/outlet" class="bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors flex-shrink-0">Reset</a>
     <?php endif; ?>
 </form>
+
+<form action="/customer/outlet" method="get" class="flex items-center gap-3 mb-4">
+<div class="flex flex-col w-full">
+    <label for="max_distance" class="text-sm text-slate-700 mb-1">Jarak Maksimal (km)</label>
+    <input type="range" name="max_distance" id="max_distance"
+           min="1" max="50"
+           value="<?= esc($maxDistance ?? 50, 'attr') ?>"
+           <?= empty($userLat) || empty($userLon) ? 'disabled class="opacity-50 cursor-not-allowed"' : '' ?>
+           oninput="document.getElementById('distanceLabel').innerText = this.value + ' km'" />
+    <div class="text-sm text-slate-600 mt-1">
+        Sampai <span id="distanceLabel"><?= esc($maxDistance ?? 50) ?> km</span>
+        <?php if (empty($userLat) || empty($userLon)): ?>
+            <span class="text-red-500 ml-2">(Alamat utama belum tersedia)</span>
+        <?php endif; ?>
+    </div>
+</div>
+</form>
+
 
     
     <div class="space-y-4">
@@ -156,6 +174,18 @@ Daftar Outlet
     function closeMapModal() {
         document.getElementById('mapModal').classList.add('hidden');
     }
+</script>
+<script>
+    const distanceSlider = document.getElementById('max_distance');
+    const form = distanceSlider.closest('form');
+    let debounceTimer;
+
+    distanceSlider.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            form.submit();
+        }, 500);
+    });
 </script>
 
 
