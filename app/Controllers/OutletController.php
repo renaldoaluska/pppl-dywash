@@ -72,7 +72,20 @@ class OutletController extends BaseController
     public function listMyOutlets()
     {
         $outletModel = new OutletModel();
-        $data['outlets'] = $outletModel->where('owner_id', session()->get('user_id'))->findAll();
+        
+        // PERUBAHAN UTAMA: Menambahkan orderBy dengan CASE untuk urutan custom
+        $data['outlets'] = $outletModel
+            ->where('owner_id', session()->get('user_id'))
+            // Urutkan berdasarkan status: 'verified' dulu, lalu 'pending', lalu 'rejected'
+            ->orderBy("CASE 
+                            WHEN status = 'verified' THEN 1 
+                            WHEN status = 'pending' THEN 2 
+                            WHEN status = 'rejected' THEN 3 
+                            ELSE 4 
+                        END")
+            // Lalu urutkan berdasarkan ID outlet yang paling baru
+            ->orderBy('outlet_id', 'DESC')
+            ->findAll();
         
         return view('outlet/my_outlets/index', $data);
     }
@@ -559,5 +572,46 @@ class OutletController extends BaseController
         ];
 
         return view('outlet/order_detail', $data);
+    }
+    public function showOutletDetail($outlet_id)
+    {
+        $outletModel = new OutletModel();
+        
+        // 1. Ambil data outlet
+        $outlet = $outletModel->find($outlet_id);
+
+        // 2. Validasi Keamanan: Pastikan outlet ada & dimiliki oleh user yg login
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Outlet tidak ditemukan atau Anda tidak memiliki akses.');
+        }
+
+        // 3. Kirim data ke view
+        $data['outlet'] = $outlet;
+        return view('outlet/my_outlets/detail', $data);
+    }
+
+    /**
+     * FUNGSI BARU: Menghapus outlet beserta data terkait.
+     */
+    public function deleteOutlet($outlet_id)
+    {
+        $outletModel = new OutletModel();
+
+        // 1. Ambil data outlet yang akan dihapus untuk validasi
+        $outlet = $outletModel->find($outlet_id);
+
+        // 2. Validasi Keamanan: Pastikan outlet ada & dimiliki oleh user yg login
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/outlet/my-outlets')->with('error', 'Anda tidak memiliki akses untuk menghapus outlet ini.');
+        }
+
+        // 3. Jika validasi lolos, hapus outlet.
+        // Karena ada 'ON DELETE CASCADE' di database, data terkait (layanan, pesanan, ulasan)
+        // seharusnya ikut terhapus secara otomatis.
+        if ($outletModel->delete($outlet_id)) {
+            return redirect()->to('/outlet/my-outlets')->with('success', 'Outlet berhasil dihapus.');
+        }
+
+        return redirect()->to('/outlet/my-outlets')->with('error', 'Gagal menghapus outlet.');
     }
 }
