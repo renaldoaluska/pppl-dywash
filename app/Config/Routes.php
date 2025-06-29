@@ -69,6 +69,8 @@ $routes->get('/outlet/(:num)/reviews', 'OutletController::showReviewsForOutlet/$
 $routes->get('/outlet/profile', 'OutletController::profile');
 // Rute BARU untuk menampilkan form edit profil
 $routes->get('/outlet/profile/edit', 'OutletController::editProfile');
+// Rute untuk menampilkan halaman detail pesanan
+$routes->get('/outlet/orders/detail/(:num)', 'OutletController::showOrderDetail/$1');
 
 // Rute BARU untuk memproses update profil
 $routes->post('/outlet/profile/update', 'OutletController::updateProfile');
