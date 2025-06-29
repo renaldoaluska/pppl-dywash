@@ -1,44 +1,49 @@
-<?= $this->extend('auth/layout') ?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="<?= base_url('assets/img/favicon.ico') ?>">
+    <title>Registrasi - DyWash</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-white">
 
-<?= $this->section('title') ?>
-Register
-<?= $this->endSection() ?>
-
-<?= $this->section('content') ?>
   <div class="container mx-auto p-6 md:p-8 max-w-lg">
     
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-gray-800">Registrasi</h1>
-      <p class="text-gray-500 mt-1">Buat akun customer untuk memulai</p>
+      <p class="text-gray-500 mt-1">Buat akun untuk memulai</p>
     </div>
 
     <form id="register-form" method="post" action="<?= site_url('auth/register/') ?>" autocomplete="off" novalidate>
       <input type="hidden" name="role" value="<?= esc($role, 'attr') ?>">
+      
       <div class="mb-5">
-        <label for="name-input" class="block mb-2 text-sm font-medium text-gray-700">Nama Lengkap</label>
+        <label for="name-input" class="block mb-2 text-sm font-bold text-gray-700">Nama Lengkap</label>
         <div id="name-container" class="border rounded-xl focus-within:ring-2 focus-within:ring-blue-400 transition-all duration-200">
-          <input type="text" id="name-input" name="name" placeholder="Masukkan nama lengkap Anda" required class="outline-none bg-white rounded-xl px-3 flex-1 py-2.5 text-gray-700 w-full">
+          <input type="text" id="name-input" name="name" placeholder="Masukkan nama lengkap Anda" required class="outline-none bg-white rounded-xl px-3 flex-1 py-2.5 text-gray-700 w-full caret-blue-600" value="<?= old('name') ?>">
         </div>
       </div>
 
       <div class="mb-5">
-        <label for="email-input" class="block mb-2 text-sm font-medium text-gray-700">Alamat Email</label>
+        <label for="email-input" class="block mb-2 text-sm font-bold text-gray-700">Alamat Email</label>
         <div id="email-container" class="border rounded-xl focus-within:ring-2 focus-within:ring-blue-400 transition-all duration-200">
-          <input type="email" id="email-input" name="email" placeholder="contoh@email.com" required class="outline-none bg-white rounded-xl px-3 flex-1 py-2.5 text-gray-700 w-full">
+          <input type="email" id="email-input" name="email" placeholder="contoh@email.com" required class="outline-none bg-white rounded-xl px-3 flex-1 py-2.5 text-gray-700 w-full caret-blue-600" value="<?= old('email') ?>">
         </div>
       </div>
 
       <div class="mb-5">
-        <label for="password-input" class="block mb-2 text-sm font-medium text-gray-700">Kata Sandi</label>
+        <label for="password-input" class="block mb-2 text-sm font-bold text-gray-700">Kata Sandi</label>
         <div id="password-container" class="border rounded-xl focus-within:ring-2 focus-within:ring-blue-400 transition-all duration-200">
-          <input type="password" id="password-input" name="password" placeholder="minimal 8 karakter" required class="outline-none bg-white rounded-xl px-3 flex-1 py-2.5 text-gray-700 w-full">
+          <input type="password" id="password-input" name="password" placeholder="minimal 8 karakter" required class="outline-none bg-white rounded-xl px-3 flex-1 py-2.5 text-gray-700 w-full caret-blue-600">
         </div>
       </div>
 
       <div class="mb-6">
-        <label for="confirm-password-input" class="block mb-2 text-sm font-medium text-gray-700">Konfirmasi Kata Sandi</label>
+        <label for="confirm-password-input" class="block mb-2 text-sm font-bold text-gray-700">Konfirmasi Kata Sandi</label>
         <div id="confirm-password-container" class="border rounded-xl focus-within:ring-2 focus-within:ring-blue-400 transition-all duration-200">
-          <input type="password" id="confirm-password-input" name="confirm_password" placeholder="Ulangi kata sandi Anda" required class="outline-none bg-white rounded-xl px-3 flex-1 py-2.5 text-gray-700 w-full">
+          <input type="password" id="confirm-password-input" name="confirm_password" placeholder="Ulangi kata sandi Anda" required class="outline-none bg-white rounded-xl px-3 flex-1 py-2.5 text-gray-700 w-full caret-blue-600">
         </div>
       </div>
 
@@ -67,6 +72,8 @@ Register
     </p>
 
   </div>
+
+<!-- Kumpulan Pop-up Alert -->
 <?php if (session()->getFlashdata('error_email_exists')): ?>
 <div id="server-error-popup" 
      class="fixed bottom-5 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-red-600 text-white py-3 px-4 rounded-lg shadow-xl text-center opacity-0 transform translate-y-10 transition-all duration-500 ease-out pointer-events-none">
@@ -99,36 +106,30 @@ Register
     <p class="font-bold">Registrasi Gagal!</p>
     <p class="text-sm">Harap setujui Syarat & Ketentuan serta Kebijakan Privasi.</p>
 </div>
+
+<!-- Kumpulan Script -->
 <script>
-    // == FUNGSI POP-UP YANG BISA DIPAKAI ULANG ==
     function showPopup(popupId) {
         const popupElement = document.getElementById(popupId);
         if (!popupElement) return;
-        
-        // Sembunyikan pop-up lain jika ada yang aktif
         document.querySelectorAll('.fixed.bottom-5').forEach(p => {
             if(p.id !== popupId) p.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
         });
-
         popupElement.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
-        
         setTimeout(() => {
             popupElement.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
         }, 7000);
     }
 
-    // == KUMPULAN SEMUA LOGIKA VALIDASI ==
     document.addEventListener('DOMContentLoaded', () => {
-        // --- 1. Cek & Tampilkan Error dari Server (Email Exists) ---
         const serverErrorPopup = document.getElementById('server-error-popup');
         if(serverErrorPopup) {
             showPopup('server-error-popup');
             document.getElementById('email-container').classList.add('border-red-500', 'border-2');
         }
 
-        // --- 2. Inisialisasi Elemen Form ---
         const registerForm = document.getElementById('register-form');
-        if (!registerForm) return; // Hentikan jika form tidak ada
+        if (!registerForm) return;
 
         const nameInput = document.getElementById('name-input');
         const emailInput = document.getElementById('email-input');
@@ -139,34 +140,25 @@ Register
         const nameContainer = document.getElementById('name-container');
         const emailContainer = document.getElementById('email-container');
         const passwordContainer = document.getElementById('password-container');
-        const confirmContainer = document.getElementById('confirm-password-input').parentNode; // Ambil parent div
-
+        const confirmContainer = document.getElementById('confirm-password-container');
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        // --- 3. Validasi Final Saat Tombol "Daftar" Ditekan ---
         registerForm.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            // Ambil semua value terbaru
             const nameValue = nameInput.value.trim();
             const emailValue = emailInput.value.trim();
             const passwordValue = passwordInput.value.trim();
             const confirmValue = confirmInput.value.trim();
 
-            // Reset semua border merah
             [nameContainer, emailContainer, passwordContainer, confirmContainer].forEach(container => {
                 container.classList.remove('border-red-500', 'border-2');
             });
             
-            // --- Mulai Pengecekan Berurutan ---
-            
-            // Aturan #1: Checkbox Syarat & Ketentuan
             if (!termsCheckbox.checked) {
                 showPopup('terms-popup');
                 return;
             }
-
-            // Aturan #2: Kolom Kosong
             if (nameValue === '' || emailValue === '' || passwordValue === '' || confirmValue === '') {
                 if (nameValue === '') nameContainer.classList.add('border-red-500', 'border-2');
                 if (emailValue === '') emailContainer.classList.add('border-red-500', 'border-2');
@@ -175,22 +167,16 @@ Register
                 showPopup('empty-fields-popup');
                 return;
             }
-            
-            // Aturan #3: Format Email Valid
             if (!emailRegex.test(emailValue)) {
                 emailContainer.classList.add('border-red-500', 'border-2');
                 showPopup('email-format-popup');
                 return;
             }
-            
-            // Aturan #4: Panjang Password Minimal
             if (passwordValue.length < 8) {
                 passwordContainer.classList.add('border-red-500', 'border-2');
                 showPopup('password-length-popup');
                 return;
             }
-
-            // Aturan #5: Konfirmasi Password Cocok
             if (passwordValue !== confirmValue) {
                 passwordContainer.classList.add('border-red-500', 'border-2');
                 confirmContainer.classList.add('border-red-500', 'border-2');
@@ -198,10 +184,9 @@ Register
                 return;
             }
 
-            // --- Jika semua validasi lolos, kirim form ---
             registerForm.submit();
         });
     });
 </script>
-
-<?= $this->endSection() ?>
+</body>
+</html>

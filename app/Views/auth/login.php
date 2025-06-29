@@ -1,76 +1,81 @@
-<?= $this->extend('auth/layout') ?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="<?= base_url('assets/img/favicon.ico') ?>">
+    <title>Login - DyWash</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-blue-50">
 
-<?= $this->section('title') ?>
-Login
-<?= $this->endSection() ?>
+<!-- Wrapper utama untuk layout flexbox vertikal -->
+<div class="flex flex-col min-h-screen">
 
-<?= $this->section('content') ?>
-  <div class="flex-1 flex flex-col justify-center">
-    <!-- Logo/Ilustrasi -->
-    <div class="flex flex-col items-center bg-blue-50 py-10">
-      <div class="bg-white rounded-lg w-20 h-20 flex items-center justify-center shadow">
-        <img src="<?= base_url('assets/img/icon.png') ?>" alt="Ilustrasi Login" class="w-16 h-16 object-contain">
-      </div>
-    </div>
-  </div>
-
-  <div class="bg-white rounded-t-3xl px-6 pt-8 pb-8 shadow-lg max-w-md w-full mx-auto -mt-8">
-    <h1 class="text-2xl font-bold mb-4 text-gray-800">Selamat Datang!</h1>
-    
-    <form id="login-form" method="post" action="<?= site_url('auth/login/') ?>" autocomplete="off" novalidate>
-      <div class="mb-4">
-        <div id="email-container" class="flex items-center border rounded-lg px-3 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-400 transition-all duration-200">
-          <svg class="w-5 h-5 text-gray-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-          <input id="email-input" type="email" name="email" placeholder="Alamat Email" required class="outline-none bg-transparent flex-1 py-3 text-gray-700">
+    <!-- Area Logo (Atas): Dibuat untuk tumbuh dan mendorong form ke bawah -->
+    <!-- PERUBAHAN: Menggunakan 'items-center' untuk menaikkan logo, bukan 'items-end' -->
+    <div class="flex-grow flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-24 h-24 flex items-center justify-center shadow-lg">
+            <img src="<?= base_url('assets/img/icon.png') ?>" alt="Logo DyWash" class="w-16 h-16 object-contain">
         </div>
-      </div>
-      <div class="mb-2">
-        <div id="password-container" class="flex items-center border rounded-lg px-3 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-400 transition-all duration-200">
-          <svg class="w-5 h-5 text-gray-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-          <input id="password-input" type="password" name="password" placeholder="Kata Sandi" required class="outline-none bg-transparent flex-1 py-3 text-gray-700">
-        </div>
-      </div>
-      <div class="flex justify-end mb-5"><a href="#" class="text-sm text-blue-600 hover:underline">Lupa kata sandi?</a></div>
-      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mb-4 transition transform hover:scale-105 duration-300 ease-in-out">Masuk</button>
-    </form>
-    
-    <div class="text-center text-sm text-gray-600">
-      Belum punya akun? 
-      <button type="button" id="open-register-modal" class="text-blue-600 font-semibold hover:underline focus:outline-none">
-        Daftar sekarang
-      </button>
     </div>
-    <div class="flex items-center my-4"><div class="flex-grow border-t border-gray-200"></div><span class="mx-3 text-gray-400 text-xs font-medium">Atau lanjut dengan</span><div class="flex-grow border-t border-gray-200"></div></div>
-    <div class="flex justify-center gap-4">
-      <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm hover:bg-gray-50 transition transform hover:scale-110"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="w-6 h-6"></button>
-      <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm hover:bg-gray-50 transition transform hover:scale-110"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook" class="w-6 h-6"></button>
-    </div>
-  </div>
-  
-  <script>
-    function setViewportHeight() { let vh = window.innerHeight * 0.01; document.documentElement.style.setProperty('--vh', `${vh}px`); }
-    setViewportHeight();
-    window.addEventListener('orientationchange', setViewportHeight);
-  </script>
 
-  <?php if (!empty($error_login)): ?>
-  <div id="login-alert-popup" class="fixed bottom-5 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-red-600 text-white py-3 px-4 rounded-lg shadow-xl text-center opacity-0 transform translate-y-10 transition-all duration-500 ease-out pointer-events-none">
+    <!-- Area Form (Bawah): Kotak putih yang menempel di bawah -->
+    <div class="bg-white rounded-t-3xl px-6 pt-8 pb-8 shadow-2xl flex-shrink-0">
+        <div class="max-w-md mx-auto">
+            <h1 class="text-2xl font-bold mb-4 text-gray-800">Selamat Datang!</h1>
+            
+            <form id="login-form" method="post" action="<?= site_url('auth/login/') ?>" autocomplete="off" novalidate>
+                <div class="mb-4">
+                    <div id="email-container" class="flex items-center border rounded-lg px-3 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-400 transition-all duration-200">
+                        <svg class="w-5 h-5 text-gray-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        <input id="email-input" type="email" name="email" placeholder="Alamat Email" required class="outline-none bg-transparent flex-1 py-3 text-gray-700">
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div id="password-container" class="flex items-center border rounded-lg px-3 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-400 transition-all duration-200">
+                        <svg class="w-5 h-5 text-gray-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                        <input id="password-input" type="password" name="password" placeholder="Kata Sandi" required class="outline-none bg-transparent flex-1 py-3 text-gray-700">
+                    </div>
+                </div>
+                <div class="flex justify-end mb-5"><a href="#" class="text-sm text-blue-600 hover:underline">Lupa kata sandi?</a></div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mb-4 transition transform hover:scale-105 duration-300 ease-in-out">Masuk</button>
+            </form>
+            
+            <div class="text-center text-sm text-gray-600">
+                Belum punya akun? 
+                <button type="button" id="open-register-modal" class="text-blue-600 font-semibold hover:underline focus:outline-none">
+                    Daftar sekarang
+                </button>
+            </div>
+            <div class="flex items-center my-4"><div class="flex-grow border-t border-gray-200"></div><span class="mx-3 text-gray-400 text-xs font-medium">Atau lanjut dengan</span><div class="flex-grow border-t border-gray-200"></div></div>
+            <div class="flex justify-center gap-4">
+                <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm hover:bg-gray-50 transition transform hover:scale-110"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="w-6 h-6"></button>
+                <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm hover:bg-gray-50 transition transform hover:scale-110"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook" class="w-6 h-6"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Semua Pop-up dan Modal diletakkan di sini, di luar wrapper utama -->
+<?php if (!empty($error_login)): ?>
+<div id="login-alert-popup" class="fixed bottom-5 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-red-600 text-white py-3 px-4 rounded-lg shadow-xl text-center opacity-0 transform translate-y-10 transition-all duration-500 ease-out pointer-events-none">
     <p class="font-bold">Login Gagal!</p>
     <p class="text-sm">Email atau password yang Anda masukkan salah.</p>
-  </div>
-  <?php endif; ?>
+</div>
+<?php endif; ?>
 
-  <div id="validation-alert-popup" class="fixed bottom-5 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-red-600 text-white py-3 px-4 rounded-lg shadow-xl text-center opacity-0 transform translate-y-10 transition-all duration-500 ease-out pointer-events-none">
+<div id="validation-alert-popup" class="fixed bottom-5 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-red-600 text-white py-3 px-4 rounded-lg shadow-xl text-center opacity-0 transform translate-y-10 transition-all duration-500 ease-out pointer-events-none">
     <p class="font-bold">Login Gagal!</p>
     <p class="text-sm">Harap lengkapi semua kolom.</p>
-  </div>
-  
-  <div id="email-format-alert-popup" class="fixed bottom-5 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-red-600 text-white py-3 px-4 rounded-lg shadow-xl text-center opacity-0 transform translate-y-10 transition-all duration-500 ease-out pointer-events-none">
+</div>
+ 
+<div id="email-format-alert-popup" class="fixed bottom-5 left-1/2 -translate-x-1/2 w-11/12 max-w-md bg-red-600 text-white py-3 px-4 rounded-lg shadow-xl text-center opacity-0 transform translate-y-10 transition-all duration-500 ease-out pointer-events-none">
     <p class="font-bold">Input Tidak Valid!</p>
     <p class="text-sm">Format email yang Anda masukkan tidak valid.</p>
-  </div>
+</div>
 
-  <div id="register-role-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 z-50 flex justify-center items-center p-4">
+<div id="register-role-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 z-50 flex justify-center items-center p-4">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
         <div class="flex justify-end"><button id="close-register-modal" class="text-gray-400 hover:text-gray-700 focus:outline-none"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
         <h3 class="text-xl font-bold text-gray-800 mb-2">Daftar Sebagai</h3>
@@ -80,9 +85,14 @@ Login
             <a href="<?= site_url('auth/register?role=outlet') ?>" class="block w-full bg-white hover:bg-gray-100 text-blue-600 font-bold py-3 px-4 rounded-xl shadow-md border border-gray-200 transition transform hover:scale-105">Saya Pemilik Laundry</a>
         </div>
     </div>
-  </div>
-  <script>
-    // == FUNGSI POP-UP YANG BISA DIPAKAI ULANG ==
+</div>
+
+<!-- Kumpulan Script -->
+<script>
+    function setViewportHeight() { let vh = window.innerHeight * 0.01; document.documentElement.style.setProperty('--vh', `${vh}px`); }
+    setViewportHeight();
+    window.addEventListener('orientationchange', setViewportHeight);
+
     function showPopup(popupId) {
         const popupElement = document.getElementById(popupId);
         if (!popupElement) return;
@@ -92,10 +102,7 @@ Login
         }, 7000);
     }
 
-    // == KUMPULAN SEMUA LOGIKA HALAMAN LOGIN ==
     document.addEventListener('DOMContentLoaded', () => {
-        
-        // --- 1. Logika untuk Modal Registrasi ---
         const modal = document.getElementById('register-role-modal');
         const openBtn = document.getElementById('open-register-modal');
         const closeBtn = document.getElementById('close-register-modal');
@@ -108,13 +115,11 @@ Login
             });
         }
         
-        // --- 2. Logika untuk Error dari Server ---
         const serverErrorPopup = document.getElementById('login-alert-popup');
         if(serverErrorPopup) {
             showPopup('login-alert-popup');
         }
 
-        // --- 3. Logika untuk Validasi Form Login ---
         const loginForm = document.getElementById('login-form');
         if(!loginForm) return;
 
@@ -157,6 +162,7 @@ Login
             loginForm.submit();
         });
     });
-  </script>
+</script>
 
-<?= $this->endSection() ?>
+</body>
+</html>
