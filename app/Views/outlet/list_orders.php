@@ -38,7 +38,7 @@ $statusColors = [
     <div class="space-y-4">
         <?php if (!empty($pending_orders)): ?>
             <?php foreach ($pending_orders as $order): ?>
-                <!-- PERUBAHAN: Kartu sekarang dibungkus dengan tag <a> -->
+                <!-- Kartu sekarang menjadi link ke halaman detail -->
                 <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" class="block bg-white border border-gray-200 rounded-xl transition-all duration-300 hover:shadow-lg hover:border-blue-400">
                     <div class="p-4">
                         <div class="flex items-start justify-between">
@@ -54,7 +54,8 @@ $statusColors = [
                     </div>
                     <!-- Form Aksi Update Status dengan Tombol Kontekstual -->
                     <div class="bg-gray-50 px-4 py-3 rounded-b-xl">
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2" onclick="event.stopPropagation();">
+                        <!-- PERBAIKAN: Menambahkan onclick="event.stopPropagation();" untuk mencegah klik merambat ke <a> induk -->
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-2" onclick="event.stopPropagation(); event.preventDefault();">
                             <?php if ($order['status'] == 'diterima'): ?>
                                 <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
                                     <?= csrf_field() ?>
@@ -76,7 +77,7 @@ $statusColors = [
                                 <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
                                     <?= csrf_field() ?>
                                     <input type="hidden" name="status" value="dikirim">
-                                    <button type="button" class="update-btn w-full px-4 py-2 text-sm font-medium text-black bg-slate-600 rounded-lg hover:bg-slate-700">Kirim ke Customer</button>
+                                    <button type="button" class="update-btn w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Kirim ke Customer</button>
                                 </form>
                             <?php elseif ($order['status'] == 'dikirim'): ?>
                                  <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
@@ -101,7 +102,6 @@ $statusColors = [
     <div class="space-y-4">
         <?php if (!empty($history_orders)): ?>
             <?php foreach ($history_orders as $order): ?>
-                <!-- PERUBAHAN: Kartu riwayat juga dibungkus tag <a> -->
                 <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" class="block bg-white border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-blue-400">
                     <div class="flex items-start justify-between">
                         <div>
@@ -145,6 +145,7 @@ $statusColors = [
         let formToSubmit = null;
         document.querySelectorAll('.update-btn').forEach(button => {
             button.addEventListener('click', function(event) {
+                // event.stopPropagation() tidak diperlukan di sini karena kita mencegah default di div pembungkus
                 formToSubmit = event.target.closest('form');
                 modal.classList.add('flex');
                 modal.classList.remove('hidden');
