@@ -132,7 +132,7 @@ class OutletController extends BaseController
 
     // --- FUNGSI KELOLA PESANAN ---
     public function listOrders()
-     {
+    {
         $orderModel = new OrderModel();
         $outletModel = new OutletModel();
         
@@ -144,21 +144,29 @@ class OutletController extends BaseController
 
         $outletIds = array_column($outlets, 'outlet_id');
         
+        // PERUBAHAN UTAMA: Query dibuat lebih eksplisit untuk setiap grup
+
+        // Grup 1: Pesanan Aktif (yang belum selesai/ditolak)
         $data['pending_orders'] = $orderModel
-            ->whereIn('orders.outlet_id', $outletIds)
-            ->whereNotIn('orders.status', ['selesai', 'diulas', 'ditolak'])
+            ->join('payments', 'payments.order_id = orders.order_id')
             ->join('users', 'users.user_id = orders.customer_id')
             ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+            ->whereIn('orders.outlet_id', $outletIds)
+            ->whereIn('payments.status', ['lunas', 'cod'])
+            ->whereNotIn('orders.status', ['selesai', 'diulas', 'ditolak'])
+            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name') // Select eksplisit
             ->orderBy('orders.created_at', 'ASC')
             ->findAll();
         
+        // Grup 2: Riwayat Pesanan (yang sudah selesai/ditolak)
         $data['history_orders'] = $orderModel
-            ->whereIn('orders.outlet_id', $outletIds)
-            ->whereIn('orders.status', ['selesai', 'diulas', 'ditolak'])
+            ->join('payments', 'payments.order_id = orders.order_id')
             ->join('users', 'users.user_id = orders.customer_id')
             ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+            ->whereIn('orders.outlet_id', $outletIds)
+            ->whereIn('payments.status', ['lunas', 'cod'])
+            ->whereIn('orders.status', ['selesai', 'diulas', 'ditolak'])
+            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name') // Select eksplisit
             ->orderBy('orders.created_at', 'DESC')
             ->findAll();
         
