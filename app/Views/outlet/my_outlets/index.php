@@ -12,7 +12,7 @@ Outlet Saya
         <h3 class="text-lg font-semibold text-gray-700">Kelola Outlet Anda</h3>
         <p class="text-sm text-gray-500 mt-1">Tambah, edit, dan kelola layanan untuk setiap outlet.</p>
     </div>
-    <a href="/outlet/my-outlets/create" class="w-full sm:w-auto mt-4 sm:mt-0 px-4 py-2 text-sm text-center font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+    <a href="/outlet/create" class="w-full sm:w-auto mt-4 sm:mt-0 px-4 py-2 text-sm text-center font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
         Tambah Outlet Baru
     </a>
 </div>

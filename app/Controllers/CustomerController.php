@@ -17,6 +17,11 @@ class CustomerController extends BaseController
      * Fitur: Melihat/Mencari Outlet
      * Menampilkan halaman dengan daftar semua outlet yang tersedia.
      */
+    public function dashboard()
+{
+    return view('dashboard/customer');
+}
+
 public function listOutlet()
 {
     $outletModel = new OutletModel();
@@ -206,12 +211,14 @@ public function storeOrder()
         
         // Logika berdasarkan metode pembayaran
         if ($payment_method === 'cod') {
-            $paymentData['status'] = 'lunas';
+            $paymentData['status'] = 'cod';
             // Langsung ubah status pesanan menjadi 'diterima'
             $orderModel->update($order_id, ['status' => 'diterima']);
         } else { // Untuk 'transfer' dan 'ewallet'
             $paymentData['status'] = 'pending';
             // Status pesanan tetap 'menunggu_pembayaran' sampai admin verifikasi
+            // Langsung ubah status pesanan menjadi 'diterima'
+            $orderModel->update($order_id, ['status' => 'diterima']);
         }
 
         $paymentModel->save($paymentData);

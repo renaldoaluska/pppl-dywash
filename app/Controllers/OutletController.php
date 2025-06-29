@@ -219,6 +219,36 @@ class OutletController extends BaseController
         // 5. Tampilkan view 'list_reviews' dan kirim datanya
         return view('outlet/list_reviews', $data);
     }
+    public function listReviewsForOutlet($outlet_id)
+    {
+        $reviewModel = new ReviewModel();
+        $outletModel = new OutletModel();
+
+        // Validasi Keamanan (tetap sama)
+        $outlet = $outletModel->find($outlet_id);
+        if (!$outlet || $outlet['owner_id'] != session()->get('user_id')) {
+            return redirect()->to('/dashboard')->with('error', 'Anda tidak memiliki akses ke ulasan outlet ini.');
+        }
+
+        // Ambil semua ulasan yang memiliki outlet_id yang sama
+        $reviews = $reviewModel
+            ->where('reviews.outlet_id', $outlet_id)
+            ->join('users', 'users.user_id = reviews.customer_id')
+            // REVISI 1: Mengubah `created_at` menjadi `review_date` di SELECT
+            ->select('reviews.rating, reviews.comment, reviews.review_date, users.name as customer_name')
+            // REVISI 2: Mengubah `created_at` menjadi `review_date` di ORDER BY
+            ->orderBy('reviews.review_date', 'DESC')
+            ->findAll();
+        
+        // Kirim data ke view
+        $data = [
+            'reviews'           => $reviews,
+            'outlet'    => $outlet
+        ];
+
+        return view('outlet/list_reviews', $data); 
+    }
+    
 
     // --- FUNGSI KELOLA LAYANAN ---
     
@@ -242,6 +272,7 @@ class OutletController extends BaseController
         
         return view('outlet/services/index', $data);
     }
+    
 
     public function createService($outlet_id)
     {

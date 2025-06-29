@@ -21,6 +21,7 @@ $routes->get('/auth/register', 'AuthController::register');
 $routes->post('/auth/register', 'AuthController::register');
 
 // Rute untuk fitur-fitur Customer
+$routes->get('/customer/dashboard', 'CustomerController::dashboard');
 $routes->get('/customer/outlet', 'CustomerController::listOutlet');
 $routes->get('/customer/order/create/(:num)', 'CustomerController::createOrder/$1');
 $routes->post('/customer/order/store', 'CustomerController::storeOrder');
@@ -44,6 +45,7 @@ $routes->get('/customer/profil', 'CustomerController::cekProfil');
 // Rute untuk manajemen banyak outlet
 $routes->get('/outlet/my-outlets', 'OutletController::listMyOutlets');
 $routes->get('/outlet/edit/(:num)', 'OutletController::editOutletForm/$1');
+
 // di dalam app/Config/Routes.php
 
 // Rute untuk menampilkan halaman form tambah outlet baru
