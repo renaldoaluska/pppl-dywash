@@ -25,21 +25,44 @@ Detail Pesanan
         </div>
         <div>
             <p class="text-slate-500">Status Pesanan</p>
-            <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
-                <?= ($order['status'] == 'selesai' || $order['status'] == 'diulas') ? 'bg-green-100 text-green-800' :
-                    (($order['status'] == 'diproses' || $order['status'] == 'dijemput' || $order['status'] == 'dikirim') ? 'bg-yellow-100 text-yellow-800' :
-                    ($order['status'] == 'ditolak' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-800')) ?>">
-                <?= ucfirst($order['status']) ?>
-            </span>
+<span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
+    <?php
+        if ($order['status'] == 'diterima') {
+            echo 'bg-blue-100 text-blue-800';
+        } elseif ($order['status'] == 'diambil' || $order['status'] == 'dikirim') {
+            echo 'bg-purple-100 text-purple-800';
+        } elseif ($order['status'] == 'selesai' || $order['status'] == 'diulas') {
+            echo 'bg-green-100 text-green-800';
+        } elseif ($order['status'] == 'ditolak') {
+            echo 'bg-red-100 text-red-800';
+        } else {
+            echo 'bg-gray-200 text-gray-800';
+        }
+    ?>">
+    <?= ucfirst($order['status']) ?>
+</span>
+
         </div>
         <div>
-            <p class="text-slate-500">Status Pembayaran</p>
-            <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
-                <?= ($order['payment_status'] == 'lunas') ? 'bg-green-100 text-green-800' :
-                    (($order['payment_status'] == 'pending') ? 'bg-yellow-100 text-yellow-800' :
-                    ($order['payment_status'] == 'gagal' ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-800')) ?>">
-                <?= ucfirst($order['payment_status'] ?? '-') ?>
-            </span>
+<p class="text-slate-500">Status Pembayaran</p>
+<span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
+    <?php
+        if ($order['payment_status'] == 'pending') {
+            echo 'bg-yellow-100 text-yellow-800';
+        } elseif ($order['payment_status'] == 'lunas') {
+            echo 'bg-green-100 text-green-800';
+        } elseif ($order['payment_status'] == 'gagal') {
+            echo 'bg-red-100 text-red-800';
+        } elseif ($order['payment_status'] == 'cod') {
+            echo 'bg-blue-100 text-blue-800';
+        } else {
+            echo 'bg-gray-200 text-gray-800';
+        }
+    ?>">
+    <?= ucfirst($order['payment_status'] ?? '-') ?>
+</span>
+
+
         </div>
         <div>
             <p class="text-slate-500">Metode Pembayaran</p>

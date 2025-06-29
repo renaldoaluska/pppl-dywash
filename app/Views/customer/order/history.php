@@ -39,12 +39,13 @@ Riwayat Pesanan
 </style>
 
 <?php
-    $statuses = ['diterima', 'diproses', 'selesai', 'diulas', 'ditolak'];
+    $statuses = ['diterima', 'diambil', 'dikirim', 'selesai', 'diulas', 'ditolak'];
     $statusColors = [
         'diterima' => 'bg-blue-100 text-blue-800',
-        'diproses' => 'bg-yellow-100 text-yellow-800',
+        'diambil'  => 'bg-purple-100 text-purple-800',
+        'dikirim'  => 'bg-purple-100 text-purple-800',
         'selesai'  => 'bg-green-100 text-green-800',
-        'diulas'   => 'bg-slate-200 text-slate-800',
+        'diulas'   => 'bg-green-100 text-green-800',
         'ditolak'  => 'bg-red-100 text-red-800',
     ];
 ?>
@@ -82,15 +83,14 @@ Riwayat Pesanan
 
 <!-- STATUS PEMBAYARAN (Kotak Abu di Atas) -->
 <div class="bg-gray-50 px-4 py-2 rounded-t-xl border-b border-slate-200 -mx-5 -mt-5 mb-2">
-  <!--<p class="text-xs text-slate-500 mb-1">Pembayaran</p>-->
   <?php if ($order['payment_status'] == 'pending'): ?>
-    <p class="text-red-500 text-sm font-medium">Menunggu pembayaran</p>
-  <?php elseif ($order['payment_status'] == 'cod'): ?>
-    <p class="text-green-600 text-sm font-medium">COD</p>
+    <p class="text-yellow-600 text-sm font-medium">Menunggu pembayaran</p>
   <?php elseif ($order['payment_status'] == 'lunas'): ?>
     <p class="text-green-600 text-sm font-medium">Lunas</p>
   <?php elseif ($order['payment_status'] == 'gagal'): ?>
     <p class="text-red-600 text-sm font-medium">Pembayaran gagal</p>
+  <?php elseif ($order['payment_status'] == 'cod'): ?>
+    <p class="text-blue-600 text-sm font-medium">COD</p>
   <?php else: ?>
     <p class="text-gray-500 text-sm font-medium">Belum konfirmasi</p>
   <?php endif; ?>
