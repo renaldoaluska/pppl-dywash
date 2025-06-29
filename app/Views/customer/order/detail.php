@@ -27,17 +27,23 @@ Detail Pesanan
             <p class="text-slate-500">Status Pesanan</p>
 <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
     <?php
-        if ($order['status'] == 'diterima') {
-            echo 'bg-blue-100 text-blue-800';
-        } elseif ($order['status'] == 'diambil' || $order['status'] == 'dikirim') {
-            echo 'bg-purple-100 text-purple-800';
-        } elseif ($order['status'] == 'selesai' || $order['status'] == 'diulas') {
-            echo 'bg-green-100 text-green-800';
-        } elseif ($order['status'] == 'ditolak') {
-            echo 'bg-red-100 text-red-800';
-        } else {
-            echo 'bg-gray-200 text-gray-800';
-        }
+    if ($order['status'] == 'diterima') {
+    echo 'bg-blue-100 text-blue-800';
+} elseif ($order['status'] == 'ditolak') {
+    echo 'bg-red-100 text-red-800';
+} elseif ($order['status'] == 'diambil') {
+    echo 'bg-purple-100 text-purple-800';
+} elseif ($order['status'] == 'dicuci') {
+    echo 'bg-yellow-100 text-yellow-800';
+} elseif ($order['status'] == 'dikirim') {
+    echo 'bg-teal-100 text-teal-800';
+} elseif ($order['status'] == 'selesai') {
+    echo 'bg-green-100 text-green-800';
+} elseif ($order['status'] == 'diulas') {
+    echo 'bg-green-200 text-green-900';
+} else {
+    echo 'bg-gray-200 text-gray-800';
+}
     ?>">
     <?= ucfirst($order['status']) ?>
 </span>
