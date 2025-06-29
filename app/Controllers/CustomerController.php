@@ -296,36 +296,56 @@ public function monitorOrder()
     }
 
     // NAMA METHOD DIUBAH: Untuk memproses form ganti password
-    public function processChangePassword()
-    {
-        $rules = [
-            'password_lama'     => 'required',
-            'password_baru'     => 'required|min_length[8]',
-            'konfirmasi_password' => 'required|matches[password_baru]',
-        ];
+// app/Controllers/CustomerController.php
 
-        if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
+public function processChangePassword()
+{
+    $rules = [
+        'password_lama' => 'required',
+        'password_baru' => 'required|min_length[8]',
+        'konfirmasi_password' => 'required|matches[password_baru]',
+    ];
 
-        $userModel = new \App\Models\UserModel();
-        $userId = session('user_id');
-        $user = $userModel->find($userId);
+    // Tambahkan pesan error kustom dalam Bahasa Indonesia
+    $errors = [
+        'password_baru' => [
+            'min_length' => 'Password baru minimal harus 8 karakter.'
+        ],
+        'konfirmasi_password' => [
+            'matches' => 'Konfirmasi password tidak cocok dengan password baru.'
+        ]
+    ];
 
-        if ($this->request->getPost('password_lama') !== $user['password']) {
-            return redirect()->back()->with('toast', [
-                'type' => 'error', 
-                'message' => 'Password lama yang Anda masukkan salah.'
-            ]);
-        }
-        
-        $newPassword = $this->request->getPost('password_baru');
-        $userModel->update($userId, ['password' => $newPassword]);
+    // PERUBAHAN UTAMA DI SINI
+    if (!$this->validate($rules, $errors)) {
+        // Ambil pesan error pertama yang muncul
+        $errorMsg = array_values($this->validator->getErrors())[0];
 
-        return redirect()->to('/customer/profil')->with('toast', [
-            'type' => 'success', 
-            'message' => 'Password berhasil diganti!'
+        // Redirect kembali dengan TOAST, bukan dengan array 'errors'
+        return redirect()->back()->withInput()->with('toast', [
+            'type' => 'error',
+            'message' => $errorMsg
         ]);
     }
+
+    $userModel = new \App\Models\UserModel();
+    $userId = session('user_id');
+    $user = $userModel->find($userId);
+
+    if ($this->request->getPost('password_lama') !== $user['password']) {
+        return redirect()->back()->with('toast', [
+            'type' => 'error',
+            'message' => 'Password lama yang Anda masukkan salah.'
+        ]);
+    }
+    
+    $newPassword = $this->request->getPost('password_baru');
+    $userModel->update($userId, ['password' => $newPassword]);
+
+    return redirect()->to('/customer/profil')->with('toast', [
+        'type' => 'success',
+        'message' => 'Password berhasil diganti!'
+    ]);
+}
     
 }
