@@ -12,7 +12,7 @@ Outlet Saya
         <h3 class="text-lg font-semibold text-gray-700">Kelola Outlet Anda</h3>
         <p class="text-sm text-gray-500 mt-1">Tambah, edit, dan lihat ulasan untuk setiap outlet.</p>
     </div>
-    <a href="/outlet/my-outlets/create" class="w-full sm:w-auto mt-4 sm:mt-0 px-4 py-2 text-sm text-center font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+    <a href="/outlet/create" class="w-full sm:w-auto mt-4 sm:mt-0 px-4 py-2 text-sm text-center font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
         Tambah Outlet Baru
     </a>
 </div>
@@ -58,7 +58,7 @@ Outlet Saya
                 </div>
                 <!-- Bagian Aksi (Tombol) -->
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-col sm:flex-row justify-end gap-3 rounded-b-xl">
-                    <a href="#" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
+                    <a href="/outlet/edit/<?= $outlet['outlet_id'] ?>" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
                         Kelola Layanan
                     </a>
                     <!-- Tombol Lihat Ulasan yang mengarah ke halaman ulasan spesifik -->

@@ -45,6 +45,7 @@ $routes->get('/customer/profil', 'CustomerController::cekProfil');
 $routes->get('/outlet/my-outlets', 'OutletController::listMyOutlets');
 $routes->get('/outlet/create', 'OutletController::createOutletForm');
 $routes->get('/outlet/edit/(:num)', 'OutletController::editOutletForm/$1');
+$routes->get('/outlet/(:num)/reviews', 'OutletController::listReviewsForOutlet/$1');
 $routes->post('/outlet/store-update', 'OutletController::storeOrUpdateOutlet');
 
 // Rute lainnya tetap sama
