@@ -44,10 +44,6 @@ Riwayat Pesanan
         }
     </style>
 
-    <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold text-slate-700">Riwayat Pesanan</h2>
-    </div>
-
     <?php
         $statuses = ['diterima', 'diproses', 'selesai', 'diulas', 'ditolak'];
         $statusColors = [

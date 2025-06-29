@@ -27,6 +27,16 @@ $routes->post('/customer/order/store', 'CustomerController::storeOrder');
 $routes->get('/customer/monitor', 'CustomerController::monitorOrder');
 $routes->post('/customer/review/store', 'CustomerController::storeReview');
 $routes->get('/customer/profil', 'CustomerController::cekProfil');
+    
+    // Rute untuk Menampilkan Form Edit Profil
+    $routes->get('/customer/profil/edit', 'CustomerController::editProfil');
+    
+    // Rute untuk Memproses Update Profil (via POST dari form)
+    $routes->post('/customer/profil/update', 'CustomerController::updateProfil');
+        // RUTE BARU: Untuk menampilkan form Ganti Password
+    $routes->get('/customer/profil/ganti-password', 'CustomerController::showChangePasswordForm'); 
+    // Untuk memproses form Ganti Password
+    $routes->post('/customer/profil/ganti-password-process', 'CustomerController::processChangePassword'); 
 
 // Rute untuk fitur-fitur Outlet
 // Rute untuk manajemen banyak outlet

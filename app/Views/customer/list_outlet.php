@@ -15,8 +15,6 @@ Daftar Outlet
         <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0">Cari</button>
     </form>
     
-    <h2 class="text-xl font-bold text-slate-700 mb-4">Daftar Outlet</h2>
-
     <div class="space-y-4">
         <?php if (!empty($outlets)): ?>
             <?php foreach ($outlets as $outlet): ?>
