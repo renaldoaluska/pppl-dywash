@@ -20,7 +20,7 @@ Profil Saya
         </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow-md border border-slate-200">
+    <div class="bg-white rounded-lg shadow-md border border-slate-200 mb-6">
         <a href="/customer/profil/edit" class="flex justify-between items-center p-4 border-b border-slate-200 hover:bg-slate-50 transition-colors">
             <div class="flex items-center space-x-4">
                 <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
@@ -35,6 +35,23 @@ Profil Saya
             </div>
             <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
         </a>
+<!-- Tombol Daftar Alamat -->
+<a href="/customer/profil/alamat" class="flex justify-between items-center p-4 border-b border-slate-200 hover:bg-slate-50 transition-colors">
+    <div class="flex items-center space-x-4">
+        <!-- Icon map-pin -->
+        <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.104 0 2-.896 2-2s-.896-2-2-2-2 .896-2 2 .896 2 2 2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4.5 8-12a8 8 0 10-16 0c0 7.5 8 12 8 12z"></path>
+        </svg>
+        <span class="text-slate-700 font-medium">Daftar Alamat</span>
+    </div>
+    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+    </svg>
+</a>
+
+
+
         <a href="/logout" class="flex justify-between items-center p-4 hover:bg-red-50 transition-colors">
             <div class="flex items-center space-x-4">
                 <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>

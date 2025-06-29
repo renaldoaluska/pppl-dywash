@@ -18,6 +18,5 @@ class AddressModel extends Model
         'longitude',
         'is_primary',
     ];
-
     protected $useTimestamps = false;
 }

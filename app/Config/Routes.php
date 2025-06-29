@@ -39,6 +39,16 @@ $routes->get('/customer/profil', 'CustomerController::cekProfil');
     // Untuk memproses form Ganti Password
     $routes->post('/customer/profil/ganti-password-process', 'CustomerController::processChangePassword'); 
 
+$routes->get('/customer/profil/alamat', 'CustomerController::indexAlamat');
+$routes->get('/customer/profil/alamat/tambah', 'CustomerController::createAlamat');
+$routes->post('/customer/profil/alamat/store', 'CustomerController::storeAlamat');
+
+$routes->get('/customer/profil/alamat/edit/(:num)', 'CustomerController::editAlamat/$1');
+$routes->post('/customer/profil/alamat/update/(:num)', 'CustomerController::updateAlamat/$1');
+$routes->post('/customer/profil/alamat/delete/(:num)', 'CustomerController::deleteAlamat/$1');
+
+$routes->post('/customer/profil/alamat/set-primary/(:num)', 'CustomerController::setPrimaryAlamat/$1');
+
     $routes->get('/customer/order/detail/(:num)', 'CustomerController::orderDetail/$1');
 
 // Rute untuk fitur-fitur Outlet
