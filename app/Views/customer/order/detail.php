@@ -104,9 +104,22 @@ Detail Pesanan
         </ul>
     </div>
 
-    <a href="/customer/monitor" class="inline-block mt-4 px-5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full text-center">
-        Kembali ke Riwayat
+<div class="flex justify-between items-center mt-4">
+    <?php if (empty($order['payment_status'])): ?>
+        <a href="/customer/payment/<?= $order['order_id'] ?>"
+            class="px-4 py-1.5 bg-white border border-emerald-400 text-emerald-600 text-sm rounded-full shadow-sm hover:bg-emerald-50 transition">
+            Konfirmasi Bayar
+        </a>
+    <?php else: ?>
+        <div></div> <!-- Spacer agar tombol kanan tetap di kanan -->
+    <?php endif; ?>
+
+    <a href="/customer/monitor"
+        class="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm rounded-full shadow-sm transition">
+        Kembali
     </a>
+</div>
+
 </div>
 
 <?= $this->endSection() ?>

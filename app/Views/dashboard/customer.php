@@ -34,7 +34,7 @@ Home
                         <option value="<?= $address['address_id'] ?>" <?= ($activeAddress && $activeAddress['address_id'] == $address['address_id']) ? 'selected' : '' ?>>
                             <?= esc($address['label']) ?>
                             <?= ($address['is_primary'] === true || $address['is_primary'] === 't') ? ' (Utama)' : '' ?>
-                            - <?= esc(word_limiter($address['address_detail'], 5)) ?>
+                            - <?= word_limiter(esc($address['address_detail']), 5, '…') ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -65,7 +65,16 @@ Home
         <?php if (!empty($nearestLaundries)): ?>
             <div class="flex overflow-x-auto space-x-4 pb-4">
                 <?php foreach ($nearestLaundries as $laundry): ?>
-                <a href="<?= site_url('laundry/detail/' . $laundry['outlet_id']) ?>" class="block w-40 flex-shrink-0">
+                <a href="javascript:void(0);" onclick='showLaundryModal(
+    <?= json_encode($laundry['name']) ?>,
+    <?= json_encode($laundry['profile_image_url'] ?? 'https://placehold.co/200x200/E5E7EB/A9A9A9?text=Laundry') ?>,
+    <?= json_encode($laundry['address']) ?>,
+    <?= json_encode($laundry['contact_phone']) ?>,
+    <?= json_encode($laundry['operating_hours']) ?>,
+    <?= $laundry['latitude'] ?>,
+    <?= $laundry['longitude'] ?>
+)' class="block w-40 flex-shrink-0">
+
                     <div class="bg-white rounded-lg shadow-md p-3">
                         <div class="bg-gray-200 rounded-md h-24 mb-3 flex items-center justify-center">
                             <img src="<?= esc($laundry['profile_image_url'] ?? 'https://placehold.co/200x200/E5E7EB/A9A9A9?text=Laundry') ?>" alt="<?= esc($laundry['name']) ?>" class="w-full h-full object-cover rounded-md">
@@ -90,6 +99,7 @@ Home
         <?php endif; ?>
     </section>
     <?php endif; ?>
+        <!--
     <?php if (!empty($topRatedLaundries)): ?>
     <section class="mb-8">
         <div class="flex justify-between items-center mb-4">
@@ -97,8 +107,16 @@ Home
             <a href="<?= site_url('laundry/terbaik') ?>" class="text-sm font-semibold text-blue-500">See more</a>
         </div>
         <div class="flex overflow-x-auto space-x-4 pb-4">
-            <?php foreach ($topRatedLaundries as $laundry): ?>
-             <a href="<?= site_url('laundry/detail/' . $laundry['outlet_id']) ?>" class="block w-40 flex-shrink-0">
+            <?php foreach ($topRatedLaundries as $laundry): ?><a href="javascript:void(0);" onclick='showLaundryModal(
+    <?= json_encode($laundry['name']) ?>,
+    <?= json_encode($laundry['profile_image_url'] ?? 'https://placehold.co/200x200/E5E7EB/A9A9A9?text=Laundry') ?>,
+    <?= json_encode($laundry['address']) ?>,
+    <?= json_encode($laundry['contact_phone']) ?>,
+    <?= json_encode($laundry['operating_hours']) ?>,,
+    <?= $laundry['latitude'] ?>,
+    <?= $laundry['longitude'] ?>
+)' class="block w-40 flex-shrink-0">
+
                 <div class="bg-white rounded-lg shadow-md p-3">
                     <div class="bg-gray-200 rounded-md h-24 mb-3 flex items-center justify-center">
                          <img src="<?= esc($laundry['profile_image_url'] ?? 'https://placehold.co/200x200/E5E7EB/A9A9A9?text=Laundry') ?>" alt="<?= esc($laundry['name']) ?>" class="w-full h-full object-cover rounded-md">
@@ -114,10 +132,13 @@ Home
         </div>
     </section>
     <?php endif; ?>
+            -->
     
 <?= $this->endSection() ?>
 
 <?= $this->section('script') ?>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <script>
@@ -141,6 +162,71 @@ Home
     document.getElementById('address_id').addEventListener('change', function() {
         document.getElementById('address-filter-form').submit();
     });
+
+    let currentMap = null;
+
+function showLaundryModal(name, imageUrl, address, phone, hours, lat, lng, distance) {
+    document.getElementById('modalLaundryName').textContent = name;
+    document.getElementById('modalLaundryImage').src = imageUrl;
+    document.getElementById('modalLaundryImage').alt = name;
+    document.getElementById('modalLaundryAddress').textContent = address;
+    document.getElementById('modalLaundryPhone').textContent = phone;
+    document.getElementById('modalLaundryHours').textContent = hours;
+
+    document.getElementById('laundryModal').classList.remove('hidden');
+
+    setTimeout(() => {
+        const mapContainer = document.getElementById('modalMap');
+
+        // Hapus instance map sebelumnya
+        if (currentMap) {
+            currentMap.remove();
+            currentMap = null;
+        }
+
+        currentMap = L.map(mapContainer).setView([lat, lng], 16);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(currentMap);
+        L.marker([lat, lng]).addTo(currentMap).bindPopup(name).openPopup();
+    }, 100);
+}
+
+
+function closeLaundryModal() {
+    document.getElementById('laundryModal').classList.add('hidden');
+}
+
+
 </script>
+
+
+<div id="laundryModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center px-4">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+    
+    <h2 id="modalLaundryName" class="text-xl font-bold mb-2"></h2>
+    <img id="modalLaundryImage" src="" alt="" class="w-full h-40 object-cover rounded mb-3">
+    
+    <div class="text-sm text-gray-700 space-y-1 mb-3">
+      <p><strong>Alamat:</strong> <span id="modalLaundryAddress"></span></p>
+      <p><strong>Telepon:</strong> <span id="modalLaundryPhone"></span></p>
+      <p><strong>Jam Operasional:</strong> <span id="modalLaundryHours"></span></p>
+      
+    </div>
+
+    <div id="modalMap" class="w-full h-48 rounded overflow-hidden mb-4"></div>
+
+    <div class="text-center">
+<div class="mt-4">
+  <button onclick="closeLaundryModal()"
+    class="w-full px-4 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm rounded-full shadow-sm transition">
+    Kembali
+  </button>
+</div>
+
+    </div>
+  </div>
+</div>
+
 
 <?= $this->endSection() ?>

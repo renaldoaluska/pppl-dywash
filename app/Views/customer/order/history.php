@@ -86,13 +86,13 @@ Riwayat Pesanan
 <!-- STATUS PEMBAYARAN (Kotak Abu di Atas) -->
 <div class="bg-gray-50 px-4 py-2 rounded-t-xl border-b border-slate-200 -mx-5 -mt-5 mb-2">
   <?php if ($order['payment_status'] == 'pending'): ?>
-    <p class="text-yellow-600 text-sm font-medium">Menunggu pembayaran</p>
+    <p class="text-yellow-600 text-sm font-medium">Pembayaran sedang diperiksa</p>
   <?php elseif ($order['payment_status'] == 'lunas'): ?>
-    <p class="text-green-600 text-sm font-medium">Lunas</p>
+    <p class="text-green-600 text-sm font-medium">Pembayaran Lunas</p>
   <?php elseif ($order['payment_status'] == 'gagal'): ?>
     <p class="text-red-600 text-sm font-medium">Pembayaran gagal</p>
   <?php elseif ($order['payment_status'] == 'cod'): ?>
-    <p class="text-blue-600 text-sm font-medium">COD</p>
+    <p class="text-blue-600 text-sm font-medium">Pembayaran COD</p>
   <?php else: ?>
     <p class="text-gray-500 text-sm font-medium">Belum konfirmasi</p>
   <?php endif; ?>
