@@ -19,6 +19,19 @@ $statusColors = [
 ];
 ?>
 
+<!-- Info Pending Pembayaran -->
+<?php if (!empty($pending_payments)): ?>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-xl mb-6 shadow">
+        <p class="font-bold text-md mb-2">⚠️ Bersiaplah!</p>
+        <p class="text-sm mb-2">Ada <span class="font-semibold"><?= array_sum(array_column($pending_payments, 'count')) ?></span> pesanan yang masih <span class="font-semibold">Pending Pembayaran</span> dan menunggu verifikasi admin.</p>
+        <ul class="list-disc list-inside text-sm">
+            <?php foreach ($pending_payments as $pp): ?>
+                <li><span class="font-semibold"><?= esc($pp['count']) ?></span> calon pesanan di <span class="font-semibold"><?= esc($pp['outlet_name']) ?></span></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
+
 <!-- Menampilkan pesan sukses/error jika ada -->
 <?php if (session()->getFlashdata('success')): ?>
     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow" role="alert">
@@ -107,6 +120,7 @@ $statusColors = [
                         <div>
                             <p class="text-xs text-gray-500">ID #<?= esc($order['order_id']) ?></p>
                             <h4 class="text-md font-medium text-gray-800"><?= esc($order['customer_name']) ?></h4>
+                            <p class="text-sm text-gray-500"><?= esc($order['outlet_name']) ?></p>
                         </div>
                         <span class="px-2.5 py-1 text-xs font-semibold rounded-full capitalize <?= $statusColors[$order['status']] ?? 'bg-gray-100' ?>">
                              <?= str_replace('_', ' ', esc($order['status'])) ?>
