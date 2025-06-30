@@ -59,12 +59,48 @@ Outlet Saya
                 </a>
                 <!-- Bagian bawah kartu (tombol) sebagai div terpisah -->
                 <div class="border-t border-gray-200 bg-gray-50 px-4 py-3 sm:px-6 flex flex-col sm:flex-row justify-end gap-3 rounded-b-xl">
-                    <a href="/outlet/services/manage/<?= $outlet['outlet_id'] ?>" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100">
-                        Kelola Layanan
-                    </a>
-                    <a href="/outlet/<?= $outlet['outlet_id'] ?>/reviews" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
-                        Lihat Ulasan
-                    </a>
+<?php
+// Asumsi variabel $status sudah ada dari sebelumnya.
+
+// Tentukan properti default untuk tombol "Kelola Layanan"
+$layananButtonClass = 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-100';
+$layananButtonHref  = "/outlet/services/manage/{$outlet['outlet_id']}";
+$isClickable        = true;
+
+// Jika statusnya 'pending', ubah properti tombol menjadi nonaktif
+if ($status == 'pending') {
+    $layananButtonClass = 'bg-gray-300 text-gray-500 cursor-not-allowed';
+    $layananButtonHref  = '#';
+    $isClickable        = false;
+}
+?>
+
+<a href="<?= $layananButtonHref ?>" 
+   class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium rounded-lg <?= $layananButtonClass ?>"
+   <?php if (!$isClickable): ?> onclick="return false;" <?php endif; ?>>
+    Kelola Layanan
+</a>
+                    <?php
+// Asumsi variabel $status sudah ada, contoh: $status = $outlet['status'];
+
+// Tentukan properti default untuk tombol "Lihat Ulasan"
+$ulasanButtonClass = 'bg-blue-600 hover:bg-blue-700 text-white';
+$ulasanButtonHref  = "/outlet/{$outlet['outlet_id']}/reviews";
+$isClickable       = true;
+
+// Jika statusnya 'pending', ubah properti tombol menjadi nonaktif
+if ($status == 'pending') {
+    $ulasanButtonClass = 'bg-gray-300 text-gray-500 text-white cursor-not-allowed';
+    $ulasanButtonHref  = '#';
+    $isClickable       = false;
+}
+?>
+
+<a href="<?= $ulasanButtonHref ?>" 
+   class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium rounded-lg <?= $ulasanButtonClass ?>"
+   <?php if (!$isClickable): ?> onclick="return false;" <?php endif; ?>>
+    Lihat Ulasan
+</a>
                     
                      <?php
 // Ambil status dari outlet
@@ -81,7 +117,7 @@ $isClickable = true;
 // Jika statusnya 'pending', ubah properti tombol
 if ($status == 'pending') {
     // Diubah menjadi abu-abu yang lebih muda
-    $buttonClass = 'bg-gray-300 cursor-not-allowed'; 
+    $buttonClass = 'bg-gray-300 text-gray-500 cursor-not-allowed';
     $buttonHref = '#'; // Link tidak kemana-mana
     $isClickable = false; // Tandai sebagai tidak bisa diklik
 }
