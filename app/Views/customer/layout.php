@@ -16,7 +16,12 @@
 <body class="bg-gray-100 antialiased">
 <?php
     // PERUBAHAN DI SINI: Definisikan kondisi untuk menyembunyikan bar
-    $hideBars = strpos(uri_string(), 'customer/payment') !== false || strpos(uri_string(), 'customer/order/create') !== false || strpos(uri_string(),'customer/order/detail') !== false || strpos(uri_string(),'customer/profil/alamat') !== false;
+    $hideBars = strpos(uri_string(), 'customer/payment') !== false ||
+    strpos(uri_string(), 'customer/order/create') !== false ||
+    strpos(uri_string(),'customer/order/detail') !== false ||
+    strpos(uri_string(),'customer/profil/edit') !== false ||
+    strpos(uri_string(),'customer/profil/ganti-password') !== false ||
+    strpos(uri_string(),'customer/profil/alamat') !== false;
 ?>
 <div class="flex flex-col min-h-screen">
     <?php if (!$hideBars): // JIKA BUKAN HALAMAN PAYMENT/CREATE, TAMPILKAN TOP BAR ?>
