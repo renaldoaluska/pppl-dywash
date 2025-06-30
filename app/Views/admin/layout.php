@@ -6,6 +6,11 @@
     <link rel="shortcut icon" type="image/png" href="<?= base_url('assets/img/favicon.ico') ?>">
     <title><?= $this->renderSection('title') ?> - DyWash Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <style>
+        html {
+            overflow-y: scroll;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 antialiased">
 <?php
@@ -37,7 +42,7 @@
 
     <!-- Konten Utama -->
     <!-- Diberi padding bawah agar tidak tertutup navbar -->
-    <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24">
+    <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24 md:pb-32 lg:pb-40">
         <?= $this->renderSection('content') ?>
     </main>
 
