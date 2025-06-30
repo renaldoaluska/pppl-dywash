@@ -14,15 +14,21 @@
     <header class="sticky top-0 bg-white shadow-sm z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Judul Halaman -->
-                <h1 class="text-xl font-semibold text-gray-800"><?= $this->renderSection('title') ?></h1>
-                
-                <!-- Profil Admin -->
-                <div class="flex items-center">
-                    <span class="mr-3 text-sm font-medium hidden sm:block"><?= esc(session('name')) ?></span>
-                    <div class="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow">
-                        A
-                    </div>
+                <!-- Placeholder Kiri (untuk mendorong logo ke tengah) -->
+                <div class="w-1/3">
+                    <!-- Kosong -->
+                </div>
+
+                <!-- Logo di Tengah -->
+                <div class="w-1/3 flex justify-center">
+                    <a href="/dashboard">
+                        <img src="<?= base_url('assets/img/logo.png') ?>" alt="DyWash Logo" class="h-8 w-auto">
+                    </a>
+                </div>
+
+                <!-- Placeholder Kanan (untuk mendorong logo ke tengah) -->
+                <div class="w-1/3">
+                    <!-- Kosong -->
                 </div>
             </div>
         </div>

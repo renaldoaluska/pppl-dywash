@@ -126,3 +126,6 @@ $routes->get('/admin/payments/verify/action/(:num)', 'AdminController::verifyPay
 // di dalam app/Config/Routes.php
 $routes->get('/admin/outlets', 'AdminController::listAllOutlets');
 $routes->get('/admin/orders', 'AdminController::listAllOrders');
+
+// liat detail outlet sebelum verif
+$routes->get('/admin/outlets/detail/(:num)', 'AdminController::showOutletDetail/$1');
