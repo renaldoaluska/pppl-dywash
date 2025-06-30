@@ -82,20 +82,27 @@ Riwayat Pesanan
 <?php if (!empty($orders)): ?>
 <?php foreach ($orders as $order): ?>
 <div class="bg-white rounded-lg shadow-md p-5 border border-slate-100">
-
 <!-- STATUS PEMBAYARAN (Kotak Abu di Atas) -->
 <div class="bg-gray-50 px-4 py-2 rounded-t-xl border-b border-slate-200 -mx-5 -mt-5 mb-2">
-  <?php if ($order['payment_status'] == 'pending'): ?>
-    <p class="text-yellow-600 text-sm font-medium">Pembayaran sedang diperiksa</p>
-  <?php elseif ($order['payment_status'] == 'lunas'): ?>
-    <p class="text-green-600 text-sm font-medium">Pembayaran Lunas</p>
-  <?php elseif ($order['payment_status'] == 'gagal'): ?>
-    <p class="text-red-600 text-sm font-medium">Pembayaran gagal</p>
-  <?php elseif ($order['payment_status'] == 'cod'): ?>
-    <p class="text-blue-600 text-sm font-medium">Pembayaran COD</p>
-  <?php else: ?>
-    <p class="text-gray-500 text-sm font-medium">Belum konfirmasi</p>
-  <?php endif; ?>
+  <div class="flex justify-between items-center">
+    <div>
+      <?php if ($order['payment_status'] == 'pending'): ?>
+        <p class="text-yellow-600 text-sm font-medium">Pembayaran sedang diperiksa</p>
+      <?php elseif ($order['payment_status'] == 'lunas'): ?>
+        <p class="text-green-600 text-sm font-medium">Pembayaran Lunas</p>
+      <?php elseif ($order['payment_status'] == 'gagal'): ?>
+        <p class="text-red-600 text-sm font-medium">Pembayaran gagal</p>
+      <?php elseif ($order['payment_status'] == 'cod'): ?>
+        <p class="text-blue-600 text-sm font-medium">Pembayaran COD</p>
+      <?php else: ?>
+        <p class="text-gray-500 text-sm font-medium">Belum konfirmasi</p>
+      <?php endif; ?>
+    </div>
+
+    <div>
+      <p class="text-sm text-slate-600 font-mono">ID #<?= esc($order['order_id']) ?></p>
+    </div>
+  </div>
 </div>
 
 
@@ -137,7 +144,16 @@ Riwayat Pesanan
         class="px-4 py-1.5 bg-white border border-amber-400 text-amber-600 text-sm rounded-full shadow-sm hover:bg-amber-50 transition">
         Beri Ulasan
       </button>
-    <?php endif; ?>
+    <?php elseif ($order['payment_status'] == 'lunas' && $order['status'] == 'ditolak'): ?>
+  <?php
+    $waText = urlencode("Halo admin, saya ingin refund pesanan saya.\n\nID Order: #{$order['order_id']}\nOutlet: {$order['outlet_name']}\nTanggal: " . date('d F Y, H:i', strtotime($order['order_date'])));
+  ?>
+  <a href="https://wa.me/6285183066133?text=<?= $waText ?>"
+    class="px-4 py-1.5 bg-white border border-rose-400 text-rose-600 text-sm rounded-full shadow-sm hover:bg-rose-50 transition">
+    Refund
+  </a>
+<?php endif; ?>
+
 
     <?php if (empty($order['payment_method'])): ?>
       <a href="/customer/payment/<?= $order['order_id'] ?>"
