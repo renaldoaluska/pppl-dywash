@@ -129,3 +129,12 @@ $routes->get('/admin/orders', 'AdminController::listAllOrders');
 
 // liat detail outlet sebelum verif
 $routes->get('/admin/outlets/detail/(:num)', 'AdminController::showOutletDetail/$1');
+
+// Rute untuk halaman detail verifikasi pembayaran
+$routes->get('/admin/payments/detail/(:num)', 'AdminController::showPaymentDetail/$1');
+
+// Rute untuk menggagalkan atau merefund pembayaran
+$routes->get('/admin/payments/fail/(:num)', 'AdminController::failOrRefundPayment/$1');
+
+// Rute untuk halaman detail outlet oleh admin
+$routes->get('/admin/outlets/detail/(:num)', 'AdminController::viewOutletDetail/$1');

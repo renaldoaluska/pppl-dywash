@@ -20,23 +20,21 @@ Verifikasi Pembayaran
     <?php if (!empty($payments)): ?>
         <?php foreach ($payments as $payment): ?>
             <!-- Kartu Individual untuk Setiap Pembayaran -->
-            <div class="bg-white rounded-xl shadow-md transition-all duration-300 hover:shadow-lg">
+            <div class="bg-white rounded-xl shadow-md transition-all duration-300">
                 <div class="p-4 sm:p-6">
                     <!-- Informasi Utama -->
-                    <div>
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <h3 class="text-lg font-bold text-gray-800 leading-tight">
-                                    <?= esc($payment['customer_name']) ?>
-                                </h3>
-                                <p class="text-2xl font-semibold text-blue-600 mt-1">
-                                    Rp <?= number_format($payment['amount'], 0, ',', '.') ?>
-                                </p>
-                            </div>
-                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                Menunggu
-                            </span>
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 leading-tight">
+                                <?= esc($payment['customer_name']) ?>
+                            </h3>
+                            <p class="text-2xl font-semibold text-blue-600 mt-1">
+                                Rp <?= number_format($payment['amount'], 0, ',', '.') ?>
+                            </p>
                         </div>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                            Menunggu
+                        </span>
                     </div>
 
                     <!-- Detail Tambahan -->
@@ -51,18 +49,16 @@ Verifikasi Pembayaran
                         </div>
                     </div>
                 </div>
-
-                <!-- Bagian Aksi (Tombol) -->
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-end gap-3 rounded-b-xl">
-                    <a href="/admin/payments/verify/action/<?= $payment['payment_id'] ?>" class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-center text-white bg-green-600 border border-transparent rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200">
-                        Verifikasi Pembayaran
+                 <!-- PERUBAHAN: Menambahkan bagian footer dengan tombol aksi -->
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-end rounded-b-xl">
+                    <a href="/admin/payments/detail/<?= $payment['payment_id'] ?>" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                        Lihat Detail
                     </a>
                 </div>
             </div>
         <?php endforeach; ?>
 
     <?php else: ?>
-        <!-- Tampilan jika tidak ada pembayaran untuk diverifikasi -->
         <div class="text-center bg-white p-8 rounded-xl shadow-md">
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path></svg>
             <h3 class="mt-2 text-sm font-medium text-gray-900">Semua Pembayaran Terkonfirmasi</h3>

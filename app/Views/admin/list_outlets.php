@@ -10,25 +10,25 @@ Daftar Outlet
     
     <!-- Header dengan Fitur Pencarian -->
     <div class="flex flex-col sm:flex-row items-center justify-between pb-4 border-b">
-        <div>
-            <h3 class="text-lg font-semibold text-gray-700">Semua Outlet Terdaftar</h3>
-            <p class="text-sm text-gray-500 mt-1">Kelola semua outlet yang ada di platform Anda.</p>
+        <!-- PERBAIKAN: Menghapus kelas 'hidden' dan 'sm:block' dari tombol kembali -->
+        <div class="flex items-center">
+            <a href="/dashboard" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </a>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700">Semua Outlet Terdaftar</h3>
+                <p class="text-sm text-gray-500 mt-1">Kelola semua outlet yang ada di platform Anda.</p>
+            </div>
         </div>
         <div class="w-full sm:w-auto flex items-center space-x-2 mt-4 sm:mt-0">
-             
-             <!-- === PERUBAHAN UTAMA DI SINI === -->
-             <!-- Membungkus input di dalam form agar bisa mengirim data pencarian -->
              <form action="/admin/outlets" method="get" class="w-full">
                 <div class="relative w-full">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
-                    <!-- Menambahkan 'value' untuk menjaga teks pencarian tetap ada setelah submit -->
                     <input type="text" name="search" id="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Cari outlet..." value="<?= esc(request()->getGet('search'), 'attr') ?>">
                 </div>
              </form>
-             <!-- === AKHIR PERUBAHAN === -->
-
         </div>
     </div>
 
@@ -63,7 +63,7 @@ Daftar Outlet
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-2 rounded-b-xl flex justify-end">
-                        <a href="#" class="text-sm font-medium text-blue-600 hover:underline">Kelola Outlet</a>
+                        <a href="/admin/outlets/detail/<?= $outlet['outlet_id'] ?>" class="text-sm font-medium text-blue-600 hover:underline">Lihat Detail</a>
                     </div>
                 </div>
             <?php endforeach; ?>

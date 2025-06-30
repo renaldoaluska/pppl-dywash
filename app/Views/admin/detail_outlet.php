@@ -56,6 +56,8 @@ Detail Verifikasi Outlet
     </div>
 
     <!-- Tombol Aksi Verifikasi -->
+    <!-- PERUBAHAN: Tombol aksi sekarang hanya muncul jika statusnya 'pending' -->
+    <?php if ($outlet['status'] == 'pending'): ?>
     <div class="border-t mt-6 pt-6 flex flex-col sm:flex-row justify-end gap-3">
         <button type="button" 
                 class="action-btn w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700"
@@ -77,6 +79,7 @@ Detail Verifikasi Outlet
         </button>
         
     </div>
+    <?php endif; ?>
 </div>
 
 <!-- Modal Konfirmasi Aksi -->
