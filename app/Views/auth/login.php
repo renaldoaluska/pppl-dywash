@@ -38,7 +38,10 @@
                         <input id="password-input" type="password" name="password" placeholder="Kata Sandi" required class="outline-none bg-transparent flex-1 py-3 text-gray-700">
                     </div>
                 </div>
-                <div class="flex justify-end mb-5"><a href="#" class="text-sm text-blue-600 hover:underline">Lupa kata sandi?</a></div>
+                  <?php
+    $waText = urlencode("Halo admin, saya ingin mengatur ulang kata sandi saya.");
+  ?>
+                <div class="flex justify-end mb-5"><a href="https://wa.me/6285183066133?text=<?= $waText ?>" class="text-sm text-blue-600 hover:underline">Lupa kata sandi?</a></div>
                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg mb-4 transition transform hover:scale-105 duration-300 ease-in-out">Masuk</button>
             </form>
             
@@ -48,11 +51,19 @@
                     Daftar sekarang
                 </button>
             </div>
-            <div class="flex items-center my-4"><div class="flex-grow border-t border-gray-200"></div><span class="mx-3 text-gray-400 text-xs font-medium">Atau lanjut dengan</span><div class="flex-grow border-t border-gray-200"></div></div>
-            <div class="flex justify-center gap-4">
-                <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm hover:bg-gray-50 transition transform hover:scale-110"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="w-6 h-6"></button>
-                <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm hover:bg-gray-50 transition transform hover:scale-110"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook" class="w-6 h-6"></button>
-            </div>
+<div class="flex items-center my-4 opacity-50 cursor-not-allowed">
+    <div class="flex-grow border-t border-gray-200"></div>
+    <span class="mx-3 text-gray-400 text-xs font-medium">Atau lanjut dengan</span>
+    <div class="flex-grow border-t border-gray-200"></div>
+</div>
+<div class="flex justify-center gap-4">
+    <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm opacity-50 cursor-not-allowed" disabled>
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="w-6 h-6">
+    </button>
+    <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm opacity-50 cursor-not-allowed" disabled>
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook" class="w-6 h-6">
+    </button>
+</div>
         </div>
     </div>
 </div>
