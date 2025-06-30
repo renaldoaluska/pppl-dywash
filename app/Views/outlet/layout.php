@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/png" href="<?= base_url('assets/img/favicon.ico') ?>">
     <title><?= $this->renderSection('title') ?> - DyWash Outlet</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <?= $this->renderSection('styles') ?>
@@ -33,7 +32,11 @@
  </header>
     <?php endif; ?>
 
+    <!-- Konten Utama -->
     <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24">
+        <!-- Judul halaman dipindahkan ke sini -->
+        <h1 class="text-2xl font-bold text-gray-800 mb-6"><?= $this->renderSection('title') ?></h1>
+        
         <?= $this->renderSection('content') ?>
     </main>
 
