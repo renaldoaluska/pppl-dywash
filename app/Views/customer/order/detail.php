@@ -7,7 +7,11 @@ Detail Pesanan
 <?= $this->section('content') ?>
 
 <div class="bg-white rounded-xl p-6 shadow space-y-4">
-    <h1 class="text-xl font-bold mb-4">Detail Pesanan</h1>
+    <div class="flex justify-between items-center mb-4">
+  <h1 class="text-xl font-bold">Detail Pesanan</h1>
+  <p class="text-sm text-slate-600 font-mono">ID #<?= esc($order['order_id']) ?></p>
+</div>
+
 
     <div class="grid grid-cols-2 gap-4 text-sm">
         <div>
@@ -118,6 +122,14 @@ Detail Pesanan
             class="px-4 py-1.5 bg-white border border-emerald-400 text-emerald-600 text-sm rounded-full shadow-sm hover:bg-emerald-50 transition">
             Konfirmasi Bayar
         </a>
+            <?php elseif ($order['payment_status'] == 'lunas' && $order['status'] == 'ditolak'): ?>
+  <?php
+    $waText = urlencode("Halo admin, saya ingin refund pesanan saya.\n\nID Order: #{$order['order_id']}\nOutlet: {$order['outlet_name']}\nTanggal: " . date('d F Y, H:i', strtotime($order['order_date'])));
+  ?>
+  <a href="https://wa.me/6285183066133?text=<?= $waText ?>"
+    class="px-4 py-1.5 bg-white border border-rose-400 text-rose-600 text-sm rounded-full shadow-sm hover:bg-rose-50 transition">
+    Refund
+  </a>
     <?php else: ?>
         <div></div> <!-- Spacer agar tombol kanan tetap di kanan -->
     <?php endif; ?>
