@@ -90,9 +90,9 @@ Dashboard
 
     <!-- PESANAN SELESAI -->
     <div class="p-5">
-        <div class="text-lg font-semibold text-gray-800 mb-3">Selesai</div>
+        <div class="text-lg font-semibold text-gray-800 mb-3">Non-aktif</div>
         <?php
-        $selesai_statuses = ['belum diulas', 'diulas'];
+        $selesai_statuses = ['ditolak','selesai', 'diulas'];
         foreach ($selesai_statuses as $status):
             $status_key = str_replace(' ', '_', $status);
             $count_var = $status_key . '_orders_count';
