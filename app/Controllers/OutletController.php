@@ -162,46 +162,48 @@ $data['pending_payments'] = $orderModel
 
     // --- FUNGSI KELOLA PESANAN ---
     public function listOrders()
-    {
-        $orderModel = new OrderModel();
-        $outletModel = new OutletModel();
-        
-        $outlets = $outletModel->where(['owner_id' => session()->get('user_id'), 'status' => 'verified'])->findAll();
+{
+    $orderModel = new OrderModel();
+    $outletModel = new OutletModel();
+    
+    $outlets = $outletModel->where(['owner_id' => session()->get('user_id'), 'status' => 'verified'])->findAll();
 
-        if (empty($outlets)) {
-            return redirect()->to('/dashboard')->with('error', 'Anda tidak memiliki outlet terverifikasi untuk melihat pesanan.');
-        }
-
-        $outletIds = array_column($outlets, 'outlet_id');
-        
-        // PERUBAHAN UTAMA: Query dibuat lebih eksplisit untuk setiap grup
-
-        // Grup 1: Pesanan Aktif (yang belum selesai/ditolak)
-        $data['pending_orders'] = $orderModel
-            ->join('payments', 'payments.order_id = orders.order_id')
-            ->join('users', 'users.user_id = orders.customer_id')
-            ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-            ->whereIn('orders.outlet_id', $outletIds)
-            ->whereIn('payments.status', ['lunas', 'cod'])
-            ->whereNotIn('orders.status', ['selesai', 'diulas', 'ditolak'])
-            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name') // Select eksplisit
-            ->orderBy('orders.created_at', 'ASC')
-            ->findAll();
-        
-        // Grup 2: Riwayat Pesanan (yang sudah selesai/ditolak)
-        $data['history_orders'] = $orderModel
-            ->join('payments', 'payments.order_id = orders.order_id')
-            ->join('users', 'users.user_id = orders.customer_id')
-            ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-            ->whereIn('orders.outlet_id', $outletIds)
-            ->whereIn('payments.status', ['lunas', 'cod'])
-            ->whereIn('orders.status', ['selesai', 'diulas', 'ditolak'])
-            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name') // Select eksplisit
-            ->orderBy('orders.created_at', 'DESC')
-            ->findAll();
-        
-        return view('outlet/list_orders', $data);
+    if (empty($outlets)) {
+        return redirect()->to('/dashboard')->with('error', 'Anda tidak memiliki outlet terverifikasi untuk melihat pesanan.');
     }
+
+    $outletIds = array_column($outlets, 'outlet_id');
+    
+    // Tambahkan ini
+    $data['outlets'] = $outlets;
+
+    // Pesanan Aktif
+    $data['pending_orders'] = $orderModel
+        ->join('payments', 'payments.order_id = orders.order_id')
+        ->join('users', 'users.user_id = orders.customer_id')
+        ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+        ->whereIn('orders.outlet_id', $outletIds)
+        ->whereIn('payments.status', ['lunas', 'cod'])
+        ->whereNotIn('orders.status', ['selesai', 'diulas', 'ditolak'])
+        ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+        ->orderBy('orders.created_at', 'ASC')
+        ->findAll();
+    
+    // Riwayat Pesanan
+    $data['history_orders'] = $orderModel
+        ->join('payments', 'payments.order_id = orders.order_id')
+        ->join('users', 'users.user_id = orders.customer_id')
+        ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+        ->whereIn('orders.outlet_id', $outletIds)
+        ->whereIn('payments.status', ['lunas', 'cod'])
+        ->whereIn('orders.status', ['selesai', 'diulas', 'ditolak'])
+        ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+        ->orderBy('orders.created_at', 'DESC')
+        ->findAll();
+    
+    return view('outlet/list_orders', $data);
+}
+
     
     public function updateOrderStatus($order_id)
     {
