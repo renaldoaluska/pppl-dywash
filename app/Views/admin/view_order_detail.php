@@ -78,6 +78,15 @@ if (request()->getGet('from') == 'verif') {
                 <span class="text-lg font-bold text-gray-900">Total</span>
                 <span class="text-xl font-bold text-blue-600">Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></span>
              </div>
+             <?php if ($order['status'] == 'ditolak' && $payment['status'] == 'lunas'): ?>
+<form action="/admin/payments/mark_refunded/<?= $payment['payment_id'] ?>" method="post" class="pt-4 border-t">
+    <?= csrf_field() ?>
+    <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-xl">
+        Sudah Di-refund
+    </button>
+</form>
+<?php endif; ?>
+
         </div>
     </div>
 </div>

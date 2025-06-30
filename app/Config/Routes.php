@@ -113,6 +113,7 @@ $routes->get('/outlet/manage', 'OutletController::listMyOutlets');
 $routes->get('/outlet/(:num)/reviews', 'OutletController::showReviewsForOutlet/$1');
 
 // Rute untuk fitur Admin
+$routes->post('/admin/payments/mark_refunded/(:num)', 'AdminController::markRefunded/$1');
 $routes->get('/admin/outlets/verify', 'AdminController::listPendingOutlets');
 $routes->get('/admin/outles/action/(:num)/(:segment)', 'AdminController::verifyOutlet/$1/$2');
 $routes->get('/admin/dashboard', 'AdminController::dashboard');
