@@ -89,9 +89,9 @@ Riwayat Pesanan
       <?php if ($order['payment_status'] == 'pending'): ?>
         <p class="text-yellow-600 text-sm font-medium">Pembayaran sedang diperiksa</p>
       <?php elseif ($order['payment_status'] == 'lunas'): ?>
-        <p class="text-green-600 text-sm font-medium">Pembayaran Lunas</p>
+        <p class="text-green-600 text-sm font-medium">Pembayaran lunas</p>
       <?php elseif ($order['payment_status'] == 'gagal'): ?>
-        <p class="text-red-600 text-sm font-medium">Pembayaran gagal</p>
+        <p class="text-red-600 text-sm font-medium">Pembayaran gagal/refund</p>
       <?php elseif ($order['payment_status'] == 'cod'): ?>
         <p class="text-blue-600 text-sm font-medium">Pembayaran COD</p>
       <?php else: ?>
