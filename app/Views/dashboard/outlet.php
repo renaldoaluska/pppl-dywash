@@ -6,6 +6,18 @@ Dashboard
 
 <?= $this->section('content') ?>
 
+<!-- Info Pending Pembayaran -->
+<?php if (!empty($pending_payments)): ?>
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-xl mb-6 shadow">
+        <p class="font-bold text-md mb-2">⚠️ Bersiaplah!</p>
+        <p class="text-sm mb-2">Ada <span class="font-semibold"><?= array_sum(array_column($pending_payments, 'count')) ?></span> pesanan yang masih <span class="font-semibold">Pending Pembayaran</span> dan menunggu verifikasi admin.</p>
+        <ul class="list-disc list-inside text-sm">
+            <?php foreach ($pending_payments as $pp): ?>
+                <li><span class="font-semibold"><?= esc($pp['count']) ?></span> calon pesanan di <span class="font-semibold"><?= esc($pp['outlet_name']) ?></span></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
 <!-- Kartu Ringkasan -->
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
     
