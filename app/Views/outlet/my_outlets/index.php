@@ -5,7 +5,6 @@ Outlet Saya
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-
 <!-- Header Halaman -->
 <div class="flex flex-col sm:flex-row items-center justify-between pb-4 mb-6">
     <div>
@@ -65,6 +64,13 @@ Outlet Saya
                     </a>
                     <a href="/outlet/<?= $outlet['outlet_id'] ?>/reviews" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
                         Lihat Ulasan
+                    </a>
+                    
+                     <?php
+    $waText = urlencode("Halo admin, saya ingin klaim penerimaan pembayaran saya.\n\nID Outlet: #{$outlet['outlet_id']}\nNama Outlet: {$outlet['name']}\nAlamat: {$outlet['address']}\nLat: {$outlet['latitude']}\nLong: {$outlet['longitude']}");
+  ?>
+                    <a href="https://wa.me/6285183066133?text=<?= $waText ?>" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">
+                        Klaim Pembayaran
                     </a>
                 </div>
             </div>
