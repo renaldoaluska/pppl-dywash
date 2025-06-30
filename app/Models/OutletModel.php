@@ -13,6 +13,8 @@ class OutletModel extends Model
         'owner_id', 
         'name', 
         'address', 
+        'latitude',         // <-- TAMBAHKAN INI
+        'longitude',        // <-- TAMBAHKAN INI
         'contact_phone', 
         'operating_hours', 
         'status'

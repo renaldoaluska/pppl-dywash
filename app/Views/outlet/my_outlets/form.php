@@ -55,6 +55,21 @@
                 </div>
             </div>
 
+            <div>
+    <label class="block text-sm font-bold text-gray-700">Tentukan Lokasi di Peta</label>
+    <p class="mt-1 text-xs text-gray-500">Cari alamat atau klik & geser penanda untuk mendapatkan koordinat.</p>
+    <div id="map" class="h-80 rounded-lg mt-2 border border-slate-300"></div>
+<div class="flex gap-4 mt-2">
+    <div class="w-1/2">
+        <label for="latitude" class="block text-sm font-bold text-gray-700 mb-1">Latitude</label>
+        <input type="text" name="latitude" id="latitude" value="<?= old('latitude', $outlet['latitude'] ?? '') ?>" class="w-full border-gray-300 rounded-xl shadow-sm bg-gray-100 cursor-not-allowed p-2.5" readonly>
+    </div>
+    <div class="w-1/2">
+        <label for="longitude" class="block text-sm font-bold text-gray-700 mb-1">Longitude</label>
+        <input type="text" name="longitude" id="longitude" value="<?= old('longitude', $outlet['longitude'] ?? '') ?>" class="w-full border-gray-300 rounded-xl shadow-sm bg-gray-100 cursor-not-allowed p-2.5" readonly>
+    </div>
+</div>
+</div>
             <!-- Nomor Telepon / Kontak -->
             <div>
                 <label for="contact_phone" class="block text-sm font-bold text-gray-700">Nomor Telepon</label>
@@ -86,3 +101,72 @@
 </div>
 
 <?= $this->endSection() ?>
+<?= $this->section('styles') ?>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@3.11.0/dist/geosearch.css" />
+<?= $this->endSection() ?>
+<?= $this->section('script') ?>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-geosearch@3.11.0/dist/geosearch.umd.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. Tentukan koordinat awal
+    // Jika mode edit, gunakan data outlet. Jika mode tambah, gunakan default (misal: Surabaya)
+    const initialLat = <?= old('latitude', $outlet['latitude'] ?? -7.2575) ?>;
+    const initialLng = <?= old('longitude', $outlet['longitude'] ?? 112.7521) ?>;
+
+    // Ambil elemen input hidden
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+
+    // 2. Inisialisasi Peta
+    const map = L.map('map').setView([initialLat, initialLng], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 3. Buat Penanda (Marker) yang bisa digeser
+    const marker = L.marker([initialLat, initialLng], {
+        draggable: true
+    }).addTo(map);
+
+    // Fungsi untuk update nilai input dan posisi marker
+    function updateMarkerAndInputs(lat, lng) {
+        marker.setLatLng([lat, lng]);
+        latInput.value = lat;
+        lngInput.value = lng;
+    }
+    
+     // ▼▼▼ TAMBAHKAN BARIS INI ▼▼▼
+    // Panggil sekali saat load untuk mengisi nilai input awal
+    updateMarkerAndInputs(initialLat, initialLng);
+    // ▲▲▲ SAMPAI SINI ▲▲▲
+    
+    // 4. Event Listener untuk interaksi
+    marker.on('dragend', function(e) {
+        const { lat, lng } = e.target.getLatLng();
+        updateMarkerAndInputs(lat, lng);
+    });
+
+    map.on('click', function(e) {
+        const { lat, lng } = e.latlng;
+        updateMarkerAndInputs(lat, lng);
+    });
+    
+    // 5. Inisialisasi Fitur Pencarian (GeoSearch)
+    const provider = new GeoSearch.OpenStreetMapProvider();
+    const searchControl = new GeoSearch.GeoSearchControl({
+        provider: provider,
+        style: 'bar',
+        showMarker: false,
+        autoClose: true,
+        keepResult: true
+    });
+    map.addControl(searchControl);
+
+    map.on('geosearch/showlocation', function (e) {
+        updateMarkerAndInputs(e.location.y, e.location.x);
+    });
+});
+</script>
+    <?= $this->endSection() ?>

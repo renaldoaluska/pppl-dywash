@@ -113,7 +113,10 @@ class OutletController extends BaseController
         $rules = [
             'name'          => 'required',
             'address'       => 'required',
-            'contact_phone' => 'required'
+            'contact_phone' => 'required',
+    // ▼▼▼ TAMBAHKAN DUA BARIS INI ▼▼▼
+    'latitude'      => 'required|numeric',
+    'longitude'     => 'required|numeric'
         ];
 
         if (!$this->validate($rules)) {
@@ -125,6 +128,9 @@ class OutletController extends BaseController
             'owner_id'        => session()->get('user_id'),
             'name'            => $this->request->getPost('name'),
             'address'         => $this->request->getPost('address'),
+    // ▼▼▼ TAMBAHKAN DUA BARIS INI ▼▼▼
+            'latitude'        => $this->request->getPost('latitude'),
+            'longitude'       => $this->request->getPost('longitude'),
             'contact_phone'   => $this->request->getPost('contact_phone'),
             'operating_hours' => $this->request->getPost('operating_hours'),
             'status'          => 'pending'
