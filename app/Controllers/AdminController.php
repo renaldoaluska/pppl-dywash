@@ -14,20 +14,18 @@ class AdminController extends BaseController
      */
     public function dashboard()
     {
-        // Inisialisasi model yang akan kita gunakan
         $outletModel = new OutletModel();
         $paymentModel = new PaymentModel();
         $orderModel = new OrderModel();
 
-        // Siapkan array data untuk dikirim ke view
         $data = [
             'pending_outlets_count' => $outletModel->where('status', 'pending')->countAllResults(),
             'pending_payments_count' => $paymentModel->where('status', 'pending')->countAllResults(),
-            'total_outlets_count' => $outletModel->countAllResults(), // Menghitung semua outlet
-            'total_orders_count' => $orderModel->countAllResults()  // Menghitung semua pesanan
+            // PERUBAHAN: Sekarang hanya menghitung outlet yang statusnya 'verified'
+            'total_outlets_count' => $outletModel->where('status', 'verified')->countAllResults(),
+            'total_orders_count' => $orderModel->countAllResults()
         ];
 
-        // Tampilkan view dashboard dan kirim data yang sudah dihitung
         return view('dashboard/admin', $data);
     }
 
@@ -40,7 +38,10 @@ class AdminController extends BaseController
         $outletModel = new OutletModel();
         
         // Ambil data outlet yang perlu diverifikasi
-        $data['outlets'] = $outletModel->where('status', 'pending')->findAll();
+        $data['outlets'] = $outletModel
+        ->where('status', 'pending')
+        ->orderBy('updated_at', 'DESC')
+        ->findAll();
         
         return view('admin/verify_outlet', $data);
     }
@@ -77,6 +78,7 @@ class AdminController extends BaseController
             ->join('orders', 'orders.order_id = payments.order_id')
             ->join('users', 'users.user_id = orders.customer_id')
             ->select('payments.*, orders.total_amount, users.name as customer_name')
+            ->orderBy('payments.order_id', 'DESC')
             ->findAll();
         
         return view('admin/verify_payment', $data);
@@ -111,23 +113,22 @@ class AdminController extends BaseController
     {
         $outletModel = new OutletModel();
         
-        // Ambil kata kunci pencarian dari URL
         $searchKeyword = $this->request->getGet('search');
 
         $query = $outletModel;
 
-        // Jika ada kata kunci pencarian, tambahkan filter 'like'
+        // PERUBAHAN: Menambahkan filter untuk hanya mengambil outlet dengan status 'verified'
+        $query->where('status', 'verified');
+
         if ($searchKeyword) {
-            $query = $outletModel->groupStart()
-                                 ->like('name', $searchKeyword)
-                                 ->orLike('address', $searchKeyword)
-                                 ->groupEnd();
+            $query->groupStart()
+                  ->like('name', $searchKeyword)
+                  ->orLike('address', $searchKeyword)
+                  ->groupEnd();
         }
 
-        // Eksekusi query
-        $data['outlets'] = $query->findAll();
+        $data['outlets'] = $query->orderBy('outlet_id', 'DESC')->findAll();
 
-        // Tampilkan view
         return view('admin/list_outlets', $data);
     }
 
@@ -161,6 +162,129 @@ class AdminController extends BaseController
         
         // Tampilkan view
         return view('admin/list_orders', $data);
+    }
+    public function showOutletDetail($outlet_id)
+    {
+        $outletModel = new OutletModel();
+        
+        $outlet = $outletModel->find($outlet_id);
+
+        // Validasi jika outlet tidak ditemukan
+        if (!$outlet) {
+            // Arahkan kembali ke halaman verifikasi dengan pesan error
+            return redirect()->to('/admin/verify')->with('error', 'Outlet tidak ditemukan.');
+        }
+
+        $data['outlet'] = $outlet;
+        return view('admin/detail_outlet', $data);
+    }
+    public function showPaymentDetail($payment_id)
+    {
+        $paymentModel = new PaymentModel();
+        
+        // 1. Ambil data pembayaran utama, SEKARANG DENGAN JOIN KE OUTLETS
+        $payment = $paymentModel
+            ->where('payments.payment_id', $payment_id)
+            ->join('orders', 'orders.order_id = payments.order_id')
+            ->join('users', 'users.user_id = orders.customer_id')
+            ->join('outlets', 'outlets.outlet_id = orders.outlet_id') // <-- JOIN ke tabel outlets
+            ->select('payments.*, orders.customer_notes, users.name as customer_name, outlets.name as outlet_name') // <-- Ambil nama outlet
+            ->first();
+            
+        if (!$payment) {
+            return redirect()->to('/admin/payments/verify')->with('error', 'Pembayaran tidak ditemukan.');
+        }
+
+        // 2. Ambil rincian item dari pesanan terkait
+        $orderItemModel = new \App\Models\OrderItemModel();
+        $order_items = $orderItemModel
+            ->where('order_items.order_id', $payment['order_id'])
+            ->join('services', 'services.service_id = order_items.service_id')
+            ->select('order_items.*, services.name as service_name, services.unit')
+            ->findAll();
+
+        $data = [
+            'payment'     => $payment,
+            'order_items' => $order_items
+        ];
+
+        return view('admin/detail_payment', $data);
+    }
+    public function failOrRefundPayment($payment_id)
+    {
+        $paymentModel = new PaymentModel();
+        $orderModel = new OrderModel();
+
+        // 1. Dapatkan data pembayaran untuk mendapatkan order_id
+        $payment = $paymentModel->find($payment_id);
+        if (!$payment) {
+            return redirect()->to('/admin/payments/verify')->with('error', 'Pembayaran tidak ditemukan.');
+        }
+
+        // 2. Ubah status pembayaran menjadi 'gagal'
+        $paymentModel->update($payment_id, ['status' => 'gagal']);
+
+        // 3. Ubah status pesanan menjadi 'ditolak'
+        $orderModel->update($payment['order_id'], ['status' => 'ditolak']);
+        
+        return redirect()->to('/admin/payments/verify')->with('success', 'Pembayaran berhasil dibatalkan/digagalkan.');
+    }
+    public function viewOutletDetail($outlet_id)
+    {
+        $outletModel = new OutletModel();
+        
+        // Join dengan tabel users untuk mendapatkan nama pemilik
+        $outlet = $outletModel
+            ->join('users', 'users.user_id = outlets.owner_id')
+            ->where('outlets.outlet_id', $outlet_id)
+            ->select('outlets.*, users.name as owner_name, users.email as owner_email')
+            ->first();
+
+        if (!$outlet) {
+            return redirect()->to('/admin/outlets')->with('error', 'Outlet tidak ditemukan.');
+        }
+
+        $data['outlet'] = $outlet;
+        
+        // Menggunakan view baru yang tanpa tombol aksi
+        return view('admin/view_outlet_detail', $data);
+    }
+    public function viewOrderDetail($order_id)
+    {
+        $orderModel = new OrderModel();
+        
+        // 1. Ambil data pesanan utama
+        $order = $orderModel
+            ->where('orders.order_id', $order_id)
+            ->join('users', 'users.user_id = orders.customer_id')
+            ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+            ->first();
+
+        if (!$order) {
+            return redirect()->to('/admin/orders')->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        // 2. Ambil data pembayaran
+        $paymentModel = new \App\Models\PaymentModel();
+        $payment = $paymentModel->where('order_id', $order_id)->first();
+
+        // 3. Ambil rincian item pesanan
+        $orderItemModel = new \App\Models\OrderItemModel();
+        $order_items = $orderItemModel
+            ->where('order_items.order_id', $order_id)
+            ->join('services', 'services.service_id = order_items.service_id')
+            ->select('order_items.*, services.name as service_name, services.unit')
+            ->findAll();
+
+        // 4. Kirim semua data ke view
+        $data = [
+            'order'       => $order,
+            'payment'     => $payment,
+            'order_items' => $order_items
+        ];
+
+        return view('admin/view_order_detail', $data);
     }
 
 }
