@@ -236,6 +236,24 @@ public function dashboard()
         $data['outlet'] = $outlet;
         return view('admin/detail_outlet', $data);
     }
+
+    public function markRefunded($payment_id)
+{
+    $paymentModel = new \App\Models\PaymentModel();
+    $payment = $paymentModel->find($payment_id);
+
+    if (!$payment) {
+        return redirect()->back()->with('error', 'Pembayaran tidak ditemukan.');
+    }
+
+    // Update status jadi gagal
+    $paymentModel->update($payment_id, [
+        'status' => 'gagal'
+    ]);
+
+    return redirect()->back()->with('success', 'Status pembayaran berhasil diupdate menjadi gagal (refund).');
+}
+
     public function showPaymentDetail($payment_id)
     {
         $paymentModel = new PaymentModel();
@@ -246,7 +264,8 @@ public function dashboard()
             ->join('orders', 'orders.order_id = payments.order_id')
             ->join('users', 'users.user_id = orders.customer_id')
             ->join('outlets', 'outlets.outlet_id = orders.outlet_id') // <-- JOIN ke tabel outlets
-            ->select('payments.*, orders.customer_notes, users.name as customer_name, outlets.name as outlet_name') // <-- Ambil nama outlet
+           // ->select('payments.*, orders.customer_notes, users.name as customer_name, outlets.name as outlet_name') // <-- Ambil nama outlet
+            ->select('payments.*, orders.customer_notes, orders.status as order_status, users.name as customer_name, outlets.name as outlet_name')
             ->first();
             
         if (!$payment) {
@@ -268,6 +287,7 @@ public function dashboard()
 
         return view('admin/detail_payment', $data);
     }
+
     public function failOrRefundPayment($payment_id)
     {
         $paymentModel = new PaymentModel();
