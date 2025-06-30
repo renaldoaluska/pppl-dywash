@@ -211,6 +211,12 @@ public function dashboard()
         // Urutkan dari yang terbaru dan ambil semua hasilnya
         $data['orders'] = $query->orderBy('orders.created_at', 'DESC')->findAll();
         
+    $status = $this->request->getGet('status');
+            // Redirect jika status = pending
+    if ($status == 'pending') {
+        return redirect()->to('/admin/payments/verify');
+    }
+
         // Tampilkan view
         return view('admin/list_orders', $data);
     }
