@@ -7,6 +7,19 @@
 
 <?= $this->section('content') ?>
 
+<!-- Header Halaman - TELAH DIPERBARUI -->
+<div class="flex flex-col sm:flex-row items-center justify-between pb-4 mb-6 border-b">
+    <div class="flex items-center">
+        <!-- Tombol Kembali -->
+        <a href="/outlet/services/manage/<?php echo $current_outlet['outlet_id'] ?>" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
+            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        </a>
+        <div>
+            <h3 class="text-lg font-semibold text-gray-700"><?= $service ? 'Edit Layanan' : 'Tambah Layanan Baru' ?></h3>
+            <p class="text-sm text-gray-500 mt-1">Tambah atau edit layanan untuk outlet: <strong><?= esc($current_outlet['name']) ?></strong></p>
+        </div>
+    </div>
+</div>
 <div class="bg-white p-4 sm:p-6 rounded-xl shadow-md max-w-2xl mx-auto">
     
     <!-- Header Form -->

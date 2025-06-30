@@ -51,7 +51,7 @@ Verifikasi Outlet
 
                 <!-- PERUBAHAN: Menambahkan bagian footer dengan tombol aksi -->
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-end rounded-b-xl">
-                    <a href="/admin/outlets/detail/<?= $outlet['outlet_id'] ?>" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                    <a href="/admin/outlets/detail/<?= $outlet['outlet_id'] ?>?from=blue" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
                         Lihat Detail
                     </a>
                 </div>

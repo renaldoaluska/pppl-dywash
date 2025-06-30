@@ -68,7 +68,7 @@ if (request()->getGet('from') == 'verif') {
                         </div>
                     </div>
                     <div class="bg-gray-50 px-4 py-2 rounded-b-xl flex justify-end">
-                        <a href="/admin/outlets/detail/<?= $outlet['outlet_id'] ?>" class="text-sm font-medium text-blue-600 hover:underline">Lihat Detail</a>
+                        <a href="/admin/outlets/detail/<?= $outlet['outlet_id'] ?><?php if (request()->getGet('from') == 'verif') {echo '?from=verif';}?>" class="text-sm font-medium text-blue-600 hover:underline">Lihat Detail</a>
                     </div>
                 </div>
             <?php endforeach; ?>

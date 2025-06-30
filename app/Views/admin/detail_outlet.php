@@ -5,13 +5,20 @@ Detail Verifikasi Outlet
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-
+<?php
+    $back = '/admin/outlets';
+if (request()->getGet('from') == 'verif') {
+    $back = '/admin/outlets?from=verif';
+} else if (request()->getGet('from') == 'blue'){
+$back = '/admin/outlets/verify';
+}
+?>
 <!-- Menambahkan CSS untuk Peta Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
 <!-- Header Halaman -->
 <div class="flex items-center mb-6">
-    <a href="/admin/outlets/verify" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
+    <a href="<?= $back ?>" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
         <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
     </a>
     <div>

@@ -22,8 +22,7 @@ Detail Outlet
     <div class="space-y-4">
         <?php if ($outlet['latitude'] && $outlet['longitude']): ?>
 <div class="pt-4 border-t">
-    <label class="text-sm font-bold text-gray-600">Lokasi Map</label>
-    <div id="outletMap" class="h-64 rounded-lg mt-2 border border-slate-300"></div>
+    <label class="text-sm font-bold text-gray-600">Lokasi Map</label><div id="outletMap" class="relative z-0 h-64 rounded-lg mt-2 border border-slate-300"></div>
 
     <div class="flex gap-4 mt-2">
         <div class="w-1/2">

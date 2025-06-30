@@ -327,6 +327,13 @@ public function dashboard()
         $paymentModel = new \App\Models\PaymentModel();
         $payment = $paymentModel->where('order_id', $order_id)->first();
 
+        if (!$payment) {
+    $payment = [
+        'payment_method' => '-',
+        'status' => '-',
+    ];
+}
+
         // 3. Ambil rincian item pesanan
         $orderItemModel = new \App\Models\OrderItemModel();
         $order_items = $orderItemModel
