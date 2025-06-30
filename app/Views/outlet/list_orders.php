@@ -99,30 +99,45 @@ $statusColors = [
 <!-- Bagian Riwayat Pesanan -->
 <div class="bg-white p-4 sm:p-6 rounded-xl shadow-md mt-8">
     <h3 class="text-lg font-semibold text-gray-700 mb-4 pb-4 border-b">Riwayat Pesanan</h3>
+    <div class="flex flex-wrap gap-2 mb-4" id="history-filter">
+    <?php 
+    $statuses = ['semua', 'diterima', 'diambil', 'dicuci', 'dikirim', 'selesai', 'diulas', 'ditolak'];
+    ?>
+    <?php foreach ($statuses as $status): ?>
+        <button type="button" onclick="applyHistoryFilter('<?= $status ?>', this)"
+            class="history-filter-btn px-3 py-1 rounded-full border text-sm bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-600 hover:text-white transition"
+            <?= $status === 'semua' ? 'id="default-history-filter"' : '' ?>>
+            <?= ucfirst($status) ?>
+        </button>
+    <?php endforeach; ?>
+</div>
+
     <div class="space-y-4">
-        <?php if (!empty($history_orders)): ?>
-            <?php foreach ($history_orders as $order): ?>
-                <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" class="block bg-white border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-blue-400">
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <p class="text-xs text-gray-500">ID #<?= esc($order['order_id']) ?></p>
-                            <h4 class="text-md font-medium text-gray-800"><?= esc($order['customer_name']) ?></h4>
-                            <p class="text-sm text-gray-500"><?= esc($order['outlet_name']) ?></p>
-                        </div>
-                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full capitalize <?= $statusColors[$order['status']] ?? 'bg-gray-100' ?>">
-                             <?= str_replace('_', ' ', esc($order['status'])) ?>
-                        </span>
+    <?php if (!empty($history_orders)): ?>
+        <?php foreach ($history_orders as $order): ?>
+            <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" class="history-order-card block bg-white border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-blue-400" data-status="<?= esc($order['status']) ?>">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-xs text-gray-500">ID #<?= esc($order['order_id']) ?></p>
+                        <h4 class="text-md font-medium text-gray-800"><?= esc($order['customer_name']) ?></h4>
+                        <p class="text-sm text-gray-500"><?= esc($order['outlet_name']) ?></p>
                     </div>
-                    <div class="flex justify-between items-center mt-2 pt-2 border-t">
-                        <p class="text-sm text-gray-500"><?= date('d M Y', strtotime($order['created_at'])) ?></p>
-                        <p class="font-semibold text-gray-700">Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></p>
-                    </div>
-                </a>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p class="text-center py-8 text-gray-500">Belum ada riwayat pesanan.</p>
-        <?php endif; ?>
-    </div>
+                    <span class="px-2.5 py-1 text-xs font-semibold rounded-full capitalize <?= $statusColors[$order['status']] ?? 'bg-gray-100' ?>">
+                        <?= str_replace('_', ' ', esc($order['status'])) ?>
+                    </span>
+                </div>
+                <div class="flex justify-between items-center mt-2 pt-2 border-t">
+                    <p class="text-sm text-gray-500"><?= date('d M Y', strtotime($order['created_at'])) ?></p>
+                    <p class="font-semibold text-gray-700">Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></p>
+                </div>
+            </a>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <!-- Pesan selalu ada di DOM, default hidden -->
+    <p id="no-history-msg" class="text-center py-8 text-gray-500 hidden">Tidak ada pesanan dengan filter ini.</p>
+</div>
+
 </div>
 
 
@@ -136,35 +151,54 @@ $statusColors = [
         </div>
     </div>
 </div>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('confirmationModal');
-        if (!modal) return;
-        const confirmBtnYa = document.getElementById('confirmBtnYa');
-        const confirmBtnTidak = document.getElementById('confirmBtnTidak');
-        let formToSubmit = null;
-        document.querySelectorAll('.update-btn').forEach(button => {
-            button.addEventListener('click', function(event) {
-                // event.stopPropagation() tidak diperlukan di sini karena kita mencegah default di div pembungkus
-                formToSubmit = event.target.closest('form');
-                modal.classList.add('flex');
-                modal.classList.remove('hidden');
-            });
-        });
-        function hideModal() {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            formToSubmit = null;
-        }
-        confirmBtnYa.addEventListener('click', () => { 
-            if (formToSubmit) formToSubmit.submit();
-        });
-        confirmBtnTidak.addEventListener('click', hideModal);
-        modal.addEventListener('click', (event) => { 
-            if (event.target === modal) hideModal();
-        });
+document.addEventListener('DOMContentLoaded', () => {
+    // Auto trigger filter 'semua' saat load
+    const defaultBtn = document.getElementById('default-history-filter');
+    if (defaultBtn) {
+        applyHistoryFilter('semua', defaultBtn);
+    }
+});
+
+function applyHistoryFilter(status, btn) {
+    console.log('Filter riwayat status:', status); // Debug
+
+    // Highlight button terpilih
+    document.querySelectorAll('.history-filter-btn').forEach(b => {
+        b.classList.remove('bg-blue-600', 'text-white');
+        b.classList.add('bg-gray-100', 'text-gray-700');
     });
+    btn.classList.remove('bg-gray-100', 'text-gray-700');
+    btn.classList.add('bg-blue-600', 'text-white');
+
+    const cards = document.querySelectorAll('.history-order-card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+        if (status === 'semua' || card.dataset.status === status) {
+            card.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+
+    // Tampilkan atau sembunyikan pesan jika kosong
+    const msg = document.getElementById('no-history-msg');
+    if (visibleCount === 0) {
+        msg.classList.remove('hidden');
+        msg.textContent = 'Belum ada pesanan dengan filter "' + status + '".';
+    } else {
+        msg.classList.add('hidden');
+    }
+
+    // Scroll ke riwayat saat filter ditekan
+    const riwayat = document.getElementById('riwayat');
+    if (riwayat) {
+        riwayat.scrollIntoView({ behavior: 'smooth' });
+    }
+}
 </script>
+
 
 <?= $this->endSection() ?>
