@@ -31,6 +31,15 @@ $statusColors = [
     </div>
 <?php endif; ?>
 
+<div class="mb-4">
+    <!--<label for="filter-outlet" class="block mb-1 text-sm font-medium text-gray-700">Filter berdasarkan Outlet</label>-->
+    <select id="filter-outlet" class="w-full sm:w-64 px-3 py-2 border rounded-lg">
+        <option value="all">Semua Outlet</option>
+        <?php foreach ($outlets as $outlet): ?>
+            <option value="<?= esc($outlet['outlet_id']) ?>"><?= esc($outlet['name']) ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
 
 <!-- Bagian Pesanan Aktif -->
 <div class="bg-white p-4 sm:p-6 rounded-xl shadow-md">
@@ -39,7 +48,9 @@ $statusColors = [
         <?php if (!empty($pending_orders)): ?>
             <?php foreach ($pending_orders as $order): ?>
                 <!-- Kartu sekarang menjadi link ke halaman detail -->
-                <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" class="block bg-white border border-gray-200 rounded-xl transition-all duration-300 hover:shadow-lg hover:border-blue-400">
+                 <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" 
+   data-outlet-id="<?= $order['outlet_id'] ?>"
+   class="order-card block bg-white border border-gray-200 rounded-xl transition-all duration-300 hover:shadow-lg hover:border-blue-400">
                     <div class="p-4">
                         <div class="flex items-start justify-between">
                             <div>
@@ -115,7 +126,10 @@ $statusColors = [
     <div class="space-y-4">
     <?php if (!empty($history_orders)): ?>
         <?php foreach ($history_orders as $order): ?>
-            <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" class="history-order-card block bg-white border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-blue-400" data-status="<?= esc($order['status']) ?>">
+            <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" 
+   data-outlet-id="<?= $order['outlet_id'] ?>"
+   class="history-order-card block bg-white border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-blue-400" data-status="<?= esc($order['status']) ?>">
+
                 <div class="flex items-start justify-between">
                     <div>
                         <p class="text-xs text-gray-500">ID #<?= esc($order['order_id']) ?></p>
@@ -199,6 +213,37 @@ function applyHistoryFilter(status, btn) {
     }
 }
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const outletFilter = document.getElementById('filter-outlet');
+    if (outletFilter) {
+        outletFilter.addEventListener('change', function() {
+            const selectedOutlet = this.value;
+            console.log('Filter outlet:', selectedOutlet);
 
+            // Filter Pesanan Aktif
+            document.querySelectorAll('.order-card').forEach(card => {
+                if (selectedOutlet === 'all' || card.dataset.outletId === selectedOutlet) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Filter Riwayat Pesanan
+            document.querySelectorAll('.history-order-card').forEach(card => {
+                if (selectedOutlet === 'all' || card.dataset.outletId === selectedOutlet) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            // Opsional: scroll ke bagian tertentu jika perlu
+            // document.getElementById('riwayat').scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+});
+</script>
 
 <?= $this->endSection() ?>
