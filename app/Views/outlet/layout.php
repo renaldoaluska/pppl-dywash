@@ -35,7 +35,7 @@
     <!-- Konten Utama -->
     <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24">
         <!-- Judul halaman dipindahkan ke sini -->
-        <h1 class="text-2xl font-bold text-gray-800 mb-6"><?= $this->renderSection('title') ?></h1>
+        <h1 class="text-2xl font-bold text-gray-800"><?= $this->renderSection('title') ?></h1>
         
         <?= $this->renderSection('content') ?>
     </main>

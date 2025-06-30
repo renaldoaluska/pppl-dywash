@@ -23,28 +23,16 @@
 
     <?php if (!$hideBars): ?>
     <!-- Header Atas (Sticky) -->
-    <header class="sticky top-0 bg-white shadow-sm z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Placeholder Kiri (untuk mendorong logo ke tengah) -->
-                <div class="w-1/3">
-                    <!-- Kosong -->
-                </div>
-
-                <!-- Logo di Tengah -->
-                <div class="w-1/3 flex justify-center">
-                    <a href="/dashboard">
-                        <img src="<?= base_url('assets/img/logo.png') ?>" alt="DyWash Logo"  class="h-12 w-auto object-contain">
-                    </a>
-                </div>
-
-                <!-- Placeholder Kanan (untuk mendorong logo ke tengah) -->
-                <div class="w-1/3">
-                    <!-- Kosong -->
-                </div>
-            </div>
-        </div>
-    </header>
+       <header class="sticky top-0 bg-white shadow-sm z-10">
+     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+         <div class="flex justify-center items-center h-16">
+             <div class="flex items-center space-x-3">
+                 <img src="<?= base_url('assets/img/logo.png') ?>" alt="DyWash Logo"  class="h-12 w-auto object-contain">
+                 <h1 class="text-xl font-semibold text-gray-800 hidden sm:block"><?= $this->renderSection('title') ?></h1>
+             </div>
+         </div>
+     </div>
+ </header>
     <?php endif; ?>
 
     <!-- Konten Utama -->

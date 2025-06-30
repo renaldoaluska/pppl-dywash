@@ -30,7 +30,7 @@
                 
                 <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                     <a href="<?= site_url('/') ?>">
-                        <img src="<?= base_url('assets/img/logo.png') ?>" alt="Logo" class="h-12 w-auto object-contain">
+                        <img src="<?= base_url('assets/img/logo.png') ?>" alt="DyWash Logo" class="h-12 w-auto object-contain">
                     </a>
                 </div>
 
