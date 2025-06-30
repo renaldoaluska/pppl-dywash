@@ -7,7 +7,8 @@ Pembayaran Pesanan
 <?= $this->section('content') ?>
 
     <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-        <h1 class="text-2xl font-bold text-slate-800 text-center">Konfirmasi Pembayaran</h1>
+        <h1 class="text-xl font-bold text-slate-800 text-center">Pesanan ID #<?= esc($order['order_id']) ?><br/>telah berhasil dibuat!</h1>
+        <h2 class="text-l font-medium text-slate-800 text-center">Silakan Konfirmasi Pembayaran</h2>
         
         <div class="bg-slate-50 rounded-xl p-5 my-6 text-center">
             <h3 class="text-sm font-medium text-slate-500">Total Tagihan untuk Pesanan #<?= esc($order['order_id']) ?></h3>
