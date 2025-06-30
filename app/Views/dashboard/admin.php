@@ -92,7 +92,7 @@ Dashboard
     <div class="p-5">
         <div class="text-lg font-semibold text-gray-800 mb-3">Non-aktif</div>
         <?php
-        $selesai_statuses = ['ditolak','selesai', 'diulas'];
+        $selesai_statuses = ['selesai', 'diulas','ditolak'];
         foreach ($selesai_statuses as $status):
             $status_key = str_replace(' ', '_', $status);
             $count_var = $status_key . '_orders_count';
