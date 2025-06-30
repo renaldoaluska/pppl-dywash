@@ -555,7 +555,8 @@ $data['pending_payments'] = $orderModel
             ->where('orders.order_id', $order_id)
             ->join('users', 'users.user_id = orders.customer_id')
             ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+           # ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+           ->select('orders.*, users.name as customer_name, outlets.name as outlet_name, outlets.address as outlet_address, outlets.contact_phone as outlet_phone')
             ->first();
 
         // Jika pesanan tidak ditemukan, lempar kembali

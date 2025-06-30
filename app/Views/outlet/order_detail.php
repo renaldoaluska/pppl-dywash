@@ -32,6 +32,16 @@ Detail Pesanan #<?= esc($order['order_id']) ?>
                 </div>
             </div>
 
+            <!-- Info Outlet Pengelola -->
+<div class="bg-white p-6 rounded-xl shadow-md">
+    <h4 class="text-md font-bold text-gray-800 mb-3">Dikelola oleh Outlet</h4>
+    <div class="text-sm text-gray-600 space-y-1">
+        <p class="font-semibold"><?= esc($order['outlet_name']) ?></p>
+        <p><?= esc($order['outlet_phone']) ?></p>
+        <p><?= esc($order['outlet_address']) ?></p>
+    </div>
+</div>
+
             <!-- Rincian Item Pesanan -->
             <div class="bg-white rounded-xl shadow-md">
                 <h4 class="text-md font-bold text-gray-800 p-6 pb-0">Rincian Layanan</h4>
