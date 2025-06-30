@@ -149,3 +149,18 @@ $routes->get('/admin/payments/fail/(:num)', 'AdminController::failOrRefundPaymen
 $routes->get('/admin/outlets/detail/(:num)', 'AdminController::viewOutletDetail/$1');
 // Rute untuk halaman detail pesanan oleh admin
 $routes->get('/admin/orders/detail/(:num)', 'AdminController::viewOrderDetail/$1');
+
+// Rute untuk menampilkan halaman daftar outlet yang menunggu verifikasi
+$routes->get('/admin/verify', 'AdminController::listPendingOutlets');
+
+// Rute untuk memproses aksi verifikasi (Setujui/Tolak)
+$routes->get('/admin/verify/action/(:num)/(:alpha)', 'AdminController::verifyOutlet/$1/$2');
+
+// Rute untuk halaman "Outlet Saya" milik owner
+$routes->get('/outlet/my-outlets', 'OutletController::listMyOutlets');
+
+// Rute untuk alur VERIFIKASI
+$routes->get('/admin/outlets/detail/(:num)', 'AdminController::showOutletDetail/$1');
+
+// Rute untuk alur MELIHAT DAFTAR
+$routes->get('/admin/outlets/view/(:num)', 'AdminController::viewOutletDetail/$1');

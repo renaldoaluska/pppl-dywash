@@ -11,7 +11,7 @@ Detail Verifikasi Outlet
 
 <!-- Header Halaman -->
 <div class="flex items-center mb-6">
-    <a href="/admin/outlets/verify" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
+    <a href="/admin/verify" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
         <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
     </a>
     <div>
@@ -40,12 +40,15 @@ Detail Verifikasi Outlet
             <p class="text-gray-800"><?= esc($outlet['operating_hours'] ?: '-') ?></p>
         </div>
         
-        <!-- PERUBAHAN BARU: Menampilkan Peta Lokasi -->
         <?php if (!empty($outlet['latitude']) && !empty($outlet['longitude'])): ?>
         <div class="pt-4 border-t">
             <label class="text-sm font-bold text-gray-600">Lokasi Peta</label>
-            <!-- Elemen div ini akan menjadi container untuk peta -->
-            <div id="map" class="mt-2 h-64 w-full rounded-lg shadow-inner border"></div>
+            <!-- PERBAIKAN: Menambahkan z-0 dan relative agar peta berada di lapisan bawah -->
+            <div id="map" class="relative z-0 mt-2 h-64 w-full rounded-lg shadow-inner border"></div>
+        </div>
+        <div class="pt-4 border-t">
+            <label class="text-sm font-bold text-gray-600">Koordinat</label>
+            <p class="text-xs text-gray-600">Lat: <span class="font-mono"><?= esc($outlet['latitude']) ?></span>, Long: <span class="font-mono"><?= esc($outlet['longitude']) ?></span></p>
         </div>
         <?php endif; ?>
         
@@ -56,7 +59,6 @@ Detail Verifikasi Outlet
     </div>
 
     <!-- Tombol Aksi Verifikasi -->
-    <!-- PERUBAHAN: Tombol aksi sekarang hanya muncul jika statusnya 'pending' -->
     <?php if ($outlet['status'] == 'pending'): ?>
     <div class="border-t mt-6 pt-6 flex flex-col sm:flex-row justify-end gap-3">
         <button type="button" 
@@ -83,7 +85,8 @@ Detail Verifikasi Outlet
 </div>
 
 <!-- Modal Konfirmasi Aksi -->
-<div id="actionConfirmationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+<!-- PERBAIKAN: Mengganti z-50 menjadi z-[9999] agar berada di lapisan paling atas -->
+<div id="actionConfirmationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
     <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm text-center">
         <h3 id="modalTitle" class="text-lg font-bold text-gray-900"></h3>
         <p id="modalMessage" class="text-sm text-gray-500 mt-2"></p>
@@ -97,10 +100,10 @@ Detail Verifikasi Outlet
 <!-- Menambahkan JavaScript untuk Peta Leaflet -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-<!-- Script untuk mengontrol modal dan peta -->
+<!-- Script dipindahkan ke dalam section content -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Bagian Logika Modal (tetap sama)
+    // Logika untuk Modal
     const modal = document.getElementById('actionConfirmationModal');
     if (modal) {
         const modalTitle = document.getElementById('modalTitle');
@@ -131,32 +134,23 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
-
         cancelBtn.addEventListener('click', hideModal);
-        modal.addEventListener('click', (event) => { 
-            if (event.target === modal) hideModal();
-        });
+        modal.addEventListener('click', (event) => { if (event.target === modal) hideModal(); });
     }
 
-    // PERUBAHAN BARU: Logika untuk menampilkan peta
+    // Logika untuk Peta
     const mapElement = document.getElementById('map');
     if (mapElement) {
-        // Ambil data latitude dan longitude dari PHP
         const lat = <?= json_encode($outlet['latitude'] ?? null) ?>;
         const lng = <?= json_encode($outlet['longitude'] ?? null) ?>;
-        
-        // Inisialisasi peta
-        const map = L.map('map').setView([lat, lng], 15); // Level zoom 15
-
-        // Tambahkan layer peta dari OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        // Tambahkan marker (penanda) di lokasi outlet
-        L.marker([lat, lng]).addTo(map)
-            .bindPopup('<b><?= esc($outlet['name'], 'js') ?></b><br><?= esc($outlet['address'], 'js') ?>')
-            .openPopup();
+        if(lat && lng) {
+            const map = L.map('map').setView([lat, lng], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup('<b><?= esc($outlet['name'], 'js') ?></b>').openPopup();
+        }
     }
 });
 </script>
