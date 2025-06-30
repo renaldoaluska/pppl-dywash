@@ -121,7 +121,8 @@ public function dashboard()
             ->where('payments.status', 'pending')
             ->join('orders', 'orders.order_id = payments.order_id')
             ->join('users', 'users.user_id = orders.customer_id')
-            ->select('payments.*, orders.total_amount, users.name as customer_name')
+            ->join('outlets', 'orders.outlet_id = outlets.outlet_id') // ✅ JOIN OUTLETS
+            ->select('payments.*, orders.total_amount, users.name as customer_name, outlets.name as outlet_name') // ✅ SELECT OUTLET NAME
             ->orderBy('payments.order_id', 'DESC')
             ->findAll();
         
