@@ -10,9 +10,15 @@ Daftar Pesanan
     
     <!-- Header dengan Fitur Pencarian -->
     <div class="flex flex-col sm:flex-row items-center justify-between pb-4 border-b">
-        <div>
-            <h3 class="text-lg font-semibold text-gray-700">Semua Pesanan Customer</h3>
-            <p class="text-sm text-gray-500 mt-1">Kelola dan pantau semua pesanan yang masuk.</p>
+        <!-- PERUBAHAN: Menambahkan wrapper dan tombol kembali -->
+        <div class="flex items-center">
+            <a href="/dashboard" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            </a>
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700">Semua Pesanan Customer</h3>
+                <p class="text-sm text-gray-500 mt-1">Kelola dan pantau semua pesanan yang masuk.</p>
+            </div>
         </div>
         <div class="w-full sm:w-auto flex items-center space-x-2 mt-4 sm:mt-0">
              <form action="/admin/orders" method="get" class="w-full">
@@ -42,13 +48,13 @@ Daftar Pesanan
                             </div>
                             <?php
                                 $status = $order['status'];
-                                $badgeColor = 'bg-gray-100 text-gray-800'; // Default (e.g., 'dibatalkan')
+                                $badgeColor = 'bg-gray-100 text-gray-800';
                                 if ($status == 'diterima') $badgeColor = 'bg-blue-100 text-blue-800';
-                                elseif ($status == 'diproses') $badgeColor = 'bg-yellow-100 text-yellow-800';
                                 elseif ($status == 'selesai') $badgeColor = 'bg-green-100 text-green-800';
+                                elseif ($status == 'ditolak') $badgeColor = 'bg-red-100 text-red-800';
                             ?>
-                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full <?= $badgeColor ?>">
-                                <?= ucfirst(esc($status)) ?>
+                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full capitalize <?= $badgeColor ?>">
+                                <?= esc($status) ?>
                             </span>
                         </div>
                         
@@ -70,12 +76,12 @@ Daftar Pesanan
                     </div>
                     <!-- Tombol Aksi -->
                     <div class="bg-gray-50 px-4 py-2 rounded-b-xl flex justify-end">
-                        <a href="#" class="text-sm font-medium text-blue-600 hover:underline">Lihat Detail Pesanan</a>
+                        <!-- PERUBAHAN: Link sekarang mengarah ke detail pesanan admin -->
+                        <a href="/admin/orders/detail/<?= $order['order_id'] ?>" class="text-sm font-medium text-blue-600 hover:underline">Lihat Detail Pesanan</a>
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <!-- Tampilan jika tidak ada pesanan -->
             <div class="text-center border-2 border-dashed border-gray-300 p-8 rounded-xl">
                  <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                 <h3 class="mt-2 text-sm font-medium text-gray-900">Belum Ada Pesanan</h3>
@@ -84,8 +90,6 @@ Daftar Pesanan
         <?php endif; ?>
     </div>
     
-    <!-- Paginasi (Sengaja Dihapus Sesuai Permintaan) -->
-
 </div>
 
 <?= $this->endSection() ?>

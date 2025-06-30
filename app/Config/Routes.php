@@ -138,3 +138,5 @@ $routes->get('/admin/payments/fail/(:num)', 'AdminController::failOrRefundPaymen
 
 // Rute untuk halaman detail outlet oleh admin
 $routes->get('/admin/outlets/detail/(:num)', 'AdminController::viewOutletDetail/$1');
+// Rute untuk halaman detail pesanan oleh admin
+$routes->get('/admin/orders/detail/(:num)', 'AdminController::viewOrderDetail/$1');

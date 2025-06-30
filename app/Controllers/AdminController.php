@@ -249,5 +249,42 @@ class AdminController extends BaseController
         // Menggunakan view baru yang tanpa tombol aksi
         return view('admin/view_outlet_detail', $data);
     }
+    public function viewOrderDetail($order_id)
+    {
+        $orderModel = new OrderModel();
+        
+        // 1. Ambil data pesanan utama
+        $order = $orderModel
+            ->where('orders.order_id', $order_id)
+            ->join('users', 'users.user_id = orders.customer_id')
+            ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name')
+            ->first();
+
+        if (!$order) {
+            return redirect()->to('/admin/orders')->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        // 2. Ambil data pembayaran
+        $paymentModel = new \App\Models\PaymentModel();
+        $payment = $paymentModel->where('order_id', $order_id)->first();
+
+        // 3. Ambil rincian item pesanan
+        $orderItemModel = new \App\Models\OrderItemModel();
+        $order_items = $orderItemModel
+            ->where('order_items.order_id', $order_id)
+            ->join('services', 'services.service_id = order_items.service_id')
+            ->select('order_items.*, services.name as service_name, services.unit')
+            ->findAll();
+
+        // 4. Kirim semua data ke view
+        $data = [
+            'order'       => $order,
+            'payment'     => $payment,
+            'order_items' => $order_items
+        ];
+
+        return view('admin/view_order_detail', $data);
+    }
 
 }
