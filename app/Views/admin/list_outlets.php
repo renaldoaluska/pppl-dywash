@@ -5,14 +5,19 @@ Daftar Outlet
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-
+<?php
+$back = '/dashboard';
+if (request()->getGet('from') == 'verif') {
+    $back = '/admin/outlets/verify';
+}
+?>
 <div class="bg-white p-4 sm:p-6 rounded-xl shadow-md">
     
     <!-- Header dengan Fitur Pencarian -->
     <div class="flex flex-col sm:flex-row items-center justify-between pb-4 border-b">
         <!-- PERBAIKAN: Menghapus kelas 'hidden' dan 'sm:block' dari tombol kembali -->
         <div class="flex items-center">
-            <a href="/dashboard" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
+            <a href="<?= $back ?>" class="p-2 mr-2 rounded-full hover:bg-gray-200 transition-colors">
                 <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             </a>
             <div>

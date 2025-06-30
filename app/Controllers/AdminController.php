@@ -12,19 +12,63 @@ class AdminController extends BaseController
      * FUNGSI BARU: Menampilkan dashboard utama admin dengan data ringkasan.
      * Method ini ditambahkan untuk menghitung data statistik di halaman dashboard.
      */
-    public function dashboard()
+ /**
+     * FUNGSI DASHBOARD (VERSI LENGKAP)
+     * Menampilkan semua statistik dari status order, payment, dan outlet.
+     */
+public function dashboard()
     {
-        $outletModel = new OutletModel();
-        $paymentModel = new PaymentModel();
-        $orderModel = new OrderModel();
+        $outletModel  = new \App\Models\OutletModel();
+        $paymentModel = new \App\Models\PaymentModel();
+        $orderModel   = new \App\Models\OrderModel();
 
+        // Inisialisasi semua data ke 0
         $data = [
-            'pending_outlets_count' => $outletModel->where('status', 'pending')->countAllResults(),
-            'pending_payments_count' => $paymentModel->where('status', 'pending')->countAllResults(),
-            // PERUBAHAN: Sekarang hanya menghitung outlet yang statusnya 'verified'
-            'total_outlets_count' => $outletModel->where('status', 'verified')->countAllResults(),
-            'total_orders_count' => $orderModel->countAllResults()
+            'total_outlets_count'   => 0, 'pending_outlets_count' => 0,
+            'total_orders_count'      => 0, 'aktif_orders_count'    => 0, 
+            'diterima_orders_count' => 0, 'diambil_orders_count'  => 0,
+            'dicuci_orders_count'   => 0, 'dikirim_orders_count'  => 0,
+            'selesai_orders_count'  => 0, 'diulas_orders_count'   => 0,
+            'ditolak_orders_count'  => 0, 'pending_payments_count' => 0,
+            'lunas_payments_count'   => 0, 'gagal_payments_count'   => 0,
+            'cod_payments_count'     => 0,
         ];
+
+        // 1. STATISTIK OUTLET
+        $data['total_outlets_count']   = $outletModel->where('status', 'verified')->countAllResults();
+        $data['pending_outlets_count'] = $outletModel->where('status', 'pending')->countAllResults();
+
+        // 2. STATISTIK PESANAN (1x Query)
+        $orderCounts = $orderModel->select('status, COUNT(order_id) as count')
+                                  ->groupBy('status')
+                                  ->findAll();
+        
+        foreach ($orderCounts as $row) {
+            if (isset($data[$row['status'] . '_orders_count'])) {
+                $data[$row['status'] . '_orders_count'] = $row['count'];
+            }
+        }
+
+        // 3. STATISTIK PEMBAYARAN (1x Query)
+        $paymentCounts = $paymentModel->select('status, COUNT(payment_id) as count')
+                                      ->groupBy('status')
+                                      ->findAll();
+
+        foreach ($paymentCounts as $row) {
+            if (isset($data[$row['status'] . '_payments_count'])) {
+                $data[$row['status'] . '_payments_count'] = $row['count'];
+            }
+        }
+        
+        // 4. KALKULASI TOTAL & AKTIF
+        // total_orders_count sekarang adalah grand total semua pesanan
+        $data['total_orders_count'] = $orderModel->countAllResults();
+        
+        // aktif_orders_count adalah jumlah pesanan yang sedang berjalan
+        $data['aktif_orders_count'] = $data['diterima_orders_count'] +
+                                      $data['diambil_orders_count'] +
+                                      $data['dicuci_orders_count'] +
+                                      $data['dikirim_orders_count'];
 
         return view('dashboard/admin', $data);
     }
@@ -129,6 +173,13 @@ class AdminController extends BaseController
 
         $data['outlets'] = $query->orderBy('outlet_id', 'DESC')->findAll();
 
+        
+    $status = $this->request->getGet('status');
+
+    // Redirect jika status = pending
+    if ($status == 'pending') {
+        return redirect()->to('/admin/outlets/verify');
+    }
         return view('admin/list_outlets', $data);
     }
 

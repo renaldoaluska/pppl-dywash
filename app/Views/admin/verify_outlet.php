@@ -6,6 +6,18 @@ Verifikasi Outlet
 
 <?= $this->section('content') ?>
 
+<!-- Header: Jumlah Outlet Menunggu + Tombol Lihat Semua -->
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <h2 class="text-xl font-bold text-gray-800">
+        <?= count($outlets) ?> Outlet Pending
+    </h2>
+    <a href="/admin/outlets?from=verif" class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-green-700 transition">
+        Lihat Semua Outlet Terdaftar
+    </a>
+</div>
+
+
+
 <!-- Menampilkan pesan sukses jika ada -->
 <?php if (session()->getFlashdata('success')): ?>
     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg shadow" role="alert">
@@ -13,6 +25,7 @@ Verifikasi Outlet
         <p><?= session()->getFlashdata('success') ?></p>
     </div>
 <?php endif; ?>
+
 
 <!-- Container untuk daftar kartu outlet -->
 <div class="space-y-4">

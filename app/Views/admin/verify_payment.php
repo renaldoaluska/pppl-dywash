@@ -5,6 +5,15 @@ Verifikasi Pembayaran
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<!-- Header: Jumlah Pembayaran Pending + Tombol Lihat Semua Pesanan -->
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <h2 class="text-xl font-bold text-gray-800">
+        <?= count($payments) ?> Pembayaran Pending
+    </h2>
+    <a href="/admin/orders?from=verif" class="inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg shadow hover:bg-green-700 transition">
+        Lihat Semua Pesanan
+    </a>
+</div>
 
 <!-- Menampilkan pesan sukses jika ada -->
 <?php if (session()->getFlashdata('success')): ?>
