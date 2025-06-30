@@ -22,6 +22,9 @@ $routes->post('/auth/register', 'AuthController::register');
 
 // Rute untuk fitur-fitur Customer
 $routes->get('/customer/dashboard', 'CustomerController::dashboard');
+$routes->get('/customer', function() {
+    return redirect()->to('/customer/dashboard');
+});
 $routes->get('/customer/outlet', 'CustomerController::listOutlet');
 $routes->get('/customer/order/create/(:num)', 'CustomerController::createOrder/$1');
 $routes->post('/customer/order/store', 'CustomerController::storeOrder');
@@ -110,10 +113,16 @@ $routes->get('/outlet/manage', 'OutletController::listMyOutlets');
 $routes->get('/outlet/(:num)/reviews', 'OutletController::showReviewsForOutlet/$1');
 
 // Rute untuk fitur Admin
-$routes->get('/admin/verify', 'AdminController::listPendingOutlets');
-$routes->get('/admin/verify/action/(:num)/(:segment)', 'AdminController::verifyOutlet/$1/$2');
+$routes->get('/admin/outlets/verify', 'AdminController::listPendingOutlets');
+$routes->get('/admin/outles/action/(:num)/(:segment)', 'AdminController::verifyOutlet/$1/$2');
 $routes->get('/admin/dashboard', 'AdminController::dashboard');
+$routes->get('/admin', function() {
+    return redirect()->to('/admin/dashboard');
+});
 $routes->get('/outlet/dashboard', 'OutletController::dashboard');
+$routes->get('/outlet', function() {
+    return redirect()->to('/outlet/dashboard');
+});
 
 // Rute untuk alur pembayaran customer
 $routes->get('/customer/payment/(:num)', 'CustomerController::paymentForm/$1');
@@ -126,3 +135,17 @@ $routes->get('/admin/payments/verify/action/(:num)', 'AdminController::verifyPay
 // di dalam app/Config/Routes.php
 $routes->get('/admin/outlets', 'AdminController::listAllOutlets');
 $routes->get('/admin/orders', 'AdminController::listAllOrders');
+
+// liat detail outlet sebelum verif
+$routes->get('/admin/outlets/detail/(:num)', 'AdminController::showOutletDetail/$1');
+
+// Rute untuk halaman detail verifikasi pembayaran
+$routes->get('/admin/payments/detail/(:num)', 'AdminController::showPaymentDetail/$1');
+
+// Rute untuk menggagalkan atau merefund pembayaran
+$routes->get('/admin/payments/fail/(:num)', 'AdminController::failOrRefundPayment/$1');
+
+// Rute untuk halaman detail outlet oleh admin
+$routes->get('/admin/outlets/detail/(:num)', 'AdminController::viewOutletDetail/$1');
+// Rute untuk halaman detail pesanan oleh admin
+$routes->get('/admin/orders/detail/(:num)', 'AdminController::viewOrderDetail/$1');
