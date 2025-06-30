@@ -42,7 +42,14 @@ Detail Outlet
         </div>
     </div>
 </div>
-<?php endif; ?>
+    <?php else: ?>
+        <div class="pt-4 border-t">
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg" role="alert">
+                <p class="font-bold">Perhatian</p>
+                <p>Mohon segera tambahkan posisi koordinat peta.</p>
+            </div>
+        </div>
+    <?php endif; ?>
 
         <div>
             <label class="text-sm font-bold text-gray-600">Nama Outlet</label>

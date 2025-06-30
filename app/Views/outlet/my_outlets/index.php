@@ -51,6 +51,12 @@ Outlet Saya
                         <span class="px-2.5 py-1 text-xs font-semibold rounded-full <?= $badgeColor ?>"><?= ucfirst(esc($status)) ?></span>
                     </div>
                     <p class="text-sm text-gray-500 mt-1"><?= esc($outlet['address']) ?></p>
+                
+                    <?php if (empty($outlet['latitude']) || empty($outlet['longitude'])): ?>
+                        <div class="mt-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-3 rounded-md text-xs" role="alert">
+                            <p><strong class="font-semibold">Perhatian:</strong> Mohon segera tambahkan posisi koordinat peta.</p>
+                        </div>
+                    <?php endif; ?>
                 </a>
                 <!-- Bagian bawah kartu (tombol) sebagai div terpisah -->
                 <div class="border-t border-gray-200 bg-gray-50 px-4 py-3 sm:px-6 flex flex-col sm:flex-row justify-end gap-3 rounded-b-xl">
