@@ -744,7 +744,7 @@ public function updateAlamat($id)
     ->update();
 
 
-    return redirect()->to('/customer/profil/alamat')->with('success', 'Alamat berhasil diperbarui.');
+    return redirect()->to('/customer/profil/alamat')->with('success', 'Alamat utama sukses diubah');
 }
 
 public function deleteAlamat($id)

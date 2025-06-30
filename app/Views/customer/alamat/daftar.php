@@ -26,13 +26,17 @@ Daftar Alamat
 <?php else: ?>
     <div class="space-y-4">
 <?php foreach ($addresses as $address): ?>
-    <div class="p-4 border rounded bg-white shadow space-y-2">
-        <div>
-            <p class="font-semibold"><?= esc($address['label']) ?><?= $address['is_primary'] ? ' (Utama)' : '' ?></p>
-        </div>
+    <div class="p-4 border rounded shadow space-y-2 transition <?= $address['is_primary'] ? 'border-blue-500 bg-blue-50' : 'bg-white' ?>">
+    <div class="flex justify-between items-center">
+        <p class="font-semibold"><?= esc($address['label']) ?></p>
+        <?php if ($address['is_primary']): ?>
+            <span class="text-xs bg-green-500 text-white rounded-full px-2 py-0.5">UTAMA</span>
+        <?php endif; ?>
+    </div>
 
-        <p><?= esc($address['recipient_name']) ?> | <?= esc($address['phone_number']) ?></p>
-        <p class="text-slate-600"><?= esc($address['address_detail']) ?></p>
+    <p><?= esc($address['recipient_name']) ?> | <?= esc($address['phone_number']) ?></p>
+    <p class="text-slate-600"><?= esc($address['address_detail']) ?></p>
+
 
         <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 pt-2 border-t">
             <a href="/customer/profil/alamat/edit/<?= $address['address_id'] ?>"
