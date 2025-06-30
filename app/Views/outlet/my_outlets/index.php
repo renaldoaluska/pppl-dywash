@@ -67,11 +67,32 @@ Outlet Saya
                     </a>
                     
                      <?php
-    $waText = urlencode("Halo admin, saya ingin klaim penerimaan pembayaran saya.\n\nID Outlet: #{$outlet['outlet_id']}\nNama Outlet: {$outlet['name']}\nAlamat: {$outlet['address']}\nLat: {$outlet['latitude']}\nLong: {$outlet['longitude']}");
-  ?>
-                    <a href="https://wa.me/6285183066133?text=<?= $waText ?>" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">
-                        Klaim Pembayaran
-                    </a>
+// Ambil status dari outlet
+$status = $outlet['status'];
+
+// Siapkan teks untuk WhatsApp
+$waText = urlencode("Halo admin, saya ingin klaim penerimaan pembayaran saya.\n\nID Outlet: #{$outlet['outlet_id']}\nNama Outlet: {$outlet['name']}\nAlamat: {$outlet['address']}\nLat: {$outlet['latitude']}\nLong: {$outlet['longitude']}");
+
+// Tentukan properti tombol berdasarkan status (default untuk selain 'pending')
+$buttonClass = 'bg-green-600 hover:bg-green-700';
+$buttonHref = "https://wa.me/6285183066133?text={$waText}";
+$isClickable = true;
+
+// Jika statusnya 'pending', ubah properti tombol
+if ($status == 'pending') {
+    // Diubah menjadi abu-abu yang lebih muda
+    $buttonClass = 'bg-gray-300 cursor-not-allowed'; 
+    $buttonHref = '#'; // Link tidak kemana-mana
+    $isClickable = false; // Tandai sebagai tidak bisa diklik
+}
+?>
+
+<a href="<?= $buttonHref ?>" 
+   class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white rounded-lg <?= $buttonClass ?>"
+   <?php if (!$isClickable): ?> onclick="return false;" <?php endif; ?>
+>
+    Klaim Pembayaran
+</a>
                 </div>
             </div>
         <?php endforeach; ?>
