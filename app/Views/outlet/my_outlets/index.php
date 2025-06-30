@@ -68,7 +68,7 @@ $layananButtonHref  = "/outlet/services/manage/{$outlet['outlet_id']}";
 $isClickable        = true;
 
 // Jika statusnya 'pending', ubah properti tombol menjadi nonaktif
-if ($status == 'pending') {
+if ($status != 'verified') {
     $layananButtonClass = 'bg-gray-300 text-gray-500 cursor-not-allowed';
     $layananButtonHref  = '#';
     $isClickable        = false;
@@ -89,7 +89,7 @@ $ulasanButtonHref  = "/outlet/{$outlet['outlet_id']}/reviews";
 $isClickable       = true;
 
 // Jika statusnya 'pending', ubah properti tombol menjadi nonaktif
-if ($status == 'pending') {
+if ($status != 'verified') {
     $ulasanButtonClass = 'bg-gray-300 text-gray-500 text-white cursor-not-allowed';
     $ulasanButtonHref  = '#';
     $isClickable       = false;
@@ -115,7 +115,7 @@ $buttonHref = "https://wa.me/6285183066133?text={$waText}";
 $isClickable = true;
 
 // Jika statusnya 'pending', ubah properti tombol
-if ($status == 'pending') {
+if ($status != 'verified') {
     // Diubah menjadi abu-abu yang lebih muda
     $buttonClass = 'bg-gray-300 text-gray-500 cursor-not-allowed';
     $buttonHref = '#'; // Link tidak kemana-mana
