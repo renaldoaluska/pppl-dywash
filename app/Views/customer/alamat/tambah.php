@@ -74,50 +74,68 @@ Tambah Alamat
 <!-- Leaflet CSS & JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet Control Geocoder CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
 
 <script>
     window.addEventListener('DOMContentLoaded', () => {
-        const inputLat = document.getElementById('latitude');
-        const inputLng = document.getElementById('longitude');
+    const inputLat = document.getElementById('latitude');
+    const inputLng = document.getElementById('longitude');
 
-        const defaultLatStr = '-7.250445';
-        const defaultLngStr = '112.768845';
+    const defaultLatStr = '-7.250445';
+    const defaultLngStr = '112.768845';
 
-        let defaultLat = parseFloat(defaultLatStr);
-        let defaultLng = parseFloat(defaultLngStr);
+    let defaultLat = parseFloat(defaultLatStr);
+    let defaultLng = parseFloat(defaultLngStr);
 
-        if (inputLat && inputLat.value) defaultLat = parseFloat(inputLat.value);
-        if (inputLng && inputLng.value) defaultLng = parseFloat(inputLng.value);
+    if (inputLat && inputLat.value) defaultLat = parseFloat(inputLat.value);
+    if (inputLng && inputLng.value) defaultLng = parseFloat(inputLng.value);
 
-        const map = L.map('map').setView([defaultLat, defaultLng], 15);
-        const marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+    const map = L.map('map').setView([defaultLat, defaultLng], 15);
+    const marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-        marker.on('dragend', function () {
-            const { lat, lng } = marker.getLatLng();
-            inputLat.value = lat.toFixed(6);
-            inputLng.value = lng.toFixed(6);
-        });
+    // ✅ Tambahin Control Geocoder di sini
+    L.Control.geocoder({
+        defaultMarkGeocode: false
+    })
+    .on('markgeocode', function(e) {
+        const latlng = e.geocode.center;
+        map.setView(latlng, 16);
+        marker.setLatLng(latlng);
+        inputLat.value = latlng.lat.toFixed(6);
+        inputLng.value = latlng.lng.toFixed(6);
+    })
+    .addTo(map);
 
-        // Hanya gunakan geolocation jika nilai input masih default
-        if ((inputLat.value === defaultLatStr && inputLng.value === defaultLngStr) && navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    map.setView([latitude, longitude], 16);
-                    marker.setLatLng([latitude, longitude]);
-                    inputLat.value = latitude.toFixed(6);
-                    inputLng.value = longitude.toFixed(6);
-                },
-                () => console.warn('Akses lokasi ditolak oleh pengguna.')
-            );
-        } else {
-            console.warn('Geolocation tidak dijalankan karena input sudah terisi atau browser tidak mendukung.');
-        }
+    marker.on('dragend', function () {
+        const { lat, lng } = marker.getLatLng();
+        inputLat.value = lat.toFixed(6);
+        inputLng.value = lng.toFixed(6);
     });
+
+    // Hanya gunakan geolocation jika nilai input masih default
+    if ((inputLat.value === defaultLatStr && inputLng.value === defaultLngStr) && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                map.setView([latitude, longitude], 16);
+                marker.setLatLng([latitude, longitude]);
+                inputLat.value = latitude.toFixed(6);
+                inputLng.value = longitude.toFixed(6);
+            },
+            () => console.warn('Akses lokasi ditolak oleh pengguna.')
+        );
+    } else {
+        console.warn('Geolocation tidak dijalankan karena input sudah terisi atau browser tidak mendukung.');
+    }
+});
+
 </script>
 
 
