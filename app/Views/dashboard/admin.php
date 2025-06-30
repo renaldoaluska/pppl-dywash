@@ -45,7 +45,7 @@ Dashboard
     <a href="/admin/outlets" class="block bg-white p-6 rounded-xl shadow-md hover:shadow-lg hover:ring-2 hover:ring-blue-400 transition-all duration-300">
         <div class="flex items-center justify-between">
             <div>
-                <div class="text-sm font-medium text-gray-500">Total Outlet</div>
+                <div class="text-sm font-medium text-gray-500">Outlet Terverifikasi</div>
                 <!-- Menampilkan data dinamis dari controller -->
                 <div class="text-3xl font-bold text-gray-800 mt-1">
                     <?= $total_outlets_count ?? 0 ?>
