@@ -44,7 +44,22 @@ $statusColors = [
 <!-- Bagian Pesanan Aktif -->
 <div class="bg-white p-4 sm:p-6 rounded-xl shadow-md">
     <h3 class="text-lg font-semibold text-gray-700 mb-4 pb-4 border-b">Pesanan Aktif</h3>
+    <div class="flex flex-wrap gap-2 mb-4" id="active-filter">
+    <?php 
+    $activeStatuses = ['semua', 'diterima', 'diambil', 'dicuci', 'dikirim'];
+    foreach ($activeStatuses as $status): ?>
+        <button type="button" onclick="applyActiveFilter('<?= $status ?>', this)"
+            class="active-filter-btn px-3 py-1 rounded-full border text-sm bg-gray-100 text-gray-700 border-gray-300 hover:bg-blue-600 hover:text-white transition"
+            <?= $status === 'semua' ? 'id="default-active-filter"' : '' ?>>
+            <?= ucfirst($status) ?>
+        </button>
+    <?php endforeach; ?>
+</div>
+
     <div class="space-y-4">
+         <p id="no-active-msg" class="text-center py-8 text-gray-500">
+        Tidak ada pesanan aktif saat ini.
+    </p>
         <?php if (!empty($pending_orders)): ?>
             <?php foreach ($pending_orders as $order): ?>
                 <!-- Kartu sekarang menjadi link ke halaman detail -->
@@ -102,8 +117,8 @@ $statusColors = [
                 </a>
             <?php endforeach; ?>
         <?php else: ?>
-            <p class="text-center py-8 text-gray-500">Tidak ada pesanan aktif saat ini.</p>
-        <?php endif; ?>
+<?php endif; ?>
+
     </div>
 </div>
 
@@ -112,7 +127,7 @@ $statusColors = [
     <h3 class="text-lg font-semibold text-gray-700 mb-4 pb-4 border-b">Riwayat Pesanan</h3>
     <div class="flex flex-wrap gap-2 mb-4" id="history-filter">
     <?php 
-    $statuses = ['semua', 'diterima', 'diambil', 'dicuci', 'dikirim', 'selesai', 'diulas', 'ditolak'];
+    $statuses = ['semua','selesai', 'diulas', 'ditolak'];
     ?>
     <?php foreach ($statuses as $status): ?>
         <button type="button" onclick="applyHistoryFilter('<?= $status ?>', this)"
@@ -156,7 +171,7 @@ $statusColors = [
 
 
 <!-- Modal Konfirmasi -->
-<div id="confirmationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center p-4">
+<div id="confirmationModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm text-center">
         <p class="text-lg font-medium text-gray-800 mb-4">Anda yakin ingin mengupdate status pesanan ini?</p>
         <div class="flex justify-center gap-4">
@@ -175,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function applyHistoryFilter(status, btn) {
-    console.log('Filter riwayat status:', status); // Debug
+    console.log('Filter riwayat status:', status);
 
     // Highlight button terpilih
     document.querySelectorAll('.history-filter-btn').forEach(b => {
@@ -185,11 +200,15 @@ function applyHistoryFilter(status, btn) {
     btn.classList.remove('bg-gray-100', 'text-gray-700');
     btn.classList.add('bg-blue-600', 'text-white');
 
+    const selectedOutlet = document.getElementById('filter-outlet').value;
     const cards = document.querySelectorAll('.history-order-card');
     let visibleCount = 0;
 
     cards.forEach(card => {
-        if (status === 'semua' || card.dataset.status === status) {
+        const matchStatus = (status === 'semua' || card.dataset.status === status);
+        const matchOutlet = (selectedOutlet === 'all' || card.dataset.outletId === selectedOutlet);
+
+        if (matchStatus && matchOutlet) {
             card.classList.remove('hidden');
             visibleCount++;
         } else {
@@ -197,34 +216,37 @@ function applyHistoryFilter(status, btn) {
         }
     });
 
-    // Tampilkan atau sembunyikan pesan jika kosong
     const msg = document.getElementById('no-history-msg');
     if (visibleCount === 0) {
         msg.classList.remove('hidden');
-        msg.textContent = 'Belum ada pesanan dengan filter "' + status + '".';
+        msg.textContent = `Belum ada pesanan dengan filter "${status}" untuk outlet ini.`;
     } else {
         msg.classList.add('hidden');
     }
 
-    // Scroll ke riwayat saat filter ditekan
     const riwayat = document.getElementById('riwayat');
     if (riwayat) {
         riwayat.scrollIntoView({ behavior: 'smooth' });
     }
 }
+
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const outletFilter = document.getElementById('filter-outlet');
     if (outletFilter) {
-        outletFilter.addEventListener('change', function() {
+        outletFilter.addEventListener('change', function () {
             const selectedOutlet = this.value;
             console.log('Filter outlet:', selectedOutlet);
 
             // Filter Pesanan Aktif
-            document.querySelectorAll('.order-card').forEach(card => {
+            const orderCards = document.querySelectorAll('.order-card');
+            let activeVisible = 0;
+
+            orderCards.forEach(card => {
                 if (selectedOutlet === 'all' || card.dataset.outletId === selectedOutlet) {
                     card.classList.remove('hidden');
+                    activeVisible++;
                 } else {
                     card.classList.add('hidden');
                 }
@@ -239,11 +261,117 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Opsional: scroll ke bagian tertentu jika perlu
-            // document.getElementById('riwayat').scrollIntoView({ behavior: 'smooth' });
+            // ✅ Reset filter status riwayat ke "semua"
+            const defaultBtn = document.getElementById('default-history-filter');
+            if (defaultBtn) {
+                applyHistoryFilter('semua', defaultBtn);
+            }
+
+            // ✅ Reset filter status aktif ke "semua"
+            const defaultActiveBtn = document.getElementById('default-active-filter');
+            if (defaultActiveBtn) {
+                applyActiveFilter('semua', defaultActiveBtn);
+            }
         });
+    }
+
+    // Trigger filter default saat halaman pertama kali dibuka
+    const defaultBtn = document.getElementById('default-history-filter');
+    if (defaultBtn) {
+        applyHistoryFilter('semua', defaultBtn);
+    }
+
+    const defaultActiveBtn = document.getElementById('default-active-filter');
+    if (defaultActiveBtn) {
+        applyActiveFilter('semua', defaultActiveBtn);
     }
 });
 </script>
 
+<script>
+    document.querySelectorAll('.update-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const form = this.closest('form');
+        if (form) {
+            // Tampilkan modal konfirmasi dulu
+            const modal = document.getElementById('confirmationModal');
+            modal.classList.remove('hidden');
+
+            // Tangani tombol "Ya, Update"
+            const confirmBtn = document.getElementById('confirmBtnYa');
+            const cancelBtn = document.getElementById('confirmBtnTidak');
+
+            const confirmHandler = () => {
+                form.submit();
+                modal.classList.add('hidden');
+                cleanup();
+            };
+
+            const cancelHandler = () => {
+                modal.classList.add('hidden');
+                cleanup();
+            };
+
+            const cleanup = () => {
+                confirmBtn.removeEventListener('click', confirmHandler);
+                cancelBtn.removeEventListener('click', cancelHandler);
+            };
+
+            confirmBtn.addEventListener('click', confirmHandler);
+            cancelBtn.addEventListener('click', cancelHandler);
+        }
+    });
+});
+
+    </script>
+    <script>
+        function applyActiveFilter(status, btn) {
+    console.log('Filter aktif status:', status);
+
+    // Highlight tombol terpilih
+    document.querySelectorAll('.active-filter-btn').forEach(b => {
+        b.classList.remove('bg-blue-600', 'text-white');
+        b.classList.add('bg-gray-100', 'text-gray-700');
+    });
+    btn.classList.remove('bg-gray-100', 'text-gray-700');
+    btn.classList.add('bg-blue-600', 'text-white');
+
+    const selectedOutlet = document.getElementById('filter-outlet').value;
+    const cards = document.querySelectorAll('.order-card');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+        const matchStatus = (status === 'semua' || card.querySelector('span').textContent.trim().toLowerCase() === status);
+        const matchOutlet = (selectedOutlet === 'all' || card.dataset.outletId === selectedOutlet);
+
+        if (matchStatus && matchOutlet) {
+            card.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+
+    const noActiveMsg = document.getElementById('no-active-msg');
+if (noActiveMsg) {
+    if (visibleCount === 0) {
+        const outletName = document.getElementById('filter-outlet').options[
+            document.getElementById('filter-outlet').selectedIndex
+        ].text;
+        const statusLabel = btn?.textContent?.trim() || 'Semua';
+        noActiveMsg.textContent = `Tidak ada pesanan aktif untuk outlet "${outletName}" dengan status "${statusLabel}".`;
+        noActiveMsg.classList.remove('hidden');
+    } else {
+        noActiveMsg.classList.add('hidden');
+    }
+}
+}
+document.addEventListener('DOMContentLoaded', () => {
+    const defaultActiveBtn = document.getElementById('default-active-filter');
+    if (defaultActiveBtn) {
+        applyActiveFilter('semua', defaultActiveBtn);
+    }
+});
+
+</script>
 <?= $this->endSection() ?>
