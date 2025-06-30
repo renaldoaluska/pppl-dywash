@@ -35,17 +35,19 @@ if (request()->getGet('from') == 'verif') {
                 </div>
              </form>
         </div>
-    </div><!-- Filter Status -->
-<div class="mt-4 overflow-x-auto">
+    </div>
+  
+    <!-- Filter Status -->
+<div id="filterContainer" class="mt-4 overflow-x-auto">
   <div class="flex space-x-2 w-max">
-    <a href="/admin/orders" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= (!$status) ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Semua</a>
-    <a href="/admin/orders?status=diterima" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='diterima') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Diterima</a>
-    <a href="/admin/orders?status=diambil" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='diambil') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Diambil</a>
-    <a href="/admin/orders?status=dicuci" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='dicuci') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Dicuci</a>
-    <a href="/admin/orders?status=dikirim" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='dikirim') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Dikirim</a>
-    <a href="/admin/orders?status=selesai" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='selesai') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Selesai</a>
-    <a href="/admin/orders?status=diulas" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='diulas') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Diulas</a>
-    <a href="/admin/orders?status=ditolak" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='ditolak') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Ditolak</a>
+    <a href="/admin/orders" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= (!$status) ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Semua</a>
+    <a href="/admin/orders?status=diterima" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='diterima') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Diterima</a>
+    <a href="/admin/orders?status=diambil" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='diambil') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Diambil</a>
+    <a href="/admin/orders?status=dicuci" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='dicuci') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Dicuci</a>
+    <a href="/admin/orders?status=dikirim" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='dikirim') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Dikirim</a>
+    <a href="/admin/orders?status=selesai" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='selesai') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Selesai</a>
+    <a href="/admin/orders?status=diulas" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='diulas') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Diulas</a>
+    <a href="/admin/orders?status=ditolak" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='ditolak') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Ditolak</a>
   </div>
 </div>
 
@@ -108,5 +110,14 @@ if (request()->getGet('from') == 'verif') {
     </div>
     
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const container = document.getElementById("filterContainer");
+    const active = container.querySelector(".active");
+    if(active){
+        container.scrollLeft = active.offsetLeft - 40; // 16px padding kiri
+    }
+});
+</script>
 
 <?= $this->endSection() ?>
