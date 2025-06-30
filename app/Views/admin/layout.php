@@ -34,7 +34,7 @@
                 <!-- Logo di Tengah -->
                 <div class="w-1/3 flex justify-center">
                     <a href="/dashboard">
-                        <img src="<?= base_url('assets/img/logo.png') ?>" alt="DyWash Logo" class="h-8 w-auto">
+                        <img src="<?= base_url('assets/img/logo.png') ?>" alt="DyWash Logo"  class="h-12 w-auto object-contain">
                     </a>
                 </div>
 

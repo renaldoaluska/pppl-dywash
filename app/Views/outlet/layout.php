@@ -9,24 +9,35 @@
     <?= $this->renderSection('styles') ?>
 </head>
 <body class="bg-gray-100 antialiased">
-
+<?php
+    // PERUBAHAN DI SINI: Definisikan kondisi untuk menyembunyikan bar
+    $hideBars = (
+        (strpos(uri_string(), '/reviews') !== false) ||
+        (strpos(uri_string(), 'outlet/services/manage') !== false) ||
+        (strpos(uri_string(), 'outlet/my-outlets/create') !== false) ||
+        (strpos(uri_string(), 'outlet/my-outlets/detail') !== false)
+    );
+?>
 <div class="flex flex-col min-h-screen">
 
+    <?php if (!$hideBars): // JIKA BUKAN HALAMAN PAYMENT/CREATE, TAMPILKAN TOP BAR ?>
     <header class="sticky top-0 bg-white shadow-sm z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-3">
-                    <img src="<?= base_url('assets/img/logo.png') ?>" alt="DyWash Logo" class="h-8 w-auto">
-                    <h1 class="text-xl font-semibold text-gray-800 hidden sm:block"><?= $this->renderSection('title') ?></h1>
-                </div>
-            </div>
-        </div>
-    </header>
+     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+         <div class="flex justify-center items-center h-16">
+             <div class="flex items-center space-x-3">
+                 <img src="<?= base_url('assets/img/logo.png') ?>" alt="DyWash Logo"  class="h-12 w-auto object-contain">
+                 <h1 class="text-xl font-semibold text-gray-800 hidden sm:block"><?= $this->renderSection('title') ?></h1>
+             </div>
+         </div>
+     </div>
+ </header>
+    <?php endif; ?>
 
     <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24">
         <?= $this->renderSection('content') ?>
     </main>
 
+    <?php if (!$hideBars): // JIKA BUKAN HALAMAN PAYMENT/CREATE, TAMPILKAN TOP BAR ?>
     <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-lg z-10">
         <div class="flex justify-around h-16">
             <a href="/outlet/dashboard" class="flex flex-col items-center justify-center w-full transition-colors duration-200 <?= (uri_string() == 'outlet/dashboard') ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600' ?>">
@@ -47,6 +58,8 @@
             </a>
         </div>
     </nav>
+    
+    <?php endif; ?>
 
 </div>
 <?= $this->renderSection('script') ?>
