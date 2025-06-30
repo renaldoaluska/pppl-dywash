@@ -40,7 +40,10 @@ class AdminController extends BaseController
         $outletModel = new OutletModel();
         
         // Ambil data outlet yang perlu diverifikasi
-        $data['outlets'] = $outletModel->where('status', 'pending')->findAll();
+        $data['outlets'] = $outletModel
+        ->where('status', 'pending')
+        ->orderBy('updated_at', 'DESC')
+        ->findAll();
         
         return view('admin/verify_outlet', $data);
     }
@@ -77,6 +80,7 @@ class AdminController extends BaseController
             ->join('orders', 'orders.order_id = payments.order_id')
             ->join('users', 'users.user_id = orders.customer_id')
             ->select('payments.*, orders.total_amount, users.name as customer_name')
+            ->orderBy('payments.order_id', 'DESC')
             ->findAll();
         
         return view('admin/verify_payment', $data);
@@ -161,6 +165,21 @@ class AdminController extends BaseController
         
         // Tampilkan view
         return view('admin/list_orders', $data);
+    }
+    public function showOutletDetail($outlet_id)
+    {
+        $outletModel = new OutletModel();
+        
+        $outlet = $outletModel->find($outlet_id);
+
+        // Validasi jika outlet tidak ditemukan
+        if (!$outlet) {
+            // Arahkan kembali ke halaman verifikasi dengan pesan error
+            return redirect()->to('/admin/verify')->with('error', 'Outlet tidak ditemukan.');
+        }
+
+        $data['outlet'] = $outlet;
+        return view('admin/detail_outlet', $data);
     }
 
 }
