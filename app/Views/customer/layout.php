@@ -55,7 +55,7 @@
     <?php endif; ?>
     <!-- Konten Utama -->
     <!-- Diberi padding bawah agar tidak tertutup navbar -->
-    <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24">
+    <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24 md:pb-32 lg:pb-40">
         <?= $this->renderSection('content') ?>
     </main>
     <?= $this->renderSection('script') ?>

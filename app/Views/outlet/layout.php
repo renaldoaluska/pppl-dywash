@@ -7,6 +7,11 @@
     <title><?= $this->renderSection('title') ?> - DyWash Outlet</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <?= $this->renderSection('styles') ?>
+            <style>
+        html {
+            overflow-y: scroll;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 antialiased">
 <?php
@@ -38,7 +43,7 @@
     <?php endif; ?>
 
     <!-- Konten Utama -->
-    <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24">
+    <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24 md:pb-32 lg:pb-40">
         <!-- Judul halaman dipindahkan ke sini -->
         <h1 class="text-2xl font-bold text-gray-800"><?= $this->renderSection('title') ?></h1>
         
