@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/png" href="<?= base_url('assets/img/favicon.ico') ?>">
     <title><?= $this->renderSection('title') ?> - DyWash Outlet</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <?= $this->renderSection('styles') ?>
@@ -12,21 +11,39 @@
 
 <div class="flex flex-col min-h-screen">
 
+    <!-- Header Atas (Sticky) - TELAH DIPERBARUI -->
     <header class="sticky top-0 bg-white shadow-sm z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-3">
-                    <img src="<?= base_url('assets/img/logo.png') ?>" alt="DyWash Logo" class="h-8 w-auto">
-                    <h1 class="text-xl font-semibold text-gray-800 hidden sm:block"><?= $this->renderSection('title') ?></h1>
+                <!-- Placeholder Kiri (untuk mendorong logo ke tengah) -->
+                <div class="w-1/3">
+                    <?= $this->renderSection('header_left') ?>
+                </div>
+
+                <!-- Logo di Tengah -->
+                <div class="w-1/3 flex justify-center">
+                    <a href="/dashboard">
+                        <img src="<?= base_url('assets/img/logo.png') ?>" alt="DyWash Logo" class="h-8 w-auto">
+                    </a>
+                </div>
+
+                <!-- Placeholder Kanan -->
+                <div class="w-1/3">
+                    <!-- Bisa diisi ikon notifikasi atau profil di masa depan -->
                 </div>
             </div>
         </div>
     </header>
 
+    <!-- Konten Utama -->
     <main class="flex-grow p-4 md:p-6 lg:p-8 pb-24">
+        <!-- Judul halaman dipindahkan ke sini -->
+        <h1 class="text-2xl font-bold text-gray-800 mb-6"><?= $this->renderSection('title') ?></h1>
+        
         <?= $this->renderSection('content') ?>
     </main>
 
+    <!-- Navbar Bawah (Fixed) -->
     <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-lg z-10">
         <div class="flex justify-around h-16">
             <a href="/outlet/dashboard" class="flex flex-col items-center justify-center w-full transition-colors duration-200 <?= (uri_string() == 'outlet/dashboard') ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600' ?>">
