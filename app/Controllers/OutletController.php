@@ -59,6 +59,17 @@ class OutletController extends BaseController
                 ->findAll();
         }
 
+        
+// Hitung jumlah pending pembayaran per outlet
+$data['pending_payments'] = $orderModel
+    ->select('outlets.name as outlet_name, COUNT(*) as count')
+    ->join('payments', 'payments.order_id = orders.order_id')
+    ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+    ->whereIn('orders.outlet_id', $ownedOutletIds)
+    ->where('payments.status', 'pending')
+    ->groupBy('outlets.outlet_id, outlets.name')
+    ->findAll();
+
         return view('dashboard/outlet', $data);
     }
     
@@ -189,17 +200,6 @@ class OutletController extends BaseController
             ->orderBy('orders.created_at', 'DESC')
             ->findAll();
         
-            // Hitung jumlah pending pembayaran per outlet
-// Hitung jumlah pending pembayaran per outlet
-$data['pending_payments'] = $orderModel
-    ->select('outlets.name as outlet_name, COUNT(*) as count')
-    ->join('payments', 'payments.order_id = orders.order_id')
-    ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-    ->whereIn('orders.outlet_id', $outletIds)
-    ->where('payments.status', 'pending')
-    ->groupBy('outlets.outlet_id, outlets.name')
-    ->findAll();
-
         return view('outlet/list_orders', $data);
     }
     
