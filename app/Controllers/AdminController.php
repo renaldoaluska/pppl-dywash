@@ -189,38 +189,40 @@ public function dashboard()
      * FUNGSI: Menampilkan semua pesanan dengan fitur pencarian.
      */
     public function listAllOrders()
-    {
-        $orderModel = new OrderModel();
-        
-        // Ambil kata kunci pencarian dari URL
-        $searchKeyword = $this->request->getGet('search');
-
-        // Siapkan query builder
-        $query = $orderModel
-            ->join('users', 'users.user_id = orders.customer_id')
-            ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-            ->select('orders.*, users.name as customer_name, outlets.name as outlet_name');
-
-        // Jika ada kata kunci pencarian, tambahkan filter
-        if ($searchKeyword) {
-            $query->groupStart()
-                  ->like('users.name', $searchKeyword)
-                  ->orLike('orders.order_id', $searchKeyword)
-                  ->groupEnd();
-        }
-
-        // Urutkan dari yang terbaru dan ambil semua hasilnya
-        $data['orders'] = $query->orderBy('orders.created_at', 'DESC')->findAll();
-        
+{
+    $orderModel = new OrderModel();
+    
+    $searchKeyword = $this->request->getGet('search');
     $status = $this->request->getGet('status');
-            // Redirect jika status = pending
-    if ($status == 'pending') {
-        return redirect()->to('/admin/payments/verify');
+
+    $query = $orderModel
+        ->join('users', 'users.user_id = orders.customer_id')
+        ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
+        ->select('orders.*, users.name as customer_name, outlets.name as outlet_name');
+
+    if ($status) {
+        if ($status == 'pending') {
+            return redirect()->to('/admin/payments/verify');
+        } else {
+            $query->where('orders.status', $status);
+        }
     }
 
-        // Tampilkan view
-        return view('admin/list_orders', $data);
+    if ($searchKeyword) {
+        $query->groupStart()
+              ->like('users.name', $searchKeyword)
+              ->orLike('orders.order_id', $searchKeyword)
+              ->groupEnd();
     }
+
+    $data['orders'] = $query->orderBy('orders.created_at', 'DESC')->findAll();
+    $data['status'] = $status;
+    $data['search'] = $searchKeyword;
+
+    return view('admin/list_orders', $data);
+}
+
+    
     public function showOutletDetail($outlet_id)
     {
         $outletModel = new OutletModel();

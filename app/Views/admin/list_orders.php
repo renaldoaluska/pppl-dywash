@@ -13,7 +13,6 @@ if (request()->getGet('from') == 'verif') {
 ?>
 
 <div class="bg-white p-4 sm:p-6 rounded-xl shadow-md">
-    
     <!-- Header dengan Fitur Pencarian -->
     <div class="flex flex-col sm:flex-row items-center justify-between pb-4 border-b">
         <!-- PERUBAHAN: Menambahkan wrapper dan tombol kembali -->
@@ -37,6 +36,17 @@ if (request()->getGet('from') == 'verif') {
              </form>
         </div>
     </div>
+<!-- Filter Status -->
+<div class="flex space-x-2 mt-4">
+    <a href="/admin/orders" class="px-3 py-1 rounded-full text-sm <?= (!$status) ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Semua</a>
+    <a href="/admin/orders?status=diterima" class="px-3 py-1 rounded-full text-sm <?= ($status=='diterima') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Diterima</a>
+    <a href="/admin/orders?status=diambil" class="px-3 py-1 rounded-full text-sm <?= ($status=='diambil') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Diambil</a>
+    <a href="/admin/orders?status=dicuci" class="px-3 py-1 rounded-full text-sm <?= ($status=='dicuci') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Dicuci</a>
+    <a href="/admin/orders?status=dikirim" class="px-3 py-1 rounded-full text-sm <?= ($status=='dikirim') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Dikirim</a>
+    <a href="/admin/orders?status=selesai" class="px-3 py-1 rounded-full text-sm <?= ($status=='selesai') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Selesai</a>
+    <a href="/admin/orders?status=diulas" class="px-3 py-1 rounded-full text-sm <?= ($status=='diulas') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Diulas</a>
+    <a href="/admin/orders?status=ditolak" class="px-3 py-1 rounded-full text-sm <?= ($status=='ditolak') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' ?>">Ditolak</a>
+</div>
 
     <!-- Daftar Kartu Pesanan -->
     <div class="mt-6 space-y-4">
