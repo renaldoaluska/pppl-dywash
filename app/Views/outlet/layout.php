@@ -16,6 +16,8 @@
         (strpos(uri_string(), 'outlet/services/manage') !== false) ||
         (strpos(uri_string(), 'outlet/services/create') !== false) ||
         (strpos(uri_string(), 'outlet/services/edit') !== false) ||
+        (strpos(uri_string(), 'outlet/profile/ganti-password') !== false) ||
+        (strpos(uri_string(), 'outlet/profile/edit') !== false) ||
         (strpos(uri_string(), 'outlet/my-outlets/create') !== false) ||
         (strpos(uri_string(), 'outlet/my-outlets/detail') !== false)
     );
