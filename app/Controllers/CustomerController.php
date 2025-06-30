@@ -209,8 +209,7 @@ public function storeOrder()
 
     // 🔥 Cek jika user belum punya alamat
     if (!$address_id) {
-        return redirect()->to('/customer/profil/tambah-alamat')
-            ->with('error', 'Tambah alamat pengiriman dulu sebelum membuat pesanan.');
+        return redirect()->back()->withInput()->with('error', 'Tambah alamat pengiriman dulu sebelum membuat pesanan.');
     }
 
     // 🔥 Cek minimal ada 1 layanan
