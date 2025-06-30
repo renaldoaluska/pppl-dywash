@@ -5,10 +5,15 @@ Detail Pesanan #<?= esc($order['order_id']) ?>
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-
+<?php
+    $back = '/admin/orders';
+if (request()->getGet('from') == 'verif') {
+    $back = '/admin/orders?from=verif';
+} 
+?>
 <!-- Header Halaman -->
 <div class="flex items-center mb-6">
-    <a href="/admin/orders" class="p-2 mr-2 rounded-full hover:bg-gray-200">
+    <a href="<?= $back ?>" class="p-2 mr-2 rounded-full hover:bg-gray-200">
         <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
     </a>
     <div>

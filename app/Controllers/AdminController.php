@@ -291,7 +291,6 @@ public function dashboard()
     {
         $outletModel = new OutletModel();
         
-        // Join dengan tabel users untuk mendapatkan nama pemilik
         $outlet = $outletModel
             ->join('users', 'users.user_id = outlets.owner_id')
             ->where('outlets.outlet_id', $outlet_id)
@@ -303,9 +302,7 @@ public function dashboard()
         }
 
         $data['outlet'] = $outlet;
-        
-        // Menggunakan view baru yang tanpa tombol aksi
-        return view('admin/view_outlet_detail', $data);
+        return view('admin/view_outlet_detail', $data); // Memanggil view read-only
     }
     public function viewOrderDetail($order_id)
     {
@@ -326,6 +323,13 @@ public function dashboard()
         // 2. Ambil data pembayaran
         $paymentModel = new \App\Models\PaymentModel();
         $payment = $paymentModel->where('order_id', $order_id)->first();
+
+        if (!$payment) {
+    $payment = [
+        'payment_method' => '-',
+        'status' => '-',
+    ];
+}
 
         // 3. Ambil rincian item pesanan
         $orderItemModel = new \App\Models\OrderItemModel();

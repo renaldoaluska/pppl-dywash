@@ -11,6 +11,7 @@ if (request()->getGet('from') == 'verif') {
     $back = '/admin/payments/verify';
 }
 ?>
+
 <div class="bg-white p-4 sm:p-6 rounded-xl shadow-md">
     
     <!-- Header dengan Fitur Pencarian -->
@@ -82,7 +83,7 @@ if (request()->getGet('from') == 'verif') {
                     <!-- Tombol Aksi -->
                     <div class="bg-gray-50 px-4 py-2 rounded-b-xl flex justify-end">
                         <!-- PERUBAHAN: Link sekarang mengarah ke detail pesanan admin -->
-                        <a href="/admin/orders/detail/<?= $order['order_id'] ?>" class="text-sm font-medium text-blue-600 hover:underline">Lihat Detail Pesanan</a>
+                        <a href="/admin/orders/detail/<?= $order['order_id'] ?><?php if (request()->getGet('from') == 'verif') {echo '?from=verif';}?>" class="text-sm font-medium text-blue-600 hover:underline">Lihat Detail Pesanan</a>
                     </div>
                 </div>
             <?php endforeach; ?>

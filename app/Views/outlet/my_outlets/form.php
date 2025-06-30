@@ -61,7 +61,7 @@
             <div>
     <label class="block text-sm font-bold text-gray-700">Tentukan Lokasi di Peta</label>
     <p class="mt-1 text-xs text-gray-500">Cari alamat atau klik & geser penanda untuk mendapatkan koordinat.</p>
-    <div id="map" class="h-80 rounded-lg mt-2 border border-slate-300"></div>
+    <div id="map" class="relative z-0 h-80 rounded-lg mt-2 border border-slate-300"></div>
 <div class="flex gap-4 mt-2">
     <div class="w-1/2">
         <label for="latitude" class="block text-sm font-bold text-gray-700 mb-1">Latitude</label>
