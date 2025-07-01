@@ -8,14 +8,14 @@ Manajemen Pesanan
 
 <?php
 // Definisikan warna status baru yang konsisten
-$statusColors = [
-    'diterima' => 'bg-blue-100 text-blue-800',
-    'diambil'  => 'bg-purple-100 text-purple-800',
-    'dicuci'   => 'bg-yellow-100 text-yellow-800',
-    'dikirim'  => 'bg-slate-200 text-slate-800',
-    'selesai'  => 'bg-green-100 text-green-800',
-    'diulas'   => 'bg-gray-200 text-gray-800',
-    'ditolak'  => 'bg-red-100 text-red-800'
+    $statusColors = [
+        'diterima' => 'bg-blue-100 text-blue-800',
+        'diambil'  => 'bg-purple-100 text-purple-800',
+        'dicuci'   => 'bg-yellow-100 text-yellow-800',
+        'dikirim'  => 'bg-gray-100 text-gray-800',
+        'selesai'  => 'bg-green-100 text-green-800',
+        'diulas'   => 'bg-green-200 text-green-900',
+        'ditolak'  => 'bg-red-100 text-red-800',
 ];
 ?>
 
@@ -62,60 +62,74 @@ $statusColors = [
     </p>
         <?php if (!empty($pending_orders)): ?>
             <?php foreach ($pending_orders as $order): ?>
-                <!-- Kartu sekarang menjadi link ke halaman detail -->
-                 <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" 
-   data-outlet-id="<?= $order['outlet_id'] ?>"
-   class="order-card block bg-white border border-gray-200 rounded-xl transition-all duration-300 hover:shadow-lg hover:border-blue-400">
-                    <div class="p-4">
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <p class="text-xs text-gray-500">ID #<?= esc($order['order_id']) ?></p>
-                                <h4 class="text-md font-bold text-gray-800 leading-tight"><?= esc($order['customer_name']) ?></h4>
-                                <p class="text-sm text-gray-500"><?= esc($order['outlet_name']) ?></p>
-                            </div>
-                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full capitalize <?= $statusColors[$order['status']] ?? 'bg-gray-100' ?>">
-                                <?= str_replace('_', ' ', esc($order['status'])) ?>
-                            </span>
-                        </div>
-                    </div>
-                    <!-- Form Aksi Update Status dengan Tombol Kontekstual -->
-                    <div class="bg-gray-50 px-4 py-3 rounded-b-xl">
-                        <!-- PERBAIKAN: Menambahkan onclick="event.stopPropagation();" untuk mencegah klik merambat ke <a> induk -->
-                        <div class="flex flex-col sm:flex-row sm:items-center gap-2" onclick="event.stopPropagation(); event.preventDefault();">
-                            <?php if ($order['status'] == 'diterima'): ?>
-                                <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="status" value="diambil">
-                                    <button type="button" class="update-btn w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Tandai Diambil</button>
-                                </form>
-                                <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="status" value="ditolak">
-                                    <button type="button" class="update-btn w-full px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200">Tolak</button>
-                                </form>
-                            <?php elseif ($order['status'] == 'diambil'): ?>
-                                <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="status" value="dicuci">
-                                    <button type="button" class="update-btn w-full px-4 py-2 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600">Mulai Cuci</button>
-                                </form>
-                            <?php elseif ($order['status'] == 'dicuci'): ?>
-                                <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="status" value="dikirim">
-                                    <button type="button" class="update-btn w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">Kirim ke Customer</button>
-                                </form>
-                            <?php elseif ($order['status'] == 'dikirim'): ?>
-                                 <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="status" value="selesai">
-                                    <button type="button" class="update-btn w-full px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">Selesaikan Pesanan</button>
-                                </form>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </a>
-            <?php endforeach; ?>
+    <!-- Kartu sekarang menjadi link ke halaman detail -->
+    <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" 
+       data-outlet-id="<?= $order['outlet_id'] ?>"
+       class="order-card block bg-white border border-gray-200 rounded-xl transition-all duration-300 hover:shadow-lg hover:border-blue-400 cursor-pointer">
+        <div class="p-4">
+            <div>
+    <p class="mb-3">
+        <span class="px-2.5 py-1 text-xs font-semibold rounded-full capitalize <?= $statusColors[$order['status']] ?? 'bg-gray-100' ?>">
+            <?= str_replace('_', ' ', esc($order['status'])) ?>
+        </span>
+    </p>
+    <p class="text-xs text-gray-500">ID #<?= esc($order['order_id']) ?></p>
+
+    <!-- Baris nama + outlet + panah -->
+    <div class="flex items-center">
+        <div>
+            <h4 class="text-md font-bold text-gray-800 leading-tight"><?= esc($order['customer_name']) ?></h4>
+            <p class="text-sm text-gray-500"><?= esc($order['outlet_name']) ?></p>
+        </div>
+
+        <!-- Panah kanan -->
+        <svg class="w-5 h-5 text-gray-400 ml-auto" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+        </svg>
+    </div>
+</div>
+
+        </div>
+
+        <!-- Form Aksi Update Status dengan Tombol Kontekstual -->
+        <div class="bg-gray-100 px-4 py-3 rounded-b-xl">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2" onclick="event.stopPropagation(); event.preventDefault();">
+                <?php if ($order['status'] == 'diterima'): ?>
+                    <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="status" value="diambil">
+                        <button type="submit" class="update-btn w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer">Tandai Diambil</button>
+                    </form>
+                    <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="status" value="ditolak">
+                        <button type="submit" class="update-btn w-full px-4 py-2 text-sm font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200 cursor-pointer">Tolak</button>
+                    </form>
+                <?php elseif ($order['status'] == 'diambil'): ?>
+                    <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="status" value="dicuci">
+                        <button type="submit" class="update-btn w-full px-4 py-2 text-sm font-medium text-white bg-yellow-500 rounded-lg hover:bg-yellow-600 cursor-pointer">Mulai Cuci</button>
+                    </form>
+                <?php elseif ($order['status'] == 'dicuci'): ?>
+                    <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="status" value="dikirim">
+                        <button type="submit" class="update-btn w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 cursor-pointer">Kirim ke Customer</button>
+                    </form>
+                <?php elseif ($order['status'] == 'dikirim'): ?>
+                    <form action="/outlet/orders/update/<?= $order['order_id'] ?>" method="post" class="w-full">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="status" value="selesai">
+                        <button type="submit" class="update-btn w-full px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 cursor-pointer">Selesaikan Pesanan</button>
+                    </form>
+                <?php endif; ?>
+            </div>
+        </div>
+    </a>
+<?php endforeach; ?>
+
         <?php else: ?>
 <?php endif; ?>
 
@@ -141,26 +155,40 @@ $statusColors = [
     <div class="space-y-4">
     <?php if (!empty($history_orders)): ?>
         <?php foreach ($history_orders as $order): ?>
-            <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" 
-   data-outlet-id="<?= $order['outlet_id'] ?>"
-   class="history-order-card block bg-white border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-blue-400" data-status="<?= esc($order['status']) ?>">
+    <a href="/outlet/orders/detail/<?= $order['order_id'] ?>" 
+       data-outlet-id="<?= $order['outlet_id'] ?>"
+       class="history-order-card block bg-white border border-gray-200 rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:border-blue-400" 
+       data-status="<?= esc($order['status']) ?>">
 
-                <div class="flex items-start justify-between">
-                    <div>
-                        <p class="text-xs text-gray-500">ID #<?= esc($order['order_id']) ?></p>
-                        <h4 class="text-md font-medium text-gray-800"><?= esc($order['customer_name']) ?></h4>
-                        <p class="text-sm text-gray-500"><?= esc($order['outlet_name']) ?></p>
-                    </div>
+        <!-- Konten utama + panah kanan -->
+        <div class="flex items-center justify-between">
+            <!-- Konten kiri -->
+            <div>
+                <p class="mb-3">
                     <span class="px-2.5 py-1 text-xs font-semibold rounded-full capitalize <?= $statusColors[$order['status']] ?? 'bg-gray-100' ?>">
                         <?= str_replace('_', ' ', esc($order['status'])) ?>
                     </span>
-                </div>
-                <div class="flex justify-between items-center mt-2 pt-2 border-t">
-                    <p class="text-sm text-gray-500"><?= date('d M Y', strtotime($order['created_at'])) ?></p>
-                    <p class="font-semibold text-gray-700">Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></p>
-                </div>
-            </a>
-        <?php endforeach; ?>
+                </p>
+                <p class="text-xs text-gray-500">ID #<?= esc($order['order_id']) ?></p>
+                <h4 class="text-md font-medium text-gray-800"><?= esc($order['customer_name']) ?></h4>
+                <p class="text-sm text-gray-500"><?= esc($order['outlet_name']) ?></p>
+            </div>
+
+            <!-- Panah kanan -->
+            <svg class="w-5 h-5 text-gray-400 ml-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </div>
+
+        <!-- Footer: tanggal & total -->
+        <div class="flex justify-between items-center mt-2 pt-2 border-t">
+            <p class="text-sm text-gray-500"><?= date('d M Y', strtotime($order['created_at'])) ?></p>
+            <p class="font-semibold text-gray-700">Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></p>
+        </div>
+    </a>
+<?php endforeach; ?>
+
     <?php endif; ?>
 
     <!-- Pesan selalu ada di DOM, default hidden -->

@@ -25,10 +25,8 @@
 
       <div class="flex flex-col items-center text-center">
         <div class="bg-white rounded-full w-24 h-24 flex items-center justify-center shadow-md mb-12">
-          <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 48 48">
-              <rect width="36" height="28" x="6" y="10" rx="4" fill="#f3f4f6"/>
-              <path d="M6 34l8-10 7 9 7-11 8 12" stroke="#d1d5db" stroke-width="2" fill="none"/>
-          </svg>
+          
+            <img src="<?= base_url('assets/img/icon.png') ?>" alt="Logo DyWash" class="w-16 h-16 object-contain">
         </div>
 
         <div class="w-full max-w-xs text-center">
@@ -53,14 +51,14 @@
         <span class="mx-3 text-gray-500 text-xs font-medium">Atau lanjutkan dengan</span>
         <div class="flex-grow border-t border-gray-300"></div>
       </div>
-      <div class="flex justify-center gap-4">
-        <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm hover:bg-gray-50 transition transform hover:scale-110">
-          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="w-6 h-6">
-        </button>
-        <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm hover:bg-gray-50 transition transform hover:scale-110">
-          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook" class="w-6 h-6">
-        </button>
-      </div>
+<div class="flex justify-center gap-4">
+    <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm opacity-50 cursor-not-allowed" disabled>
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="w-6 h-6">
+    </button>
+    <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm opacity-50 cursor-not-allowed" disabled>
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook" class="w-6 h-6">
+    </button>
+</div>
     </footer>
 
   </div>
