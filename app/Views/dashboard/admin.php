@@ -120,7 +120,7 @@ Dashboard
             $count_var = $status . '_payments_count';
             $count = $$count_var ?? 0;
         ?>
-       <a href="/admin/orders?status=<?= $status ?>" class="flex justify-between items-center py-2 border-t border-b border-gray-200 hover:bg-gray-50">
+       <a href="/admin/orders?pay_status=<?= $status ?>" class="flex justify-between items-center py-2 border-t border-b border-gray-200 hover:bg-gray-50">
     <div class="flex items-center">
                 <span class="text-md font-bold text-gray-700 w-6"><?= $count ?></span>
                 <span class="ml-4 text-gray-600 capitalize"><?= $status ?></span>
