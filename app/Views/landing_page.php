@@ -51,14 +51,14 @@
         <span class="mx-3 text-gray-500 text-xs font-medium">Atau lanjutkan dengan</span>
         <div class="flex-grow border-t border-gray-300"></div>
       </div>
-      <div class="flex justify-center gap-4">
-        <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm hover:bg-gray-50 transition transform hover:scale-110">
-          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="w-6 h-6">
-        </button>
-        <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm hover:bg-gray-50 transition transform hover:scale-110">
-          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook" class="w-6 h-6">
-        </button>
-      </div>
+<div class="flex justify-center gap-4">
+    <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm opacity-50 cursor-not-allowed" disabled>
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="w-6 h-6">
+    </button>
+    <button class="bg-white border border-gray-300 rounded-full w-12 h-12 flex items-center justify-center shadow-sm opacity-50 cursor-not-allowed" disabled>
+        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg" alt="Facebook" class="w-6 h-6">
+    </button>
+</div>
     </footer>
 
   </div>
