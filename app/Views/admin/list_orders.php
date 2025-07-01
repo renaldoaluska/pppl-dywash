@@ -37,8 +37,13 @@ if (request()->getGet('from') == 'verif') {
         </div>
     </div>
   
+    
+<!-- Label Status Pembayaran -->
+<p class="mt-2 mb-2 text-sm font-semibold text-gray-700">Status pesanan</p>
+  
     <!-- Filter Status -->
-<div id="filterContainer" class="mt-4 overflow-x-auto">
+<div id="filterContainer" class="overflow-x-auto">
+
   <div class="flex space-x-2 w-max">
     <a href="/admin/orders" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= (!$status) ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Semua</a>
     <a href="/admin/orders?status=diterima" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($status=='diterima') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Diterima</a>
@@ -51,55 +56,86 @@ if (request()->getGet('from') == 'verif') {
   </div>
 </div>
 
+<!-- Label Status Pembayaran -->
+<p class="mt-6 mb-2 text-sm font-semibold text-gray-700">Status pembayaran</p>
+
+<!-- Filter Status Pembayaran -->
+<div id="payFilterContainer" class="overflow-x-auto">
+  <div class="flex space-x-2 w-max">
+    <a href="/admin/orders" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= (!$pay_status) ? 'bg-blue-600 text-white font-semibold ring-2 ring-blue-300 active' : 'bg-gray-200 text-gray-700' ?>">Semua</a>
+    <a href="/admin/orders?pay_status=pending" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($pay_status=='pending') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Pending</a>
+    <a href="/admin/orders?pay_status=lunas" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($pay_status=='lunas') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Lunas</a>
+    <a href="/admin/orders?pay_status=gagal" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($pay_status=='gagal') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">Gagal</a>
+    <a href="/admin/orders?pay_status=cod" class="whitespace-nowrap px-3 py-1 rounded-full text-sm <?= ($pay_status=='cod') ? 'bg-blue-600 text-white active' : 'bg-gray-200 text-gray-700' ?>">COD</a>
+  </div>
+</div>
+
+
     <!-- Daftar Kartu Pesanan -->
     <div class="mt-6 space-y-4">
         <?php if (!empty($orders)): ?>
             <?php foreach ($orders as $order): ?>
-                <!-- Kartu Individual untuk Setiap Pesanan -->
-                <div class="bg-white border border-gray-200 rounded-xl transition-all duration-300 hover:shadow-lg hover:border-blue-400">
-                    <div class="p-4">
-                        <div class="flex items-start justify-between">
-                            <div>
-                                <p class="text-xs text-gray-500">ID #<?= esc($order['order_id']) ?></p>
-                                <h4 class="text-md font-bold text-gray-800 leading-tight">
-                                    <?= esc($order['customer_name']) ?>
-                                </h4>
-                            </div>
-                            <?php
-                                $status = $order['status'];
-                                $badgeColor = 'bg-gray-100 text-gray-800';
-                                if ($status == 'diterima') $badgeColor = 'bg-blue-100 text-blue-800';
-                                elseif ($status == 'selesai') $badgeColor = 'bg-green-100 text-green-800';
-                                elseif ($status == 'ditolak') $badgeColor = 'bg-red-100 text-red-800';
-                            ?>
-                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full capitalize <?= $badgeColor ?>">
-                                <?= esc($status) ?>
-                            </span>
-                        </div>
-                        
-                         <!-- Detail Pesanan -->
-                         <div class="mt-3 pt-3 border-t text-sm space-y-2">
-                             <div class="flex justify-between">
-                                 <span class="text-gray-500">Tanggal Pesan:</span>
-                                 <span class="font-medium text-gray-700"><?= date('d M Y, H:i', strtotime($order['created_at'])) ?></span>
-                             </div>
-                             <div class="flex justify-between">
-                                 <span class="text-gray-500">Outlet:</span>
-                                 <span class="font-medium text-gray-700"><?= esc($order['outlet_name']) ?></span>
-                             </div>
-                             <div class="flex justify-between items-center mt-2 pt-2 border-t">
-                                 <span class="text-gray-900 font-bold">Total Bayar:</span>
-                                 <span class="font-bold text-lg text-blue-600">Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></span>
-                             </div>
-                         </div>
-                    </div>
-                    <!-- Tombol Aksi -->
-                    <div class="bg-gray-50 px-4 py-2 rounded-b-xl flex justify-end">
-                        <!-- PERUBAHAN: Link sekarang mengarah ke detail pesanan admin -->
-                        <a href="/admin/orders/detail/<?= $order['order_id'] ?><?php if (request()->getGet('from') == 'verif') {echo '?from=verif';}?>" class="text-sm font-medium text-blue-600 hover:underline">Lihat Detail Pesanan</a>
-                    </div>
+    <div class="bg-white border border-gray-200 rounded-xl transition-all duration-300 hover:shadow-lg hover:border-blue-400">
+        <div class="p-4">
+            <!-- Status Pembayaran -->
+            <div class="mb-2 border-b pb-2">
+                <?php if ($order['payment_status'] == 'pending'): ?>
+                    <p class="text-yellow-600 text-sm font-medium">Pembayaran sedang diperiksa</p>
+                <?php elseif ($order['payment_status'] == 'lunas'): ?>
+                    <p class="text-green-600 text-sm font-medium">Pembayaran lunas</p>
+                <?php elseif ($order['payment_status'] == 'gagal'): ?>
+                    <p class="text-red-600 text-sm font-medium">Pembayaran gagal/refund</p>
+                <?php elseif ($order['payment_status'] == 'cod'): ?>
+                    <p class="text-blue-600 text-sm font-medium">Pembayaran COD</p>
+                <?php else: ?>
+                    <p class="text-gray-500 text-sm font-medium">Belum konfirmasi</p>
+                <?php endif; ?>
+            </div>
+
+            <!-- Header Pesanan -->
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-xs text-gray-500">ID #<?= esc($order['order_id']) ?></p>
+                    <h4 class="text-md font-bold text-gray-800 leading-tight">
+                        <?= esc($order['customer_name']) ?>
+                    </h4>
                 </div>
-            <?php endforeach; ?>
+                <?php
+                    $status = $order['status'];
+                    $badgeColor = 'bg-gray-100 text-gray-800';
+                    if ($status == 'diterima') $badgeColor = 'bg-blue-100 text-blue-800';
+                    elseif ($status == 'selesai') $badgeColor = 'bg-green-100 text-green-800';
+                    elseif ($status == 'ditolak') $badgeColor = 'bg-red-100 text-red-800';
+                ?>
+                <span class="px-2.5 py-1 text-xs font-semibold rounded-full capitalize <?= $badgeColor ?>">
+                    <?= esc($status) ?>
+                </span>
+            </div>
+
+            <!-- Detail Pesanan -->
+            <div class="mt-3 pt-3 border-t text-sm space-y-2">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Tanggal Pesan:</span>
+                    <span class="font-medium text-gray-700"><?= date('d M Y, H:i', strtotime($order['created_at'])) ?></span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Outlet:</span>
+                    <span class="font-medium text-gray-700"><?= esc($order['outlet_name']) ?></span>
+                </div>
+                <div class="flex justify-between items-center mt-2 pt-2 border-t">
+                    <span class="text-gray-900 font-bold">Total Bayar:</span>
+                    <span class="font-bold text-lg text-blue-600">Rp <?= number_format($order['total_amount'], 0, ',', '.') ?></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="bg-gray-50 px-4 py-2 rounded-b-xl flex justify-end">
+            <a href="/admin/orders/detail/<?= $order['order_id'] ?><?= request()->getGet('from') == 'verif' ? '?from=verif' : '' ?>" class="text-sm font-medium text-blue-600 hover:underline">Lihat Detail Pesanan</a>
+        </div>
+    </div>
+<?php endforeach; ?>
+
         <?php else: ?>
             <div class="text-center border-2 border-dashed border-gray-300 p-8 rounded-xl">
                  <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
@@ -116,6 +152,15 @@ document.addEventListener("DOMContentLoaded", function(){
     const active = container.querySelector(".active");
     if(active){
         container.scrollLeft = active.offsetLeft - 40; // 16px padding kiri
+    }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const payContainer = document.getElementById("payFilterContainer");
+    const activePay = payContainer.querySelector(".active");
+    if(activePay){
+        payContainer.scrollLeft = activePay.offsetLeft - 40;
     }
 });
 </script>

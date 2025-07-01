@@ -150,62 +150,69 @@ public function dashboard()
         
         return redirect()->to('/admin/payments/verify')->with('success', 'Pembayaran berhasil diverifikasi.');
     }
-    
-    /**
-     * FUNGSI: Menampilkan semua outlet, dengan fitur pencarian.
-     */
     public function listAllOutlets()
-    {
-        $outletModel = new OutletModel();
-        
-        $searchKeyword = $this->request->getGet('search');
-
-        $query = $outletModel;
-
-        // PERUBAHAN: Menambahkan filter untuk hanya mengambil outlet dengan status 'verified'
-        $query->where('status', 'verified');
-
-        if ($searchKeyword) {
-            $query->groupStart()
-                  ->like('name', $searchKeyword)
-                  ->orLike('address', $searchKeyword)
-                  ->groupEnd();
-        }
-
-        $data['outlets'] = $query->orderBy('outlet_id', 'DESC')->findAll();
-
-        
+{
+    $outletModel = new OutletModel();
+    
+    $searchKeyword = $this->request->getGet('search');
     $status = $this->request->getGet('status');
 
-    // Redirect jika status = pending
+    // ✅ Validasi status
     if ($status == 'pending') {
         return redirect()->to('/admin/outlets/verify');
-    }
-        return view('admin/list_outlets', $data);
+    } elseif ($status && $status !== 'verified') {
+        $status = null; // atau bisa abaikan, tergantung kebutuhan
     }
 
+    $query = $outletModel;
 
-    /**
-     * FUNGSI: Menampilkan semua pesanan dengan fitur pencarian.
-     */
-    public function listAllOrders()
+    // Filter hanya outlet yang sudah diverifikasi
+    $query->where('status', 'verified');
+
+    if ($searchKeyword) {
+        $query->groupStart()
+              ->like('name', $searchKeyword)
+              ->orLike('address', $searchKeyword)
+              ->groupEnd();
+    }
+
+    $data['outlets'] = $query->orderBy('outlet_id', 'DESC')->findAll();
+
+    return view('admin/list_outlets', $data);
+}
+
+public function listAllOrders()
 {
     $orderModel = new OrderModel();
     
     $searchKeyword = $this->request->getGet('search');
     $status = $this->request->getGet('status');
 
+    // ✅ Validasi status
+    $validStatuses = ['diterima', 'diambil', 'dicuci', 'dikirim', 'selesai', 'diulas', 'ditolak'];
+    if ($status == 'pending') {
+        return redirect()->to('/admin/payments/verify');
+    } elseif ($status && !in_array($status, $validStatuses)) {
+        $status = null;
+    }
+
+    // ✅ Validasi pay_status
+$payStatus = $this->request->getGet('pay_status');
+$validPayStatuses = ['pending', 'lunas', 'gagal', 'cod'];
+$isValidPayStatus = in_array($payStatus, $validPayStatuses);
+
     $query = $orderModel
         ->join('users', 'users.user_id = orders.customer_id')
         ->join('outlets', 'outlets.outlet_id = orders.outlet_id')
-        ->select('orders.*, users.name as customer_name, outlets.name as outlet_name');
+        ->join('payments', 'payments.order_id = orders.order_id', 'left')
+        ->select('orders.*, users.name as customer_name, outlets.name as outlet_name, payments.status as payment_status');
 
     if ($status) {
-        if ($status == 'pending') {
-            return redirect()->to('/admin/payments/verify');
-        } else {
-            $query->where('orders.status', $status);
-        }
+        $query->where('orders.status', $status);
+    }
+
+    if ($isValidPayStatus) {
+        $query->where('payments.status', $payStatus);
     }
 
     if ($searchKeyword) {
@@ -217,10 +224,12 @@ public function dashboard()
 
     $data['orders'] = $query->orderBy('orders.created_at', 'DESC')->findAll();
     $data['status'] = $status;
+    $data['pay_status'] = $payStatus;
     $data['search'] = $searchKeyword;
 
     return view('admin/list_orders', $data);
 }
+
 
     
     public function showOutletDetail($outlet_id)
