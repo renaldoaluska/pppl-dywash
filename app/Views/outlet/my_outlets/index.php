@@ -41,7 +41,7 @@ Outlet Saya
                     <div class="flex items-center justify-between">
                         <h3 class="text-lg font-bold text-gray-800 leading-tight">
     <?= esc($outlet['name']) ?>
-    <svg class="w-4 h-4 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg class="w-4 h-4 text-gray-400 inline-block ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
     </svg>
 </h3>
