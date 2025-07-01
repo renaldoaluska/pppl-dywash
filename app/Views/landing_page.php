@@ -25,10 +25,8 @@
 
       <div class="flex flex-col items-center text-center">
         <div class="bg-white rounded-full w-24 h-24 flex items-center justify-center shadow-md mb-12">
-          <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 48 48">
-              <rect width="36" height="28" x="6" y="10" rx="4" fill="#f3f4f6"/>
-              <path d="M6 34l8-10 7 9 7-11 8 12" stroke="#d1d5db" stroke-width="2" fill="none"/>
-          </svg>
+          
+            <img src="<?= base_url('assets/img/icon.png') ?>" alt="Logo DyWash" class="w-16 h-16 object-contain">
         </div>
 
         <div class="w-full max-w-xs text-center">
